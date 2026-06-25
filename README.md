@@ -203,6 +203,45 @@ The reader auto-detects comma, tab, whitespace and semicolon delimiters.
 - `requirements.txt`: runtime dependencies
 - `requirements-dev.txt`: runtime plus notebook/test/lint tooling
 
+## LLM Usage Rules
+
+Use these rules when an LLM or coding agent scans this repository and generates
+or modifies code:
+
+- Treat `XMatcher/` as the canonical Python package. Add new library features
+  there instead of duplicating logic in notebooks, HTML files or one-off
+  scripts.
+- Preserve the public imports exposed by `XMatcher.__init__`: `XRDRetriever`,
+  `XRDReader`, `PeakDetector`, `XRDMatcher` and `DatabaseBuilder`.
+- Keep the retrieval pipeline deterministic. If scores tie, preserve stable
+  tie-breakers and avoid random ordering unless a seed is explicitly provided.
+- Do not change result field names without updating tests and user-facing
+  guides. Existing callers expect keys such as `score`, `weighted_score`,
+  `fom`, `precision`, `recall`, `estimated_shift`, `peak_matches`, `mpid`,
+  `formula`, `elements`, `spacegroup` and `spacegroup_symbol`.
+- Keep database compatibility in mind. Version-1 pickle databases should remain
+  loadable, and missing indexes should continue to be rebuilt in memory.
+- Never auto-download or auto-load untrusted pickle files. Database paths should
+  remain explicit user inputs.
+- Prefer structured numerical operations with `numpy`, `scipy`, `pandas`, `ase`
+  and `pymatgen` over ad hoc text parsing or hand-rolled crystallography logic.
+- Keep new APIs Python 3.9 compatible and follow the local `ruff` settings
+  (`line-length = 120`).
+- Add or update focused regression tests in `tests/` for matcher behavior,
+  reader parsing, peak detection, database loading or API changes.
+- Before finishing code changes, run:
+
+```bash
+pytest
+```
+
+For dependency setup in a fresh environment, use:
+
+```bash
+pip install -r requirements-dev.txt
+pip install -e .
+```
+
 
 
 ## License
