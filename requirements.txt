@@ -1,0 +1,13 @@
+# Core dependencies
+numpy>=1.20.0
+scipy>=1.7.0
+pandas>=1.3.0
+
+# ASE for crystal structure handling
+ase>=3.22.0
+
+# Pymatgen for XRD calculations
+pymatgen>=2022.0.0
+
+# Progress bars
+tqdm>=4.62.0

@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XMatcher Local XRD Identification UI</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #171b22;
+      --muted: #657084;
+      --line: #d8dde6;
+      --accent: #0f766e;
+      --accent-2: #1d4ed8;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --good: #047857;
+      --soft: #eef6f5;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+    .dot.ok { background: var(--good); }
+    .dot.bad { background: var(--bad); }
+
+    main {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 18px 24px 32px;
+      display: grid;
+      grid-template-columns: 370px minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    section, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .hint {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #374151;
+      margin: 12px 0 5px;
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      border: 1px dashed #a7b0bf;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 11px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1e40af;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto auto minmax(320px, auto);
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+      min-width: 0;
+    }
+
+    .metric .k {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .metric .v {
+      font-size: 18px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .chart-wrap {
+      padding: 14px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 420px;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 3px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 420px;
+      border-top: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: #475569;
+      z-index: 1;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover, tbody tr.selected {
+      background: var(--soft);
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #334155;
+      background: #f8fafc;
+    }
+
+    .log {
+      min-height: 38px;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .error { color: var(--bad); }
+    .ok-text { color: var(--good); }
+    .warn-text { color: var(--warn); }
+
+    details {
+      border-top: 1px solid var(--line);
+      padding: 12px 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .matches {
+      overflow: auto;
+      max-height: 260px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .metrics {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>XMatcher Local XRD Identification</h1>
+        <p class="subtitle">上传实验 XRD，调整参数，调用本机 XMatcher 自动识别，并对比实验峰与理论峰。</p>
+      </div>
+      <div class="status">
+        <span id="serverDot" class="dot"></span>
+        <span id="serverText">Checking local API...</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <div class="panel">
+        <h2>1. Local API</h2>
+        <label for="apiUrl">API 地址</label>
+        <input id="apiUrl" type="text" value="http://127.0.0.1:8765">
+        <p class="hint">先在项目根目录运行：<br><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></p>
+        <div class="actions">
+          <button id="checkServer" class="secondary">检查连接</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>2. Upload XRD</h2>
+        <input id="fileInput" type="file" accept=".csv,.txt,.xy,.dat,.xrdml,.xml,.json">
+        <p class="hint">支持 CSV/TXT/XY/DAT、简单 JSON、常见 XRDML/XML。默认取前两列数值作为 2θ 和 intensity。</p>
+        <label for="manualData">也可以粘贴两列数据</label>
+        <textarea id="manualData" placeholder="two_theta,intensity&#10;20.12,100&#10;27.45,320"></textarea>
+        <div class="actions">
+          <button id="parseManual">解析粘贴数据</button>
+          <button id="clearData">清空</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>3. Search Scope</h2>
+        <label for="elements">元素过滤，可留空做全库检索</label>
+        <input id="elements" type="text" placeholder="例如 Ti,O；留空 = 全库">
+        <div class="grid2">
+          <div>
+            <label for="filterMode">过滤模式</label>
+            <select id="filterMode">
+              <option value="contains">contains</option>
+              <option value="exact">exact</option>
+            </select>
+          </div>
+          <div>
+            <label for="topN">候选数 top_n</label>
+            <input id="topN" type="number" value="10" min="1" max="100" step="1">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>4. Peak Detection</h2>
+        <div class="grid2">
+          <div>
+            <label for="minPeakHeight">min_peak_height</label>
+            <input id="minPeakHeight" type="number" value="3" step="0.5">
+          </div>
+          <div>
+            <label for="minPeakProminence">min_peak_prominence</label>
+            <input id="minPeakProminence" type="number" value="2" step="0.5">
+          </div>
+          <div>
+            <label for="minPeakDistance">min_peak_distance</label>
+            <input id="minPeakDistance" type="number" value="0.1" step="0.01">
+          </div>
+          <div>
+            <label for="nPeaks">n_peaks</label>
+            <input id="nPeaks" type="number" value="20" min="1" max="80" step="1">
+          </div>
+          <div>
+            <label for="smoothWindow">smooth_window</label>
+            <input id="smoothWindow" type="number" value="7" min="3" step="2">
+          </div>
+          <div>
+            <label for="baselineWindowFraction">baseline_window_fraction</label>
+            <input id="baselineWindowFraction" type="number" value="0.05" step="0.01">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>5. Matching</h2>
+        <div class="grid2">
+          <div>
+            <label for="positionTolerance">position_tolerance</label>
+            <input id="positionTolerance" type="number" value="0.2" step="0.01">
+          </div>
+          <div>
+            <label for="minMatchedPeaks">min_matched_peaks</label>
+            <input id="minMatchedPeaks" type="number" value="2" min="1" step="1">
+          </div>
+          <div>
+            <label for="maxShift">max_shift</label>
+            <input id="maxShift" type="number" value="0.5" step="0.05">
+          </div>
+          <div>
+            <label for="shiftStep">shift_step</label>
+            <input id="shiftStep" type="number" value="0.02" step="0.01">
+          </div>
+          <div>
+            <label for="positionWeight">position_weight</label>
+            <input id="positionWeight" type="number" value="0.85" step="0.05">
+          </div>
+          <div>
+            <label for="intensityWeight">intensity_weight</label>
+            <input id="intensityWeight" type="number" value="0.15" step="0.05">
+          </div>
+        </div>
+        <label for="scoringMethod">scoring_method</label>
+        <select id="scoringMethod">
+          <option value="hybrid">hybrid</option>
+          <option value="weighted">weighted</option>
+          <option value="fom">fom</option>
+          <option value="combined">combined</option>
+        </select>
+        <div class="actions">
+          <button id="runMatch" class="primary">自动识别</button>
+          <button id="downloadJson">下载 JSON</button>
+          <button id="downloadCsv">下载 CSV</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="metrics">
+        <div class="metric"><div class="k">Input points</div><div id="mPoints" class="v">0</div></div>
+        <div class="metric"><div class="k">Detected peaks</div><div id="mPeaks" class="v">0</div></div>
+        <div class="metric"><div class="k">Candidates scanned</div><div id="mCandidates" class="v">0</div></div>
+        <div class="metric"><div class="k">Best score</div><div id="mBest" class="v">-</div></div>
+        <div class="metric"><div class="k">Selected phase</div><div id="mPhase" class="v">-</div></div>
+      </div>
+
+      <div class="panel chart-wrap">
+        <h2>实验 XRD 与理论衍射峰对比</h2>
+        <canvas id="plot" width="1400" height="520"></canvas>
+        <div class="legend">
+          <span><i class="swatch" style="background:#1d4ed8"></i>实验谱线</span>
+          <span><i class="swatch" style="background:#dc2626"></i>检测到的实验峰</span>
+          <span><i class="swatch" style="background:#0f766e"></i>理论峰，已应用 estimated_shift</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>候选物相与打分</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Formula</th>
+                <th>MP ID</th>
+                <th>Elements</th>
+                <th>Score</th>
+                <th>Weighted</th>
+                <th>FOM</th>
+                <th>Exp coverage</th>
+                <th>Matched</th>
+                <th>MAE</th>
+                <th>Shift</th>
+                <th>Spacegroup</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+        <details open>
+          <summary>匹配峰对 Peak matches</summary>
+          <div class="matches">
+            <table>
+              <thead>
+                <tr>
+                  <th>Exp 2θ</th>
+                  <th>DB 2θ shifted</th>
+                  <th>DB 2θ raw</th>
+                  <th>Delta</th>
+                  <th>Exp intensity</th>
+                  <th>DB intensity</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody id="matchesBody"></tbody>
+            </table>
+          </div>
+        </details>
+        <div id="log" class="log">等待上传 XRD 文件。</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      raw: null,
+      processed: null,
+      detectedPeaks: [],
+      results: [],
+      selectedIndex: 0,
+      fileName: null,
+      serverStats: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function log(message, kind = "") {
+      $("log").innerHTML = kind ? `<span class="${kind}">${escapeHtml(message)}</span>` : escapeHtml(message);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[ch]));
+    }
+
+    function num(id) {
+      return Number($(id).value);
+    }
+
+    function fmt(value, digits = 2) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
+      return Number(value).toFixed(digits);
+    }
+
+    function getApiUrl() {
+      return $("apiUrl").value.replace(/\/$/, "");
+    }
+
+    async function checkServer() {
+      try {
+        const res = await fetch(`${getApiUrl()}/api/status`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        state.serverStats = data.database;
+        $("serverDot").className = "dot ok";
+        $("serverText").textContent = `API connected: ${data.database.total_entries.toLocaleString()} entries`;
+        log(`本地 API 已连接，数据库 ${data.database.total_entries.toLocaleString()} 条。`, "ok-text");
+      } catch (err) {
+        $("serverDot").className = "dot bad";
+        $("serverText").textContent = "API not connected";
+        log(`无法连接本地 API。先运行 python xmatcher_local_api.py --database MP500_xrd_database.pkl。错误：${err.message}`, "error");
+      }
+    }
+
+    function parseDelimited(text) {
+      const rows = [];
+      const lines = text.split(/\r?\n/);
+      for (const line of lines) {
+        const cleaned = line.trim();
+        if (!cleaned || cleaned.startsWith("#") || cleaned.startsWith("//")) continue;
+        const parts = cleaned.split(/[,;\t ]+/).filter(Boolean);
+        if (parts.length < 2) continue;
+        const x = Number(parts[0]);
+        const y = Number(parts[1]);
+        if (Number.isFinite(x) && Number.isFinite(y)) rows.push([x, y]);
+      }
+      return rows;
+    }
+
+    function parseJson(text) {
+      const obj = JSON.parse(text);
+      if (Array.isArray(obj)) {
+        return obj.map((row) => Array.isArray(row) ? [Number(row[0]), Number(row[1])] : [Number(row.two_theta ?? row.angle), Number(row.intensity)]);
+      }
+      const x = obj.two_theta || obj.angle || obj.x;
+      const y = obj.intensity || obj.y;
+      if (Array.isArray(x) && Array.isArray(y)) return x.map((value, index) => [Number(value), Number(y[index])]);
+      throw new Error("JSON 格式需要包含 two_theta/intensity 数组，或二维数组。");
+    }
+
+    function parseXml(text) {
+      const doc = new DOMParser().parseFromString(text, "application/xml");
+      const parseNumbers = (value) => String(value || "").trim().split(/[\s,;]+/).map(Number).filter(Number.isFinite);
+      const intensityNode = doc.querySelector("intensities, counts, intensity");
+      const positionNode = doc.querySelector("positions, twoTheta, twotheta");
+      if (intensityNode && positionNode) {
+        const y = parseNumbers(intensityNode.textContent);
+        const x = parseNumbers(positionNode.textContent);
+        if (x.length === y.length && x.length > 2) return x.map((value, index) => [value, y[index]]);
+      }
+      const startNode = doc.querySelector("startPosition");
+      const endNode = doc.querySelector("endPosition");
+      if (intensityNode && startNode && endNode) {
+        const y = parseNumbers(intensityNode.textContent);
+        const start = Number(startNode.textContent);
+        const end = Number(endNode.textContent);
+        if (Number.isFinite(start) && Number.isFinite(end) && y.length > 2) {
+          const step = (end - start) / (y.length - 1);
+          return y.map((value, index) => [start + index * step, value]);
+        }
+      }
+      throw new Error("无法解析该 XML/XRDML。请导出为两列 CSV/TXT 后再试。");
+    }
+
+    function parseTextByName(text, name = "") {
+      const lower = name.toLowerCase();
+      let rows;
+      if (lower.endsWith(".json")) rows = parseJson(text);
+      else if (lower.endsWith(".xml") || lower.endsWith(".xrdml")) rows = parseXml(text);
+      else rows = parseDelimited(text);
+      rows = rows.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+      if (rows.length < 3) throw new Error("没有解析到足够的两列数值数据。");
+      rows.sort((a, b) => a[0] - b[0]);
+      const merged = [];
+      for (const [x, y] of rows) {
+        const last = merged[merged.length - 1];
+        if (last && Math.abs(last[0] - x) < 1e-12) {
+          last[1] = (last[1] + y) / 2;
+        } else {
+          merged.push([x, Math.max(0, y)]);
+        }
+      }
+      return {
+        two_theta: merged.map((row) => row[0]),
+        intensity: merged.map((row) => row[1])
+      };
+    }
+
+    function setRawData(data, fileName = "manual") {
+      state.raw = data;
+      state.fileName = fileName;
+      state.processed = null;
+      state.detectedPeaks = [];
+      state.results = [];
+      state.selectedIndex = 0;
+      $("mPoints").textContent = data.two_theta.length.toLocaleString();
+      $("mPeaks").textContent = "0";
+      $("mCandidates").textContent = "0";
+      $("mBest").textContent = "-";
+      $("mPhase").textContent = "-";
+      renderResults();
+      renderMatches();
+      drawPlot();
+      log(`已加载 ${fileName}，${data.two_theta.length.toLocaleString()} 个数据点。`);
+    }
+
+    async function handleFile(file) {
+      const text = await file.text();
+      const data = parseTextByName(text, file.name);
+      setRawData(data, file.name);
+    }
+
+    function getParams() {
+      return {
+        min_peak_height: num("minPeakHeight"),
+        min_peak_prominence: num("minPeakProminence"),
+        min_peak_distance: num("minPeakDistance"),
+        smooth_window: Math.max(3, Math.round(num("smoothWindow"))),
+        baseline_window_fraction: num("baselineWindowFraction"),
+        n_peaks: Math.round(num("nPeaks")),
+        position_tolerance: num("positionTolerance"),
+        intensity_weight: num("intensityWeight"),
+        position_weight: num("positionWeight"),
+        min_matched_peaks: Math.round(num("minMatchedPeaks")),
+        max_shift: num("maxShift"),
+        shift_step: num("shiftStep"),
+        scoring_method: $("scoringMethod").value
+      };
+    }
+
+    function getElements() {
+      const text = $("elements").value.trim();
+      if (!text) return null;
+      return text.split(/[,，\s]+/).map((x) => x.trim()).filter(Boolean);
+    }
+
+    async function runMatch() {
+      if (!state.raw) {
+        log("请先上传或粘贴 XRD 数据。", "error");
+        return;
+      }
+      $("runMatch").disabled = true;
+      log("正在识别。全库检索可能需要较长时间，请等待本地 API 返回结果...", "warn-text");
+      try {
+        const payload = {
+          two_theta: state.raw.two_theta,
+          intensity: state.raw.intensity,
+          params: getParams(),
+          elements: getElements(),
+          element_filter_mode: $("filterMode").value,
+          top_n: Math.round(num("topN"))
+        };
+        const res = await fetch(`${getApiUrl()}/api/match`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || data.status === "error") throw new Error(data.error || `HTTP ${res.status}`);
+        state.processed = data.processed_spectrum;
+        state.detectedPeaks = data.detected_peaks || [];
+        state.results = data.results || [];
+        state.selectedIndex = 0;
+        $("mPeaks").textContent = state.detectedPeaks.length.toLocaleString();
+        $("mCandidates").textContent = Number(data.candidate_count || 0).toLocaleString();
+        $("mBest").textContent = state.results[0] ? fmt(state.results[0].score, 2) : "-";
+        $("mPhase").textContent = state.results[0] ? state.results[0].formula : "-";
+        renderResults();
+        renderMatches();
+        drawPlot();
+        log(`识别完成：检测到 ${state.detectedPeaks.length} 个实验峰，返回 ${state.results.length} 个候选。`, "ok-text");
+      } catch (err) {
+        log(`识别失败：${err.message}`, "error");
+      } finally {
+        $("runMatch").disabled = false;
+      }
+    }
+
+    function renderResults() {
+      const body = $("resultsBody");
+      body.innerHTML = "";
+      state.results.forEach((r, index) => {
+        const tr = document.createElement("tr");
+        if (index === state.selectedIndex) tr.classList.add("selected");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td><strong>${escapeHtml(r.formula)}</strong></td>
+          <td>${escapeHtml(r.mpid ?? "")}</td>
+          <td>${(r.elements || []).map((e) => `<span class="pill">${escapeHtml(e)}</span>`).join(" ")}</td>
+          <td>${fmt(r.score, 2)}</td>
+          <td>${fmt(r.weighted_score, 2)}</td>
+          <td>${fmt(r.fom, 2)}</td>
+          <td>${fmt(r.experimental_coverage, 2)}</td>
+          <td>${escapeHtml(r.n_matched_peaks)}</td>
+          <td>${fmt(r.mean_abs_error, 4)}</td>
+          <td>${fmt(r.estimated_shift, 4)}</td>
+          <td>${escapeHtml(r.spacegroup_symbol || r.spacegroup || "")}</td>
+        `;
+        tr.addEventListener("click", () => {
+          state.selectedIndex = index;
+          renderResults();
+          renderMatches();
+          drawPlot();
+          $("mBest").textContent = fmt(r.score, 2);
+          $("mPhase").textContent = r.formula || "-";
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    function renderMatches() {
+      const body = $("matchesBody");
+      body.innerHTML = "";
+      const selected = state.results[state.selectedIndex];
+      const matches = selected?.peak_matches || [];
+      for (const m of matches) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${fmt(m.exp_two_theta, 4)}</td>
+          <td>${fmt(m.db_two_theta, 4)}</td>
+          <td>${fmt(m.db_two_theta_unshifted, 4)}</td>
+          <td>${fmt(m.delta, 4)}</td>
+          <td>${fmt(m.exp_intensity, 2)}</td>
+          <td>${fmt(m.db_intensity, 2)}</td>
+          <td>${fmt(m.cost, 4)}</td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    function normalize(values, maxOut = 100) {
+      const max = Math.max(...values.filter(Number.isFinite), 0);
+      if (max <= 0) return values.map(() => 0);
+      return values.map((v) => Math.max(0, Number(v)) * maxOut / max);
+    }
+
+    function drawPlot() {
+      const canvas = $("plot");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+
+      const margin = {left: 58, right: 24, top: 24, bottom: 48};
+      const plotW = w - margin.left - margin.right;
+      const plotH = h - margin.top - margin.bottom;
+
+      const raw = state.processed || state.raw;
+      if (!raw) {
+        drawEmpty(ctx, w, h, "上传 XRD 文件后显示图谱");
+        return;
+      }
+
+      const x = raw.two_theta;
+      const y = normalize(raw.intensity);
+      const xMin = Math.min(...x);
+      const xMax = Math.max(...x);
+      const yMin = -105;
+      const yMax = 110;
+      const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
+      const sy = (value) => margin.top + (yMax - value) * plotH / (yMax - yMin);
+
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i <= 8; i++) {
+        const yy = margin.top + i * plotH / 8;
+        ctx.moveTo(margin.left, yy);
+        ctx.lineTo(w - margin.right, yy);
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = "#111827";
+      ctx.beginPath();
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, h - margin.bottom);
+      ctx.lineTo(w - margin.right, h - margin.bottom);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#1d4ed8";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      for (let i = 0; i < x.length; i++) {
+        const px = sx(x[i]);
+        const py = sy(y[i]);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "#dc2626";
+      for (const peak of state.detectedPeaks) {
+        const px = sx(peak.two_theta);
+        const py = sy(peak.intensity);
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const selected = state.results[state.selectedIndex];
+      if (selected?.theoretical_peaks) {
+        const shift = Number(selected.estimated_shift || 0);
+        const positions = selected.theoretical_peaks.positions || [];
+        const intensities = normalize(selected.theoretical_peaks.intensities || []);
+        ctx.strokeStyle = "#0f766e";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < positions.length; i++) {
+          const px = sx(Number(positions[i]) + shift);
+          if (px < margin.left || px > w - margin.right) continue;
+          ctx.beginPath();
+          ctx.moveTo(px, sy(0));
+          ctx.lineTo(px, sy(-intensities[i]));
+          ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle = "#475569";
+      ctx.font = "16px ui-sans-serif, system-ui";
+      ctx.fillText("Relative intensity / 相对强度", 14, 22);
+      ctx.fillText("2θ / degree", w / 2 - 36, h - 12);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "13px ui-sans-serif, system-ui";
+      for (let i = 0; i <= 6; i++) {
+        const xv = xMin + i * (xMax - xMin) / 6;
+        ctx.fillText(xv.toFixed(1), sx(xv) - 12, h - margin.bottom + 22);
+      }
+      ctx.fillText("+100", 18, sy(100) + 4);
+      ctx.fillText("0", 36, sy(0) + 4);
+      ctx.fillText("-100", 16, sy(-100) + 4);
+    }
+
+    function drawEmpty(ctx, w, h, message) {
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "22px ui-sans-serif, system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText(message, w / 2, h / 2);
+      ctx.textAlign = "left";
+    }
+
+    function download(name, content, type) {
+      const blob = new Blob([content], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadJson() {
+      if (!state.results.length) {
+        log("没有可下载的识别结果。", "error");
+        return;
+      }
+      download("xmatcher_results.json", JSON.stringify({
+        fileName: state.fileName,
+        params: getParams(),
+        elements: getElements(),
+        detectedPeaks: state.detectedPeaks,
+        results: state.results
+      }, null, 2), "application/json");
+    }
+
+    function downloadCsv() {
+      if (!state.results.length) {
+        log("没有可下载的识别结果。", "error");
+        return;
+      }
+      const header = ["rank","entry_id","mpid","formula","elements","score","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
+      const rows = state.results.map((r, i) => [
+        i + 1, r.entry_id, r.mpid, r.formula, (r.elements || []).join("|"), r.score, r.weighted_score, r.fom,
+        r.experimental_coverage, r.precision, r.recall, r.n_matched_peaks, r.mean_abs_error, r.estimated_shift, r.spacegroup_symbol
+      ]);
+      const csv = [header, ...rows].map((row) => row.map((value) => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+      download("xmatcher_results.csv", csv, "text/csv");
+    }
+
+    $("checkServer").addEventListener("click", checkServer);
+    $("fileInput").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        await handleFile(file);
+      } catch (err) {
+        log(`文件解析失败：${err.message}`, "error");
+      }
+    });
+    $("parseManual").addEventListener("click", () => {
+      try {
+        setRawData(parseTextByName($("manualData").value, "manual.txt"), "pasted-data");
+      } catch (err) {
+        log(`粘贴数据解析失败：${err.message}`, "error");
+      }
+    });
+    $("clearData").addEventListener("click", () => {
+      state.raw = null;
+      state.processed = null;
+      state.detectedPeaks = [];
+      state.results = [];
+      state.selectedIndex = 0;
+      $("fileInput").value = "";
+      $("manualData").value = "";
+      $("mPoints").textContent = "0";
+      $("mPeaks").textContent = "0";
+      $("mCandidates").textContent = "0";
+      $("mBest").textContent = "-";
+      $("mPhase").textContent = "-";
+      renderResults();
+      renderMatches();
+      drawPlot();
+      log("已清空。");
+    });
+    $("runMatch").addEventListener("click", runMatch);
+    $("downloadJson").addEventListener("click", downloadJson);
+    $("downloadCsv").addEventListener("click", downloadCsv);
+    window.addEventListener("resize", drawPlot);
+
+    drawPlot();
+    checkServer();
+  </script>
+</body>
+</html>

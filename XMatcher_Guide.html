@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XMatcher 使用说明 / User Guide</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #5f6c7b;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-dark: #115e59;
+      --code-bg: #101820;
+      --code-text: #e8eef7;
+      --warning-bg: #fff8e5;
+      --warning-line: #f2c94c;
+      --ok-bg: #ecfdf5;
+      --ok-line: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--accent-dark);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .toggle {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef2f6;
+    }
+
+    .toggle button {
+      min-width: 86px;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .toggle button.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 56px 20px 28px;
+    }
+
+    .hero h1 {
+      max-width: 820px;
+      margin: 0 0 14px;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .layout {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px 56px;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    nav {
+      position: sticky;
+      top: 78px;
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    nav a {
+      display: block;
+      padding: 7px 8px;
+      border-radius: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      background: #eef5f4;
+      color: var(--accent-dark);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      margin: 0 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 26px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 26px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 18px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul, ol {
+      margin: 0 0 14px;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      border-radius: 5px;
+      background: #eef2f6;
+      padding: 2px 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.94em;
+    }
+
+    pre {
+      margin: 12px 0 18px;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout {
+      margin: 14px 0;
+      border-left: 4px solid var(--ok-line);
+      border-radius: 6px;
+      background: var(--ok-bg);
+      padding: 12px 14px;
+    }
+
+    .warning {
+      border-left-color: var(--warning-line);
+      background: var(--warning-bg);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fbfcfe;
+    }
+
+    .mini strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .lang {
+      display: none;
+    }
+
+    body[data-lang="zh"] .lang-zh,
+    body[data-lang="en"] .lang-en {
+      display: block;
+    }
+
+    body[data-lang="zh"] .inline-zh,
+    body[data-lang="en"] .inline-en {
+      display: inline;
+    }
+
+    .inline-zh,
+    .inline-en {
+      display: none;
+    }
+
+    @media (max-width: 860px) {
+      .topbar-inner {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .toggle button {
+        min-width: 0;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        position: static;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-lang="zh">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">XMatcher Guide</div>
+      <div class="toggle" aria-label="Language switch">
+        <button id="btn-zh" class="active" type="button">中文</button>
+        <button id="btn-en" type="button">English</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="lang lang-zh">
+      <h1>从零开始使用 XMatcher</h1>
+      <p>本说明教你安装环境、从 release 直接下载预构建的 <code>MP500_xrd_database.pkl</code>，或下载 <code>MP500.db</code> 后自行构建理论峰数据库，再运行第一个 XRD 匹配任务。</p>
+    </div>
+    <div class="lang lang-en">
+      <h1>Build And Use XMatcher From Zero</h1>
+      <p>This guide shows how to install XMatcher, directly download the prebuilt <code>MP500_xrd_database.pkl</code> from Releases, or download <code>MP500.db</code> and build the theoretical peak database yourself before running a first XRD search.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <a href="#overview"><span class="inline-zh">概览</span><span class="inline-en">Overview</span></a>
+      <a href="#install"><span class="inline-zh">安装环境</span><span class="inline-en">Install</span></a>
+      <a href="#release-db"><span class="inline-zh">下载数据库</span><span class="inline-en">Download DB</span></a>
+      <a href="#build-db"><span class="inline-zh">构建峰数据库</span><span class="inline-en">Build Peak DB</span></a>
+      <a href="#first-run"><span class="inline-zh">第一次匹配</span><span class="inline-en">First Search</span></a>
+      <a href="#jupyter-api"><span class="inline-zh">Jupyter API</span><span class="inline-en">Jupyter API</span></a>
+      <a href="#local-ui"><span class="inline-zh">本地界面</span><span class="inline-en">Local UI</span></a>
+      <a href="#input-data"><span class="inline-zh">实验数据格式</span><span class="inline-en">Input Data</span></a>
+      <a href="#parameters"><span class="inline-zh">参数建议</span><span class="inline-en">Parameters</span></a>
+      <a href="#troubleshooting"><span class="inline-zh">常见问题</span><span class="inline-en">Troubleshooting</span></a>
+    </nav>
+
+    <main>
+      <section id="overview">
+        <div class="lang lang-zh">
+          <h2>概览</h2>
+          <p>XMatcher 的推荐工作流有三个阶段。最快方式是直接从 GitHub Releases 下载已经构建好的 <code>MP500_xrd_database.pkl</code>；如果你需要修改构建参数，也可以下载 <code>MP500.db</code> 后自行构建。</p>
+          <div class="grid">
+            <div class="mini">
+              <strong>1. 获取峰数据库</strong>
+              <p>优先从 GitHub Releases 下载 <code>MP500_xrd_database.pkl</code>。它是检索阶段直接读取的理论峰数据库。</p>
+            </div>
+            <div class="mini">
+              <strong>2. 可选：自行构建</strong>
+              <p>如果只下载了 <code>MP500.db</code>，运行 <code>build_database_parallel.py</code> 把它转换成 <code>MP500_xrd_database.pkl</code>。</p>
+            </div>
+            <div class="mini">
+              <strong>3. 检索实验 XRD</strong>
+              <p>用 <code>XRDRetriever</code> 读取 <code>MP500_xrd_database.pkl</code>，再输入实验谱进行匹配。</p>
+            </div>
+          </div>
+          <p>检索阶段只读取 <code>MP500_xrd_database.pkl</code>。不要把原始 <code>MP500.db</code> 直接传给 <code>XRDRetriever</code>。</p>
+        </div>
+        <div class="lang lang-en">
+          <h2>Overview</h2>
+          <p>XMatcher has a three-stage recommended workflow. The fastest path is to download the prebuilt <code>MP500_xrd_database.pkl</code> from GitHub Releases. If you need custom build parameters, download <code>MP500.db</code> and build the peak database yourself.</p>
+          <div class="grid">
+            <div class="mini">
+              <strong>1. Get the peak database</strong>
+              <p>Prefer downloading <code>MP500_xrd_database.pkl</code> from GitHub Releases. It is the theoretical peak database consumed directly by retrieval.</p>
+            </div>
+            <div class="mini">
+              <strong>2. Optional: build it yourself</strong>
+              <p>If you downloaded only <code>MP500.db</code>, run <code>build_database_parallel.py</code> to convert it into <code>MP500_xrd_database.pkl</code>.</p>
+            </div>
+            <div class="mini">
+              <strong>3. Search experimental XRD</strong>
+              <p>Use <code>XRDRetriever</code> to load <code>MP500_xrd_database.pkl</code>, then match experimental patterns.</p>
+            </div>
+          </div>
+          <p>The retrieval stage reads only <code>MP500_xrd_database.pkl</code>. Do not pass the raw <code>MP500.db</code> directly to <code>XRDRetriever</code>.</p>
+        </div>
+      </section>
+
+      <section id="install">
+        <div class="lang lang-zh">
+          <h2>1. 安装环境</h2>
+          <p>建议使用 Python 3.9 或更高版本，并创建一个独立环境。</p>
+          <pre><code>git clone https://github.com/Bin-Cao/XMatcher.git
+cd XMatcher
+
+python -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .</code></pre>
+          <p>如果你要运行 notebook、测试或代码检查：</p>
+          <pre><code>pip install -r requirements-dev.txt
+pytest</code></pre>
+        </div>
+        <div class="lang lang-en">
+          <h2>1. Install The Environment</h2>
+          <p>Use Python 3.9 or newer and create an isolated environment.</p>
+          <pre><code>git clone https://github.com/Bin-Cao/XMatcher.git
+cd XMatcher
+
+python -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+pip install -e .</code></pre>
+          <p>For notebooks, tests, and lint tooling:</p>
+          <pre><code>pip install -r requirements-dev.txt
+pytest</code></pre>
+        </div>
+      </section>
+
+      <section id="release-db">
+        <div class="lang lang-zh">
+          <h2>2. 从 Releases 下载数据库</h2>
+          <p>打开项目 GitHub Releases 页面。现在有两种下载方式：</p>
+          <ul>
+            <li><code>MP500_xrd_database.pkl</code>：推荐下载。它是已经构建好的 XMatcher 理论峰数据库，可以直接用于检索。</li>
+            <li><code>MP500.db</code>：原始 ASE 晶体结构数据库。只有当你想自己重新构建、修改峰数或 2θ 范围等构建参数时才需要下载。</li>
+          </ul>
+          <p>如果你选择直接下载 <code>MP500_xrd_database.pkl</code>，把它放到项目根目录即可：</p>
+          <pre><code>XMatcher/
+  MP500_xrd_database.pkl
+  exp_data/
+  XMatcher/</code></pre>
+          <div class="callout">
+            <strong>直接检索：</strong> 预构建文件可以直接这样读取：<code>XRDRetriever(database_path="MP500_xrd_database.pkl")</code>。
+          </div>
+          <div class="callout warning">
+            <strong>不要把 <code>MP500.db</code> 传给检索器：</strong> <code>XRDRetriever(database_path=...)</code> 需要的是 <code>MP500_xrd_database.pkl</code>。<code>MP500.db</code> 只能作为构建输入。
+          </div>
+        </div>
+        <div class="lang lang-en">
+          <h2>2. Download Databases From Releases</h2>
+          <p>Open the project's GitHub Releases page. There are now two download paths:</p>
+          <ul>
+            <li><code>MP500_xrd_database.pkl</code>: recommended. This is the prebuilt XMatcher theoretical peak database and can be used directly for retrieval.</li>
+            <li><code>MP500.db</code>: the raw ASE crystal structure database. Download it only if you want to rebuild the peak database yourself or change build parameters such as peak count or 2θ range.</li>
+          </ul>
+          <p>If you download <code>MP500_xrd_database.pkl</code> directly, place it in the project root:</p>
+          <pre><code>XMatcher/
+  MP500_xrd_database.pkl
+  exp_data/
+  XMatcher/</code></pre>
+          <div class="callout">
+            <strong>Direct retrieval:</strong> The prebuilt file can be loaded with <code>XRDRetriever(database_path="MP500_xrd_database.pkl")</code>.
+          </div>
+          <div class="callout warning">
+            <strong>Do not pass <code>MP500.db</code> to the retriever:</strong> <code>XRDRetriever(database_path=...)</code> expects <code>MP500_xrd_database.pkl</code>. <code>MP500.db</code> is only a build input.
+          </div>
+        </div>
+      </section>
+
+      <section id="build-db">
+        <div class="lang lang-zh">
+          <h2>3. 构建 XMatcher 理论峰数据库</h2>
+          <p><code>build_database_parallel.py</code> 的作用是读取 <code>MP500.db</code> 中的晶体结构，调用 pymatgen 计算每个结构的理论 XRD 图谱，提取最强峰，并保存成 XMatcher 检索用的特征数据库。</p>
+          <h3>小规模测试构建</h3>
+          <pre><code>python build_database_parallel.py \
+  --db-path MP500.db \
+  --output MP500_xrd_database.pkl \
+  --workers 4 \
+  --max-entries 500 \
+  --batch-size 200 \
+  --n-peaks 30 \
+  --two-theta-min 10 \
+  --two-theta-max 90</code></pre>
+          <h3>完整构建</h3>
+          <pre><code>python build_database_parallel.py \
+  --db-path MP500.db \
+  --output MP500_xrd_database.pkl \
+  --workers 8 \
+  --batch-size 1000 \
+  --save-interval 1000 \
+  --n-peaks 30 \
+  --two-theta-min 10 \
+  --two-theta-max 90</code></pre>
+          <p>构建完成后，项目目录里会出现 <code>MP500_xrd_database.pkl</code>。检索代码必须读取这个输出文件：</p>
+          <pre><code>retriever = XRDRetriever(database_path="MP500_xrd_database.pkl")</code></pre>
+          <div class="callout">
+            <strong>建议：</strong> 第一次构建先使用 <code>--max-entries 500</code> 验证环境和速度，再移除该参数构建全量库。
+          </div>
+        </div>
+        <div class="lang lang-en">
+          <h2>3. Build The XMatcher Theoretical Peak Database</h2>
+          <p><code>build_database_parallel.py</code> reads crystal structures from <code>MP500.db</code>, uses pymatgen to calculate theoretical XRD patterns, extracts the strongest peaks, and saves the searchable feature database used by XMatcher.</p>
+          <h3>Small Test Build</h3>
+          <pre><code>python build_database_parallel.py \
+  --db-path MP500.db \
+  --output MP500_xrd_database.pkl \
+  --workers 4 \
+  --max-entries 500 \
+  --batch-size 200 \
+  --n-peaks 30 \
+  --two-theta-min 10 \
+  --two-theta-max 90</code></pre>
+          <h3>Full Build</h3>
+          <pre><code>python build_database_parallel.py \
+  --db-path MP500.db \
+  --output MP500_xrd_database.pkl \
+  --workers 8 \
+  --batch-size 1000 \
+  --save-interval 1000 \
+  --n-peaks 30 \
+  --two-theta-min 10 \
+  --two-theta-max 90</code></pre>
+          <p>After the build finishes, <code>MP500_xrd_database.pkl</code> will appear in the project directory. Retrieval must read this output file:</p>
+          <pre><code>retriever = XRDRetriever(database_path="MP500_xrd_database.pkl")</code></pre>
+          <div class="callout">
+            <strong>Recommendation:</strong> Start with <code>--max-entries 500</code> to verify the environment and speed, then remove it for a full build.
+          </div>
+        </div>
+      </section>
+
+      <section id="first-run">
+        <div class="lang lang-zh">
+          <h2>4. 运行第一次匹配</h2>
+          <p>下面的脚本会读取示例实验数据，检测峰，然后在构建好的 <code>MP500_xrd_database.pkl</code> 里检索最相近的结构。</p>
+          <pre><code>from XMatcher import XRDRetriever
+
+retriever = XRDRetriever(
+    database_path="MP500_xrd_database.pkl",
+    n_peaks=20,
+    position_tolerance=0.2,
+    scoring_method="hybrid",
+)
+
+results = retriever.retrieve_from_file(
+    "exp_data/BTc.csv",
+    elements=["B", "Tc"],
+    element_filter_mode="exact",
+    top_n=10,
+)
+
+retriever.print_results(results)
+
+best = results[0]
+print(best["formula"], best["score"], best["estimated_shift"])
+print(best["peak_matches"][:3])</code></pre>
+          <p>保存为 <code>quick_start.py</code> 后运行：</p>
+          <pre><code>python quick_start.py</code></pre>
+        </div>
+        <div class="lang lang-en">
+          <h2>4. Run The First Search</h2>
+          <p>The script below reads an example experimental pattern, detects peaks, and retrieves the closest structures from the built <code>MP500_xrd_database.pkl</code>.</p>
+          <pre><code>from XMatcher import XRDRetriever
+
+retriever = XRDRetriever(
+    database_path="MP500_xrd_database.pkl",
+    n_peaks=20,
+    position_tolerance=0.2,
+    scoring_method="hybrid",
+)
+
+results = retriever.retrieve_from_file(
+    "exp_data/BTc.csv",
+    elements=["B", "Tc"],
+    element_filter_mode="exact",
+    top_n=10,
+)
+
+retriever.print_results(results)
+
+best = results[0]
+print(best["formula"], best["score"], best["estimated_shift"])
+print(best["peak_matches"][:3])</code></pre>
+          <p>Save it as <code>quick_start.py</code> and run:</p>
+          <pre><code>python quick_start.py</code></pre>
+        </div>
+      </section>
+
+      <section id="jupyter-api">
+        <div class="lang lang-zh">
+          <h2>5. Jupyter API 说明</h2>
+          <p>如果你希望在 notebook 里逐步导入实验 XRD、调整寻峰参数、执行全库检索并查看匹配峰对，请打开根目录下的 API 示例：</p>
+          <pre><code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code></pre>
+          <p>这个 notebook 默认使用 <code>MP500_xrd_database.pkl</code>，并把 <code>QUERY_ELEMENTS = None</code> 作为全库检索设置。你可以直接修改实验数据路径、峰检测参数和匹配参数。</p>
+          <div class="callout">
+            <strong>API 地址：</strong> <code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code>
+          </div>
+        </div>
+        <div class="lang lang-en">
+          <h2>5. Jupyter API Guide</h2>
+          <p>For a step-by-step notebook workflow covering experimental XRD import, peak-detection tuning, full-database retrieval, and peak-match inspection, open the API example in the project root:</p>
+          <pre><code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code></pre>
+          <p>The notebook uses <code>MP500_xrd_database.pkl</code> by default and sets <code>QUERY_ELEMENTS = None</code> for full-database retrieval. You can edit the experimental data path, peak-detection parameters, and matching parameters directly.</p>
+          <div class="callout">
+            <strong>API path:</strong> <code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code>
+          </div>
+        </div>
+      </section>
+
+      <section id="local-ui">
+        <div class="lang lang-zh">
+          <h2>6. 高级本地识别界面</h2>
+          <p>如果希望用浏览器上传 XRD、调参数、查看多个候选和分数、对比实验谱与理论峰，并下载识别结果，可以使用根目录下的本地界面：</p>
+          <pre><code>XMatcher_Local_UI.html</code></pre>
+          <p>识别计算需要本机 Python API，因为浏览器不能直接运行 XMatcher、SciPy 和 <code>MP500_xrd_database.pkl</code>。先在项目根目录启动服务，再双击打开 HTML：</p>
+          <pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>
+          <h3>使用流程</h3>
+          <ol>
+            <li>确认 <code>MP500_xrd_database.pkl</code> 已在项目根目录；如果没有，可从 Releases 直接下载。</li>
+            <li>运行上面的 <code>xmatcher_local_api.py</code> 命令，终端保持打开。</li>
+            <li>双击打开 <code>XMatcher_Local_UI.html</code>，页面右上角显示 API connected 后即可使用。</li>
+            <li>上传实验 XRD 文件，或把两列 <code>2θ,intensity</code> 数据粘贴到文本框。</li>
+            <li>如果要全库检索，元素过滤留空；如果已知元素组成，填入例如 <code>Ti,O</code> 可加速并减少误匹配。</li>
+            <li>调整寻峰参数和匹配参数，点击“自动识别”。</li>
+            <li>点击候选表中的不同物相，图中会切换对应理论峰，便于和实验谱比较。</li>
+            <li>使用“下载 JSON”或“下载 CSV”保存识别结果。</li>
+          </ol>
+          <h3>支持的数据</h3>
+          <p>界面支持常见两列文本文件，例如 <code>.csv</code>、<code>.txt</code>、<code>.xy</code>、<code>.dat</code>，也支持简单 <code>.json</code> 和部分常见 <code>.xml</code>/<code>.xrdml</code>。最稳妥的格式是两列数值：第一列 2θ，第二列强度。</p>
+          <h3>界面参数</h3>
+          <ul>
+            <li><code>min_peak_height</code> 和 <code>min_peak_prominence</code>：控制寻峰严格程度。噪声峰太多时调大，弱峰漏检时调小。</li>
+            <li><code>n_peaks</code>：用于匹配的实验峰数量。复杂谱图可适当增加。</li>
+            <li><code>position_tolerance</code>：峰位容差。仪器偏移或样品位移较明显时可增大。</li>
+            <li><code>max_shift</code> 和 <code>shift_step</code>：整体 2θ 偏移扫描范围和步长。步长越小越精细，但更慢。</li>
+            <li><code>top_n</code>：返回候选数量。</li>
+          </ul>
+          <div class="callout">
+            <strong>全库检索：</strong> 元素过滤留空时，界面会搜索整个 <code>MP500_xrd_database.pkl</code>。全库检索可能耗时较长，属于正常现象。
+          </div>
+        </div>
+        <div class="lang lang-en">
+          <h2>6. Advanced Local UI</h2>
+          <p>Use the local browser UI to upload XRD files, tune parameters, inspect multiple scored candidates, compare experimental and theoretical peaks, and download identification results:</p>
+          <pre><code>XMatcher_Local_UI.html</code></pre>
+          <p>The identification calculation needs the local Python API because the browser cannot directly run XMatcher, SciPy, and <code>MP500_xrd_database.pkl</code>. Start the service in the project root, then open the HTML file:</p>
+          <pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>
+          <h3>Workflow</h3>
+          <ol>
+            <li>Make sure <code>MP500_xrd_database.pkl</code> is in the project root. If not, download it directly from Releases.</li>
+            <li>Run the <code>xmatcher_local_api.py</code> command above and keep the terminal open.</li>
+            <li>Open <code>XMatcher_Local_UI.html</code>. The top-right status should show API connected.</li>
+            <li>Upload an experimental XRD file, or paste two-column <code>2θ,intensity</code> data into the text box.</li>
+            <li>Leave the element filter blank for full-database retrieval. If the chemistry is known, enter values such as <code>Ti,O</code> to speed up matching and reduce false positives.</li>
+            <li>Tune peak-detection and matching parameters, then click the identify button.</li>
+            <li>Click different candidates in the result table to switch the theoretical peak overlay in the plot.</li>
+            <li>Use JSON or CSV export to save the identification results.</li>
+          </ol>
+          <h3>Supported Data</h3>
+          <p>The UI supports common two-column text files such as <code>.csv</code>, <code>.txt</code>, <code>.xy</code>, and <code>.dat</code>, plus simple <code>.json</code> and some common <code>.xml</code>/<code>.xrdml</code> files. The most reliable format is two numeric columns: 2θ first, intensity second.</p>
+          <h3>Key Parameters</h3>
+          <ul>
+            <li><code>min_peak_height</code> and <code>min_peak_prominence</code>: peak-detection strictness. Increase them for noisy false peaks; decrease them if weak real peaks are missed.</li>
+            <li><code>n_peaks</code>: number of experimental peaks used for matching. Increase it for complex patterns.</li>
+            <li><code>position_tolerance</code>: peak-position tolerance. Increase it when calibration or sample displacement causes larger shifts.</li>
+            <li><code>max_shift</code> and <code>shift_step</code>: global 2θ shift scan range and step. Smaller steps are more precise but slower.</li>
+            <li><code>top_n</code>: number of candidates returned.</li>
+          </ul>
+          <div class="callout">
+            <strong>Full-database retrieval:</strong> Leaving the element filter blank searches the entire <code>MP500_xrd_database.pkl</code>. This can take a while for large databases.
+          </div>
+        </div>
+      </section>
+
+      <section id="input-data">
+        <div class="lang lang-zh">
+          <h2>7. 实验 XRD 数据格式</h2>
+          <p>实验文件至少需要两列：第一列为 2θ，第二列为强度。支持逗号、制表符、空格和分号分隔。</p>
+          <pre><code>two_theta,intensity
+10.00,5.2
+10.02,5.5
+10.04,5.1</code></pre>
+          <p>读取器会自动排序、去除非法值、合并重复 2θ 点，并过滤负强度。</p>
+        </div>
+        <div class="lang lang-en">
+          <h2>7. Experimental XRD Input Format</h2>
+          <p>The file needs at least two columns: 2θ in the first column and intensity in the second. Comma, tab, whitespace, and semicolon delimiters are supported.</p>
+          <pre><code>two_theta,intensity
+10.00,5.2
+10.02,5.5
+10.04,5.1</code></pre>
+          <p>The reader sorts values, removes invalid rows, merges duplicate 2θ points, and filters negative intensities.</p>
+        </div>
+      </section>
+
+      <section id="parameters">
+        <div class="lang lang-zh">
+          <h2>8. 常用参数建议</h2>
+          <ul>
+            <li><code>elements</code>：已知元素组成时一定要填，能显著减少误匹配。</li>
+            <li><code>element_filter_mode="exact"</code>：候选相必须只包含给定元素时使用。</li>
+            <li><code>element_filter_mode="contains"</code>：允许掺杂、杂质或额外元素时使用。</li>
+            <li><code>position_tolerance=0.2</code>：常规实验数据的起点；仪器误差更大时可尝试 0.3 到 0.5。</li>
+            <li><code>n_peaks=20</code>：一般足够；复杂多相或低信噪数据可提高到 30。</li>
+            <li><code>intensity_weight=0.15</code>：默认偏重峰位，适合实验强度不完全可靠的场景。</li>
+          </ul>
+        </div>
+        <div class="lang lang-en">
+          <h2>8. Parameter Suggestions</h2>
+          <ul>
+            <li><code>elements</code>: provide known elements whenever possible to reduce false positives.</li>
+            <li><code>element_filter_mode="exact"</code>: use when candidates must contain exactly the given elements.</li>
+            <li><code>element_filter_mode="contains"</code>: use when dopants, impurities, or extra elements are possible.</li>
+            <li><code>position_tolerance=0.2</code>: a good starting point; try 0.3 to 0.5 for noisier calibration.</li>
+            <li><code>n_peaks=20</code>: usually enough; increase to 30 for complex or noisy patterns.</li>
+            <li><code>intensity_weight=0.15</code>: keeps the score position-focused when experimental intensities are less reliable.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="troubleshooting">
+        <div class="lang lang-zh">
+          <h2>9. 常见问题</h2>
+          <h3>找不到 <code>MP500.db</code></h3>
+          <p>确认文件已经从 Releases 下载，并且 <code>build_database_parallel.py --db-path</code> 指向正确路径。相对路径以你运行命令的目录为准。</p>
+          <h3>找不到 <code>MP500_xrd_database.pkl</code></h3>
+          <p>说明还没有完成构建，或者输出文件不在当前目录。先运行构建命令，并让 <code>XRDRetriever(database_path=...)</code> 指向构建后的 <code>.pkl</code> 文件。</p>
+          <h3>没有匹配结果</h3>
+          <p>先尝试放宽 <code>element_filter_mode</code> 为 <code>contains</code>，或增大 <code>position_tolerance</code>。同时检查实验文件的 2θ 单位和范围是否正确。</p>
+          <h3>构建数据库很慢</h3>
+          <p>理论 XRD 计算本身比较重。先用 <code>--max-entries</code> 小规模测试，再根据机器核心数调整 <code>--workers</code> 和 <code>--batch-size</code>。</p>
+          <h3>pickle 安全警告</h3>
+          <p>这是针对构建后 <code>.pkl</code> 特征数据库的安全边界提醒。只加载自己构建的输出文件或可信来源提供的预构建特征库。</p>
+        </div>
+        <div class="lang lang-en">
+          <h2>9. Troubleshooting</h2>
+          <h3><code>MP500.db</code> cannot be found</h3>
+          <p>Make sure the file was downloaded from Releases and <code>build_database_parallel.py --db-path</code> points to the correct location. Relative paths are resolved from the directory where you run the command.</p>
+          <h3><code>MP500_xrd_database.pkl</code> cannot be found</h3>
+          <p>The build has not finished, or the output file is not in the current directory. Run the build command first, then point <code>XRDRetriever(database_path=...)</code> to the built <code>.pkl</code> file.</p>
+          <h3>No matches returned</h3>
+          <p>Try <code>element_filter_mode="contains"</code> or increase <code>position_tolerance</code>. Also verify the 2θ unit and range in the experimental file.</p>
+          <h3>Database building is slow</h3>
+          <p>Theoretical XRD calculation is computationally heavy. Start with <code>--max-entries</code>, then tune <code>--workers</code> and <code>--batch-size</code> for your machine.</p>
+          <h3>Pickle security warning</h3>
+          <p>This safety boundary applies to the built <code>.pkl</code> feature database. Only load outputs built by yourself or trusted prebuilt feature databases.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const buttons = {
+      zh: document.getElementById("btn-zh"),
+      en: document.getElementById("btn-en")
+    };
+
+    function setLanguage(lang) {
+      document.body.dataset.lang = lang;
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      buttons.zh.classList.toggle("active", lang === "zh");
+      buttons.en.classList.toggle("active", lang === "en");
+      localStorage.setItem("xmatcher-guide-lang", lang);
+    }
+
+    buttons.zh.addEventListener("click", () => setLanguage("zh"));
+    buttons.en.addEventListener("click", () => setLanguage("en"));
+
+    const saved = localStorage.getItem("xmatcher-guide-lang");
+    if (saved === "zh" || saved === "en") {
+      setLanguage(saved);
+    }
+  </script>
+</body>
+</html>
