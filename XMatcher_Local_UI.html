@@ -7,18 +7,20 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f6f7f9;
+      --bg: #f3f5f8;
       --panel: #ffffff;
       --ink: #171b22;
       --muted: #657084;
       --line: #d8dde6;
+      --line-strong: #c3cbd8;
       --accent: #0f766e;
       --accent-2: #1d4ed8;
       --warn: #b45309;
       --bad: #b91c1c;
       --good: #047857;
       --soft: #eef6f5;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --soft-blue: #eff6ff;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
     }
 
     * { box-sizing: border-box; }
@@ -31,12 +33,13 @@
     }
 
     header {
-      background: var(--panel);
+      background: rgba(255, 255, 255, 0.96);
       border-bottom: 1px solid var(--line);
-      padding: 18px 24px;
+      padding: 16px 24px;
       position: sticky;
       top: 0;
       z-index: 10;
+      backdrop-filter: blur(10px);
     }
 
     .topbar {
@@ -50,14 +53,32 @@
 
     h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 24px;
       line-height: 1.2;
     }
 
     .subtitle {
-      margin: 4px 0 0;
+      margin: 5px 0 0;
       color: var(--muted);
       font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .author {
+      margin: 8px 0 0;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .author a {
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .author a:hover {
+      text-decoration: underline;
     }
 
     .status {
@@ -67,6 +88,10 @@
       font-size: 13px;
       color: var(--muted);
       white-space: nowrap;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 8px 12px;
     }
 
     .dot {
@@ -83,7 +108,7 @@
       margin: 0 auto;
       padding: 18px 24px 32px;
       display: grid;
-      grid-template-columns: 370px minmax(0, 1fr);
+      grid-template-columns: 400px minmax(0, 1fr);
       gap: 18px;
     }
 
@@ -108,10 +133,18 @@
       margin: 0 0 12px;
       font-size: 15px;
       line-height: 1.25;
+      color: #0f172a;
     }
 
     .hint {
       margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .section-note {
+      margin: -4px 0 12px;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
@@ -122,6 +155,14 @@
       font-size: 12px;
       color: #374151;
       margin: 12px 0 5px;
+      font-weight: 650;
+    }
+
+    .field-help {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.38;
     }
 
     input, select, textarea, button {
@@ -136,6 +177,11 @@
       background: #fff;
       color: var(--ink);
       font-size: 13px;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+      outline: 2px solid rgba(15, 118, 110, 0.16);
+      border-color: var(--accent);
     }
 
     input[type="file"] {
@@ -180,6 +226,17 @@
       color: var(--ink);
       cursor: pointer;
       font-size: 13px;
+      font-weight: 650;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--line-strong);
+      background: #f8fafc;
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px);
     }
 
     button.primary {
@@ -188,9 +245,14 @@
       color: white;
     }
 
+    button.primary:hover:not(:disabled) {
+      border-color: #0b5f59;
+      background: #0b5f59;
+    }
+
     button.secondary {
       border-color: #bfdbfe;
-      background: #eff6ff;
+      background: var(--soft-blue);
       color: #1e40af;
     }
 
@@ -217,7 +279,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 10px;
-      background: #fbfcfe;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       min-width: 0;
     }
 
@@ -237,11 +299,30 @@
       padding: 14px;
     }
 
+    .panel-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .panel-heading h2 {
+      margin-bottom: 4px;
+    }
+
+    .panel-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     canvas {
       width: 100%;
       height: 420px;
       display: block;
-      border: 1px solid var(--line);
+      border: 1px solid var(--line-strong);
       border-radius: 8px;
       background: #fff;
     }
@@ -363,8 +444,9 @@
   <header>
     <div class="topbar">
       <div>
-        <h1>XMatcher Local XRD Identification</h1>
-        <p class="subtitle">上传实验 XRD，调整参数，调用本机 XMatcher 自动识别，并对比实验峰与理论峰。</p>
+        <h1>XMatcher Local XRD Identification / 本地 XRD 物相识别</h1>
+        <p class="subtitle">Upload experimental XRD data, tune key parameters, run local matching, and compare experimental peaks with theoretical reflections.<br>上传实验 XRD，调整关键参数，调用本机 XMatcher 自动识别，并对比实验峰与理论峰。</p>
+        <p class="author">Author / 作者：<a href="https://bin-cao.github.io" target="_blank" rel="noopener">Dr. Bin Cao (曹斌)</a></p>
       </div>
       <div class="status">
         <span id="serverDot" class="dot"></span>
@@ -376,173 +458,202 @@
   <main>
     <aside class="sidebar">
       <div class="panel">
-        <h2>1. Local API</h2>
-        <label for="apiUrl">API 地址</label>
+        <h2>1. Local API / 本地服务</h2>
+        <p class="section-note">Connects the page to the local XMatcher backend. / 连接本机 XMatcher 后端。</p>
+        <label for="apiUrl">API URL / API 地址</label>
         <input id="apiUrl" type="text" value="http://127.0.0.1:8765">
-        <p class="hint">先在项目根目录运行：<br><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></p>
+        <p class="hint">Run first in the project root / 先在项目根目录运行：<br><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></p>
         <div class="actions">
-          <button id="checkServer" class="secondary">检查连接</button>
+          <button id="checkServer" class="secondary">Check connection / 检查连接</button>
         </div>
       </div>
 
       <div class="panel">
-        <h2>2. Upload XRD</h2>
+        <h2>2. Upload XRD / 上传数据</h2>
         <input id="fileInput" type="file" accept=".csv,.txt,.xy,.dat,.xrdml,.xml,.json">
-        <p class="hint">支持 CSV/TXT/XY/DAT、简单 JSON、常见 XRDML/XML。默认取前两列数值作为 2θ 和 intensity。</p>
-        <label for="manualData">也可以粘贴两列数据</label>
+        <p class="hint">Supports CSV/TXT/XY/DAT, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2θ and intensity.<br>支持 CSV/TXT/XY/DAT、简单 JSON、常见 XRDML/XML。默认取前两列数值作为 2θ 和强度。</p>
+        <label for="manualData">Paste two-column data / 粘贴两列数据</label>
         <textarea id="manualData" placeholder="two_theta,intensity&#10;20.12,100&#10;27.45,320"></textarea>
         <div class="actions">
-          <button id="parseManual">解析粘贴数据</button>
-          <button id="clearData">清空</button>
+          <button id="parseManual">Parse / 解析</button>
+          <button id="clearData">Clear / 清空</button>
         </div>
       </div>
 
       <div class="panel">
-        <h2>3. Search Scope</h2>
-        <label for="elements">元素过滤，可留空做全库检索</label>
+        <h2>3. Search Scope / 检索范围</h2>
+        <p class="section-note">Use element filters to reduce false positives and speed up matching. / 用元素过滤可减少误匹配并加快检索。</p>
+        <label for="elements">Elements / 元素过滤</label>
         <input id="elements" type="text" placeholder="例如 Ti,O；留空 = 全库">
+        <p class="field-help">Leave blank for full database search. Use comma or space separators. / 留空表示全库检索，可用逗号或空格分隔。</p>
         <div class="grid2">
           <div>
-            <label for="filterMode">过滤模式</label>
+            <label for="filterMode">Filter mode / 过滤模式</label>
             <select id="filterMode">
-              <option value="contains">contains</option>
-              <option value="exact">exact</option>
+              <option value="contains">contains / 包含这些元素</option>
+              <option value="exact">exact / 元素集合完全一致</option>
             </select>
           </div>
           <div>
-            <label for="topN">候选数 top_n</label>
+            <label for="topN">Top candidates / 候选数</label>
             <input id="topN" type="number" value="10" min="1" max="100" step="1">
+            <p class="field-help">Number of returned matches. / 返回的候选物相数量。</p>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>4. Peak Detection</h2>
+        <h2>4. Peak Detection / 寻峰参数</h2>
+        <p class="section-note">Controls preprocessing and experimental peak selection. / 控制预处理和实验峰筛选。</p>
         <div class="grid2">
           <div>
-            <label for="minPeakHeight">min_peak_height</label>
+            <label for="minPeakHeight">Min height / 最小峰高</label>
             <input id="minPeakHeight" type="number" value="3" step="0.5">
+            <p class="field-help">Ignore weak peaks below this relative height. / 低于该相对高度的弱峰会被忽略。</p>
           </div>
           <div>
-            <label for="minPeakProminence">min_peak_prominence</label>
+            <label for="minPeakProminence">Min prominence / 最小显著性</label>
             <input id="minPeakProminence" type="number" value="2" step="0.5">
+            <p class="field-help">Higher values keep only more isolated peaks. / 值越大，越偏向保留突出峰。</p>
           </div>
           <div>
-            <label for="minPeakDistance">min_peak_distance</label>
+            <label for="minPeakDistance">Min distance / 最小峰距</label>
             <input id="minPeakDistance" type="number" value="0.1" step="0.01">
+            <p class="field-help">Minimum 2θ spacing between detected peaks. / 相邻实验峰的最小 2θ 间距。</p>
           </div>
           <div>
-            <label for="nPeaks">n_peaks</label>
+            <label for="nPeaks">Peak count / 峰数量</label>
             <input id="nPeaks" type="number" value="20" min="1" max="80" step="1">
+            <p class="field-help">Top experimental peaks used for matching. / 用于匹配的最强实验峰数量。</p>
           </div>
           <div>
-            <label for="smoothWindow">smooth_window</label>
+            <label for="smoothWindow">Smooth window / 平滑窗口</label>
             <input id="smoothWindow" type="number" value="7" min="3" step="2">
+            <p class="field-help">Odd window size for denoising. / 去噪平滑窗口，建议使用奇数。</p>
           </div>
           <div>
-            <label for="baselineWindowFraction">baseline_window_fraction</label>
+            <label for="baselineWindowFraction">Baseline window / 背景窗口</label>
             <input id="baselineWindowFraction" type="number" value="0.05" step="0.01">
+            <p class="field-help">Fraction used for baseline correction. / 用于背景扣除的窗口比例。</p>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>5. Matching</h2>
+        <h2>5. Matching / 匹配参数</h2>
+        <p class="section-note">Controls peak alignment, score weighting, and minimum evidence for a phase. / 控制峰位校准、打分权重和候选物相的最低匹配证据。</p>
         <div class="grid2">
           <div>
-            <label for="positionTolerance">position_tolerance</label>
+            <label for="positionTolerance">Position tolerance / 峰位容差</label>
             <input id="positionTolerance" type="number" value="0.2" step="0.01">
+            <p class="field-help">Allowed 2θ error after shift correction. / 平移校正后的允许 2θ 误差。</p>
           </div>
           <div>
-            <label for="minMatchedPeaks">min_matched_peaks</label>
+            <label for="minMatchedPeaks">Min matched peaks / 最少匹配峰</label>
             <input id="minMatchedPeaks" type="number" value="2" min="1" step="1">
+            <p class="field-help">Reject phases with fewer matched peaks. / 匹配峰数不足的候选会被排除。</p>
           </div>
           <div>
-            <label for="maxShift">max_shift</label>
+            <label for="maxShift">Max shift / 最大平移</label>
             <input id="maxShift" type="number" value="0.5" step="0.05">
+            <p class="field-help">Maximum global 2θ correction searched. / 搜索的最大整体 2θ 平移量。</p>
           </div>
           <div>
-            <label for="shiftStep">shift_step</label>
+            <label for="shiftStep">Shift step / 平移步长</label>
             <input id="shiftStep" type="number" value="0.02" step="0.01">
+            <p class="field-help">Smaller is finer but slower. / 越小越精细，但计算更慢。</p>
           </div>
           <div>
-            <label for="positionWeight">position_weight</label>
+            <label for="positionWeight">Position weight / 峰位权重</label>
             <input id="positionWeight" type="number" value="0.85" step="0.05">
+            <p class="field-help">Weight for 2θ agreement. / 峰位一致性的打分权重。</p>
           </div>
           <div>
-            <label for="intensityWeight">intensity_weight</label>
+            <label for="intensityWeight">Intensity weight / 强度权重</label>
             <input id="intensityWeight" type="number" value="0.15" step="0.05">
+            <p class="field-help">Weight for relative intensity agreement. / 相对强度一致性的打分权重。</p>
           </div>
         </div>
-        <label for="scoringMethod">scoring_method</label>
+        <label for="scoringMethod">Scoring method / 打分方法</label>
         <select id="scoringMethod">
           <option value="hybrid">hybrid</option>
           <option value="weighted">weighted</option>
           <option value="fom">fom</option>
           <option value="combined">combined</option>
         </select>
+        <p class="field-help">Hybrid is recommended for routine use. / 常规识别建议使用 hybrid。</p>
         <div class="actions">
-          <button id="runMatch" class="primary">自动识别</button>
-          <button id="downloadJson">下载 JSON</button>
-          <button id="downloadCsv">下载 CSV</button>
+          <button id="runMatch" class="primary">Run match / 自动识别</button>
+          <button id="downloadJson">JSON</button>
+          <button id="downloadCsv">CSV</button>
         </div>
       </div>
     </aside>
 
     <section class="content">
       <div class="metrics">
-        <div class="metric"><div class="k">Input points</div><div id="mPoints" class="v">0</div></div>
-        <div class="metric"><div class="k">Detected peaks</div><div id="mPeaks" class="v">0</div></div>
-        <div class="metric"><div class="k">Candidates scanned</div><div id="mCandidates" class="v">0</div></div>
-        <div class="metric"><div class="k">Best score</div><div id="mBest" class="v">-</div></div>
-        <div class="metric"><div class="k">Selected phase</div><div id="mPhase" class="v">-</div></div>
+        <div class="metric"><div class="k">Input points / 数据点</div><div id="mPoints" class="v">0</div></div>
+        <div class="metric"><div class="k">Detected peaks / 实验峰</div><div id="mPeaks" class="v">0</div></div>
+        <div class="metric"><div class="k">Candidates scanned / 扫描候选</div><div id="mCandidates" class="v">0</div></div>
+        <div class="metric"><div class="k">Best score / 最佳分数</div><div id="mBest" class="v">-</div></div>
+        <div class="metric"><div class="k">Selected phase / 当前物相</div><div id="mPhase" class="v">-</div></div>
       </div>
 
       <div class="panel chart-wrap">
-        <h2>实验 XRD 与理论衍射峰对比</h2>
+        <div class="panel-heading">
+          <div>
+            <h2>XRD Pattern Comparison / 实验谱与理论峰对比</h2>
+            <p>Theoretical peaks are drawn upward after applying estimated_shift. / 理论峰应用 estimated_shift 后向上显示。</p>
+          </div>
+        </div>
         <canvas id="plot" width="1400" height="520"></canvas>
         <div class="legend">
-          <span><i class="swatch" style="background:#1d4ed8"></i>实验谱线</span>
-          <span><i class="swatch" style="background:#dc2626"></i>检测到的实验峰</span>
-          <span><i class="swatch" style="background:#0f766e"></i>理论峰，已应用 estimated_shift</span>
+          <span><i class="swatch" style="background:#1d4ed8"></i>Experimental profile / 实验谱线</span>
+          <span><i class="swatch" style="background:#dc2626"></i>Detected peaks / 检测峰</span>
+          <span><i class="swatch" style="background:#0f766e"></i>Theoretical peaks shifted / 平移后的理论峰</span>
         </div>
       </div>
 
       <div class="panel">
-        <h2>候选物相与打分</h2>
+        <div class="panel-heading">
+          <div>
+            <h2>Candidate Phases / 候选物相</h2>
+            <p>Click a row to update the theoretical peaks and matched-peak table. / 点击候选行可更新理论峰和匹配峰表。</p>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>#</th>
-                <th>Formula</th>
+                <th>Formula / 化学式</th>
                 <th>MP ID</th>
-                <th>Elements</th>
-                <th>Score</th>
+                <th>Elements / 元素</th>
+                <th>Score / 分数</th>
                 <th>Weighted</th>
                 <th>FOM</th>
-                <th>Exp coverage</th>
-                <th>Matched</th>
+                <th>Exp coverage / 覆盖率</th>
+                <th>Matched / 匹配峰</th>
                 <th>MAE</th>
-                <th>Shift</th>
-                <th>Spacegroup</th>
+                <th>Shift / 平移</th>
+                <th>Spacegroup / 空间群</th>
               </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
           </table>
         </div>
         <details open>
-          <summary>匹配峰对 Peak matches</summary>
+          <summary>Peak matches / 匹配峰对</summary>
           <div class="matches">
             <table>
               <thead>
                 <tr>
-                  <th>Exp 2θ</th>
-                  <th>DB 2θ shifted</th>
-                  <th>DB 2θ raw</th>
-                  <th>Delta</th>
-                  <th>Exp intensity</th>
-                  <th>DB intensity</th>
+                  <th>Exp 2θ / 实验</th>
+                  <th>DB 2θ shifted / 平移后</th>
+                  <th>DB 2θ raw / 原始</th>
+                  <th>Delta / 偏差</th>
+                  <th>Exp intensity / 实验强度</th>
+                  <th>DB intensity / 理论强度</th>
                   <th>Cost</th>
                 </tr>
               </thead>
@@ -550,7 +661,7 @@
             </table>
           </div>
         </details>
-        <div id="log" class="log">等待上传 XRD 文件。</div>
+        <div id="log" class="log">Waiting for XRD data. / 等待上传 XRD 文件。</div>
       </div>
     </section>
   </main>
@@ -844,7 +955,7 @@
 
       const raw = state.processed || state.raw;
       if (!raw) {
-        drawEmpty(ctx, w, h, "上传 XRD 文件后显示图谱");
+        drawEmpty(ctx, w, h, "Upload XRD data to show the pattern / 上传 XRD 文件后显示图谱");
         return;
       }
 
@@ -852,8 +963,8 @@
       const y = normalize(raw.intensity);
       const xMin = Math.min(...x);
       const xMax = Math.max(...x);
-      const yMin = -105;
-      const yMax = 110;
+      const yMin = 0;
+      const yMax = 112;
       const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
       const sy = (value) => margin.top + (yMax - value) * plotH / (yMax - yMin);
 
@@ -906,7 +1017,7 @@
           if (px < margin.left || px > w - margin.right) continue;
           ctx.beginPath();
           ctx.moveTo(px, sy(0));
-          ctx.lineTo(px, sy(-intensities[i]));
+          ctx.lineTo(px, sy(intensities[i]));
           ctx.stroke();
         }
       }
@@ -921,9 +1032,9 @@
         const xv = xMin + i * (xMax - xMin) / 6;
         ctx.fillText(xv.toFixed(1), sx(xv) - 12, h - margin.bottom + 22);
       }
-      ctx.fillText("+100", 18, sy(100) + 4);
-      ctx.fillText("0", 36, sy(0) + 4);
-      ctx.fillText("-100", 16, sy(-100) + 4);
+      ctx.fillText("100", 20, sy(100) + 4);
+      ctx.fillText("50", 26, sy(50) + 4);
+      ctx.fillText("0", 36, sy(0) - 4);
     }
 
     function drawEmpty(ctx, w, h, message) {

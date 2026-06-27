@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+"""Ensure the bundled XMatcher database exists before desktop packaging."""
+
+from __future__ import annotations
+
+import os
+import sys
+import urllib.request
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DATABASE = ROOT / "MP500_xrd_database.pkl"
+
+
+def main() -> int:
+    if DATABASE.exists():
+        print(f"Database found: {DATABASE}")
+        return 0
+
+    database_url = os.environ.get("DATABASE_URL", "").strip()
+    if not database_url:
+        print(
+            "MP500_xrd_database.pkl is missing. This file is ignored by Git, so "
+            "GitHub Actions cannot see your local copy. Re-run the workflow with "
+            "the database_url input, or track the database with Git LFS.",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(f"Downloading database from {database_url}")
+    with urllib.request.urlopen(database_url) as response:
+        DATABASE.write_bytes(response.read())
+    print(f"Database downloaded: {DATABASE} ({DATABASE.stat().st_size} bytes)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

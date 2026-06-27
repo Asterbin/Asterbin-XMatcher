@@ -1,0 +1,57 @@
+name: Build Desktop Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      database_url:
+        description: "Optional direct download URL for MP500_xrd_database.pkl when it is not tracked in Git"
+        required: false
+        default: "https://github.com/Asterbin/Asterbin-XMatcher/releases/download/pkl_V0.0.1/MP500_xrd_database.pkl"
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r desktop/requirements-desktop.txt
+
+      - name: Prepare database
+        env:
+          DATABASE_URL: ${{ inputs.database_url }}
+        run: python desktop/prepare_database.py
+
+      - name: Build desktop app
+        run: python desktop/build_desktop.py
+
+      - name: Upload Windows artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: XMatcher-Windows
+          path: dist/XMatcher
+          retention-days: 14
+
+      - name: Upload macOS artifact
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: XMatcher-macOS
+          path: dist/XMatcher.app
+          retention-days: 14
