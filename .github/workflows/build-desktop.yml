@@ -40,12 +40,15 @@ jobs:
       - name: Build desktop app
         run: python desktop/build_desktop.py
 
+      - name: Package artifact
+        run: python desktop/package_artifacts.py
+
       - name: Upload Windows artifact
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: XMatcher-Windows
-          path: dist/XMatcher
+          path: dist/artifacts/XMatcher-Windows.zip
           retention-days: 14
 
       - name: Upload macOS artifact
@@ -53,5 +56,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: XMatcher-macOS
-          path: dist/XMatcher.app
+          path: dist/artifacts/XMatcher-macOS.zip
           retention-days: 14

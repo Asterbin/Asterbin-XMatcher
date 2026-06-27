@@ -7,6 +7,7 @@ This folder contains the desktop packaging files for XMatcher.
 - `xmatcher_desktop.py`: desktop launcher. It starts the local API and opens `XMatcher_Local_UI.html` in a native window.
 - `prepare_database.py`: checks that `MP500_xrd_database.pkl` is available, or downloads it from the workflow input URL.
 - `build_desktop.py`: PyInstaller build script used locally and by GitHub Actions.
+- `package_artifacts.py`: zips the built app before upload so `.app` bundles keep their required structure.
 - `requirements-desktop.txt`: desktop-only build/runtime dependencies.
 
 The GitHub Actions workflow lives in `.github/workflows/build-desktop.yml` because GitHub requires workflow files to be there. It only calls files from this folder and uploads build artifacts. It does not upload anything to Releases.
