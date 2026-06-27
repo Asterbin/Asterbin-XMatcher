@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -29,8 +30,22 @@ def main() -> int:
         return 1
 
     print(f"Downloading database from {database_url}")
-    with urllib.request.urlopen(database_url) as response:
-        DATABASE.write_bytes(response.read())
+    try:
+        request = urllib.request.Request(database_url, headers={"User-Agent": "XMatcher-GitHub-Actions"})
+        with urllib.request.urlopen(request) as response:
+            DATABASE.write_bytes(response.read())
+    except urllib.error.HTTPError as exc:
+        print(
+            f"Failed to download database: HTTP {exc.code} {exc.reason}. "
+            "Check that the release tag, asset name, and repository visibility are correct. "
+            "For private repositories, this direct release URL is not enough; use actions/download-artifact, "
+            "gh release download with GITHUB_TOKEN, or make the asset publicly accessible.",
+            file=sys.stderr,
+        )
+        return 1
+    except urllib.error.URLError as exc:
+        print(f"Failed to download database: {exc.reason}", file=sys.stderr)
+        return 1
     print(f"Database downloaded: {DATABASE} ({DATABASE.stat().st_size} bytes)")
     return 0
 
