@@ -121,7 +121,7 @@ def _match(payload: Dict) -> Dict:
         smooth_window=int(params.get("smooth_window", 7)),
         baseline_window_fraction=float(params.get("baseline_window_fraction", 0.05)),
     )
-    n_peaks = int(params.get("n_peaks", 20))
+    n_peaks = int(params.get("n_peaks", 4))
     peaks = detector.get_top_peaks(two_theta, intensity, n_peaks=n_peaks, preprocess=True)
     exp_positions, exp_intensities = detector.extract_peak_positions_and_intensities(peaks)
 

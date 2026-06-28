@@ -65,7 +65,7 @@ from XMatcher import XRDRetriever
 
 retriever = XRDRetriever(
     database_path="xrd_database.pkl",
-    n_peaks=20,
+    n_peaks=4,
     position_tolerance=0.2,
     scoring_method="hybrid",
 )

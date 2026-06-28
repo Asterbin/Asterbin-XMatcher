@@ -31,7 +31,7 @@ class XRDRetriever:
         position_tolerance: float = 0.2,
         min_peak_height: float = 3.0,
         min_peak_prominence: float = 2.0,
-        n_peaks: int = 20,
+        n_peaks: int = 4,
         scoring_method: str = "hybrid",
         intensity_weight: float = 0.15,
         position_weight: float = 0.85,
