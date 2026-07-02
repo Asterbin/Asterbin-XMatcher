@@ -8,10 +8,10 @@ Run:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import logging
 import math
-import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -231,11 +231,8 @@ def _calculate_cif_xrd(payload: Dict) -> Dict:
             raise ValueError(f"Invalid weight for {name}")
         weights.append(weight)
 
-        with tempfile.NamedTemporaryFile("w", suffix=".cif", encoding="utf-8", delete=True) as handle:
-            handle.write(content)
-            handle.flush()
-            parser = CifParser(handle.name)
-            structures = parser.get_structures(primitive=False)
+        parser = CifParser(io.StringIO(content.lstrip("\ufeff")))
+        structures = parser.get_structures(primitive=False)
         if not structures:
             raise ValueError(f"No structure found in {name}")
         structure = structures[0]
