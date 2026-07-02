@@ -20,6 +20,9 @@
       --warning-line: #f2c94c;
       --ok-bg: #ecfdf5;
       --ok-line: #34d399;
+      --blue-bg: #eff6ff;
+      --blue-line: #60a5fa;
+      --ink-panel: #111827;
     }
 
     * {
@@ -44,9 +47,10 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.28);
+      background: linear-gradient(90deg, #111827 0%, #1f2937 100%);
+      color: #ffffff;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
     }
 
     .topbar-inner {
@@ -63,6 +67,39 @@
       font-weight: 700;
       letter-spacing: 0;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: inline-grid;
+      place-items: center;
+      background: #ffffff;
+      color: var(--accent-dark);
+      font-weight: 850;
+    }
+
+    .toplinks {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .toplinks a {
+      color: #dbeafe;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toplinks a:hover {
+      text-decoration: underline;
     }
 
     .toggle {
@@ -72,7 +109,7 @@
       padding: 3px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #eef2f6;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .toggle button {
@@ -81,21 +118,21 @@
       border-radius: 6px;
       padding: 8px 12px;
       background: transparent;
-      color: var(--muted);
+      color: #d1d5db;
       font: inherit;
       font-weight: 650;
       cursor: pointer;
     }
 
     .toggle button.active {
-      background: var(--accent);
-      color: #ffffff;
+      background: #ffffff;
+      color: #111827;
     }
 
     .hero {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 56px 20px 28px;
+      padding: 56px 20px 22px;
     }
 
     .hero h1 {
@@ -111,6 +148,110 @@
       margin: 0;
       color: var(--muted);
       font-size: 18px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .hero-meta span {
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #ffffff;
+      padding: 5px 10px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .resource-hub {
+      max-width: 1120px;
+      margin: 0 auto 26px;
+      padding: 0 20px;
+    }
+
+    .resource-panel {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+
+    .resource-head {
+      padding: 18px 20px;
+      background: linear-gradient(90deg, #111827 0%, #1f2937 100%);
+      color: #ffffff;
+    }
+
+    .resource-head h2 {
+      margin: 0 0 6px;
+      color: #ffffff;
+      font-size: 22px;
+    }
+
+    .resource-head p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .resource-item {
+      min-width: 0;
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .resource-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #0f172a;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .resource-item p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .resource-item a {
+      overflow-wrap: anywhere;
+      font-weight: 700;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px 34px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      line-height: 1.55;
+    }
+
+    footer a {
+      font-weight: 700;
     }
 
     .layout {
@@ -150,12 +291,101 @@
       min-width: 0;
     }
 
+    .manual-module {
+      margin: 0 0 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+    }
+
+    .manual-module > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 24px;
+      cursor: pointer;
+      list-style: none;
+      background: linear-gradient(90deg, #f8fafc 0%, #eef6f5 100%);
+    }
+
+    .manual-module > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .manual-module > summary::after {
+      content: "+";
+      width: 34px;
+      height: 34px;
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 22px;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .manual-module[open] > summary::after {
+      content: "-";
+    }
+
+    .module-title {
+      min-width: 0;
+    }
+
+    .module-title h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .module-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .module-hint {
+      display: inline-flex;
+      margin-top: 10px;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      background: #ffffff;
+      padding: 4px 9px;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .module-body {
+      padding: 18px;
+      background: #f8fafc;
+    }
+
     section {
       margin: 0 0 18px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
       padding: 26px;
+    }
+
+    section.featured {
+      border-color: #b6d8f8;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    section.resource-hub {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 0 20px;
     }
 
     h2 {
@@ -223,6 +453,11 @@
       background: var(--warning-bg);
     }
 
+    .info {
+      border-left-color: var(--blue-line);
+      background: var(--blue-bg);
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -240,6 +475,124 @@
     .mini strong {
       display: block;
       margin-bottom: 4px;
+    }
+
+    .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 0 12px;
+      padding: 4px 9px;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .step-list {
+      counter-reset: guide-step;
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .step-list li {
+      counter-increment: guide-step;
+      position: relative;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 14px 14px 14px 54px;
+    }
+
+    .step-list li::before {
+      content: counter(guide-step);
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      background: var(--ink-panel);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .step-list strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .doc-table th,
+    .doc-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .doc-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 750;
+    }
+
+    .doc-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .kbd {
+      display: inline-block;
+      min-width: 24px;
+      border: 1px solid #cbd5e1;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #ffffff;
+      padding: 1px 6px;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .workflow-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .workflow-strip div {
+      border: 1px solid #cbd5e1;
+      border-top: 3px solid var(--accent);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 12px;
+      min-height: 92px;
+    }
+
+    .workflow-strip strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #0f172a;
     }
 
     .lang {
@@ -282,49 +635,145 @@
       .grid {
         grid-template-columns: 1fr;
       }
+
+      .workflow-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .resource-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .manual-module > summary {
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body data-lang="zh">
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand">XMatcher Guide</div>
-      <div class="toggle" aria-label="Language switch">
-        <button id="btn-zh" class="active" type="button">中文</button>
-        <button id="btn-en" type="button">English</button>
+      <div class="brand"><span class="brand-mark">XM</span><span>XMatcher User Guide</span></div>
+      <div class="toplinks">
+        <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener">Download</a>
+        <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener">Manual</a>
+        <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener">Issues</a>
+        <div class="toggle" aria-label="Language switch">
+          <button id="btn-zh" class="active" type="button">中文</button>
+          <button id="btn-en" type="button">English</button>
+        </div>
       </div>
     </div>
   </div>
 
   <header class="hero">
     <div class="lang lang-zh">
-      <h1>从零开始使用 XMatcher</h1>
-      <p>本说明教你安装环境、从 release 直接下载预构建的 <code>MP500_xrd_database.pkl</code>，或下载 <code>MP500.db</code> 后自行构建理论峰数据库，再运行第一个 XRD 匹配任务。</p>
+      <h1>XMatcher 正式使用手册</h1>
+      <p>面向粉末 XRD 物相识别的完整软件文档。手册分为三个模块：代码与应用、App 使用、常见问题。点击对应模块即可展开阅读，避免内容混在一起。</p>
+      <div class="hero-meta">
+        <span>Official Release V1.0.0</span>
+        <span>Author: Dr. Bin Cao</span>
+        <span>XRD Phase Identification</span>
+      </div>
     </div>
     <div class="lang lang-en">
-      <h1>Build And Use XMatcher From Zero</h1>
-      <p>This guide shows how to install XMatcher, directly download the prebuilt <code>MP500_xrd_database.pkl</code> from Releases, or download <code>MP500.db</code> and build the theoretical peak database yourself before running a first XRD search.</p>
+      <h1>XMatcher Official User Guide</h1>
+      <p>A complete software manual for powder XRD phase identification. The guide is split into three modules: Code & Application, App Usage, and FAQ. Click a module to expand only the part you need.</p>
+      <div class="hero-meta">
+        <span>Official Release V1.0.0</span>
+        <span>Author: Dr. Bin Cao</span>
+        <span>XRD Phase Identification</span>
+      </div>
     </div>
   </header>
 
+  <section id="resources" class="resource-hub">
+    <div class="resource-panel">
+      <div class="resource-head">
+        <div class="lang lang-zh">
+          <h2>项目资源与引用信息</h2>
+          <p>下载软件、阅读在线手册、反馈问题，并复制正式引用信息。</p>
+        </div>
+        <div class="lang lang-en">
+          <h2>Project Resources And Citation</h2>
+          <p>Download the software, read the online manual, report issues, and copy the formal citation.</p>
+        </div>
+      </div>
+      <div class="resource-grid">
+        <div class="resource-item">
+          <strong><span class="inline-zh">作者</span><span class="inline-en">Author</span></strong>
+          <p>Dr. Bin Cao (曹斌)</p>
+          <a href="https://bin-cao.github.io" target="_blank" rel="noopener">bin-cao.github.io</a>
+        </div>
+        <div class="resource-item">
+          <strong><span class="inline-zh">软件下载</span><span class="inline-en">Download</span></strong>
+          <p><span class="inline-zh">正式发行版本与数据文件。</span><span class="inline-en">Official release and data files.</span></p>
+          <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener">doi.org/10.6084/m9.figshare.32812985</a>
+        </div>
+        <div class="resource-item">
+          <strong><span class="inline-zh">在线手册</span><span class="inline-en">Manual</span></strong>
+          <p><span class="inline-zh">App 和代码文档入口。</span><span class="inline-en">Entry point for App and code documentation.</span></p>
+          <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener">asterbin.github.io/Asterbin-XMatcher</a>
+        </div>
+        <div class="resource-item">
+          <strong><span class="inline-zh">问题反馈</span><span class="inline-en">Issues</span></strong>
+          <p><span class="inline-zh">报告 bug、使用问题或功能建议。</span><span class="inline-en">Report bugs, usage questions, or feature requests.</span></p>
+          <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener">GitHub Issues</a>
+        </div>
+      </div>
+      <div class="resource-item">
+        <strong><span class="inline-zh">引用方式</span><span class="inline-en">Citation</span></strong>
+        <div class="callout info">
+          <div class="lang lang-zh">
+            <strong>引用说明：</strong> XMatcher 并非 XQueryer 本身，而是作为 XQueryer 相关研究工作的一部分开发和整理的本地 XRD 物相识别软件。目前 XMatcher 没有单独发表论文；如果本软件支持了您的研究，建议引用下面的 XQueryer 论文。
+          </div>
+          <div class="lang lang-en">
+            <strong>Citation note:</strong> XMatcher is not XQueryer itself. It is a local XRD phase-identification software developed and organized as part of the related XQueryer research work. XMatcher currently does not have a separate publication; if this software supports your research, please cite the XQueryer paper below.
+          </div>
+        </div>
+        <p>Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. <em>National Science Review</em> 12(12), nwaf421 (2025).</p>
+        <pre><code>@article{cao2025xqueryer,
+  title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
+  author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
+  journal={National Science Review},
+  volume={12},
+  number={12},
+  pages={nwaf421},
+  year={2025},
+  publisher={Oxford University Press}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
   <div class="layout">
     <nav>
-      <a href="#overview"><span class="inline-zh">概览</span><span class="inline-en">Overview</span></a>
-      <a href="#install"><span class="inline-zh">安装环境</span><span class="inline-en">Install</span></a>
-      <a href="#release-db"><span class="inline-zh">下载数据库</span><span class="inline-en">Download DB</span></a>
-      <a href="#build-db"><span class="inline-zh">构建峰数据库</span><span class="inline-en">Build Peak DB</span></a>
-      <a href="#first-run"><span class="inline-zh">第一次匹配</span><span class="inline-en">First Search</span></a>
-      <a href="#jupyter-api"><span class="inline-zh">Jupyter API</span><span class="inline-en">Jupyter API</span></a>
-      <a href="#local-ui"><span class="inline-zh">本地界面</span><span class="inline-en">Local UI</span></a>
-      <a href="#input-data"><span class="inline-zh">实验数据格式</span><span class="inline-en">Input Data</span></a>
-      <a href="#parameters"><span class="inline-zh">参数建议</span><span class="inline-en">Parameters</span></a>
-      <a href="#troubleshooting"><span class="inline-zh">常见问题</span><span class="inline-en">Troubleshooting</span></a>
+      <a href="#resources"><span class="inline-zh">资源与引用</span><span class="inline-en">Resources</span></a>
+      <a href="#module-code"><span class="inline-zh">代码与应用</span><span class="inline-en">Code & Application</span></a>
+      <a href="#module-app"><span class="inline-zh">App 使用</span><span class="inline-en">App Usage</span></a>
+      <a href="#module-faq"><span class="inline-zh">常见问题</span><span class="inline-en">FAQ</span></a>
     </nav>
 
     <main>
+      <details id="module-code" class="manual-module">
+        <summary>
+          <div class="module-title">
+            <div class="lang lang-zh">
+              <h2>模块一：代码与应用</h2>
+              <p>背景知识、安装环境、获取数据库、构建理论峰库、第一次代码匹配和 Jupyter API。</p>
+              <span class="module-hint">点击展开阅读模块一</span>
+            </div>
+            <div class="lang lang-en">
+              <h2>Module 1: Code & Application</h2>
+              <p>Background, environment setup, database download, theoretical peak database build, first code search, and Jupyter API.</p>
+              <span class="module-hint">Click to expand Module 1</span>
+            </div>
+          </div>
+        </summary>
+        <div class="module-body">
       <section id="overview">
         <div class="lang lang-zh">
-          <h2>概览</h2>
+          <h2>1. 概览</h2>
           <p>XMatcher 的推荐工作流有三个阶段。最快方式是直接从 GitHub Releases 下载已经构建好的 <code>MP500_xrd_database.pkl</code>；如果你需要修改构建参数，也可以下载 <code>MP500.db</code> 后自行构建。</p>
           <div class="grid">
             <div class="mini">
@@ -343,7 +792,7 @@
           <p>检索阶段只读取 <code>MP500_xrd_database.pkl</code>。不要把原始 <code>MP500.db</code> 直接传给 <code>XRDRetriever</code>。</p>
         </div>
         <div class="lang lang-en">
-          <h2>Overview</h2>
+          <h2>1. Overview</h2>
           <p>XMatcher has a three-stage recommended workflow. The fastest path is to download the prebuilt <code>MP500_xrd_database.pkl</code> from GitHub Releases. If you need custom build parameters, download <code>MP500.db</code> and build the peak database yourself.</p>
           <div class="grid">
             <div class="mini">
@@ -363,9 +812,62 @@
         </div>
       </section>
 
+      <section id="background" class="featured">
+        <div class="lang lang-zh">
+          <span class="section-kicker">Background for beginners</span>
+          <h2>2. 背景知识：先理解 XRD 识别在做什么</h2>
+          <p>粉末 XRD 物相识别的核心问题是：实验谱图中的峰位和峰强，是否能由某个晶体结构的理论衍射峰解释。XMatcher 把数据库中的晶体结构预先转换为理论峰特征，然后把实验谱中最有代表性的峰与数据库特征进行比较。</p>
+          <div class="workflow-strip">
+            <div><strong>实验谱</strong><p>来自仪器测量，横轴通常是 2θ，纵轴是强度。实验谱可能包含背景、噪声、峰位偏移和多相叠加。</p></div>
+            <div><strong>理论峰</strong><p>由晶体结构和 X 射线波长计算得到。理论峰告诉我们某个结构应该在哪些 2θ 位置出现衍射峰。</p></div>
+            <div><strong>峰匹配</strong><p>软件比较实验峰和理论峰的峰位差、相对强度、匹配数量和整体平移，得到候选物相排序。</p></div>
+            <div><strong>PDF 全峰确认</strong><p>自动识别只用部分强峰做快速检索；最终判断应查看完整理论峰是否与实验谱整体一致。</p></div>
+          </div>
+          <h3>几个必须认识的概念</h3>
+          <table class="doc-table">
+            <thead><tr><th>概念</th><th>含义</th><th>在软件中的表现</th></tr></thead>
+            <tbody>
+              <tr><td>2θ</td><td>XRD 图谱的横坐标，表示衍射角。</td><td>所有图谱、峰位、容差和范围控制都以 2θ 为单位。</td></tr>
+              <tr><td>背景</td><td>样品、仪器或散射造成的缓慢变化强度。</td><td>主匹配图和 PDF 模块会显示去背底后的实验曲线，便于观察峰。</td></tr>
+              <tr><td>寻峰</td><td>从连续实验谱中找到局部峰。</td><td>最小峰高、最小显著性、峰数量会影响进入匹配的实验峰。</td></tr>
+              <tr><td>峰位偏移</td><td>样品高度、仪器校准等原因造成理论峰和实验峰整体错开。</td><td><code>max_shift</code> 和 <code>shift_step</code> 控制软件允许搜索的整体平移。</td></tr>
+              <tr><td>多相样品</td><td>实验谱可能由多个晶体相叠加。</td><td>PDF 模块可上传最多五个 CIF，并按含量计算加权混合谱。</td></tr>
+            </tbody>
+          </table>
+          <div class="callout info">
+            <strong>初学者判断原则：</strong> 不要只看最高分。一个可靠结果通常需要峰位对得上、匹配峰数量足够、整体平移不大，并且 PDF 全峰对比中主要理论峰都能在实验谱中找到合理对应。
+          </div>
+        </div>
+        <div class="lang lang-en">
+          <span class="section-kicker">Background for beginners</span>
+          <h2>2. Background: What XRD Identification Means</h2>
+          <p>Powder XRD phase identification asks whether the peak positions and intensities in an experimental pattern can be explained by the theoretical diffraction peaks of a crystal structure. XMatcher precomputes theoretical peak features from database structures, then compares representative experimental peaks against those features.</p>
+          <div class="workflow-strip">
+            <div><strong>Experimental pattern</strong><p>Measured by the instrument. It may contain background, noise, peak shifts, and overlapping phases.</p></div>
+            <div><strong>Theoretical peaks</strong><p>Calculated from a crystal structure and X-ray wavelength. They indicate where diffraction peaks should appear.</p></div>
+            <div><strong>Peak matching</strong><p>The software compares peak positions, relative intensities, matched-peak counts, and global shifts to rank candidates.</p></div>
+            <div><strong>Full-peak PDF check</strong><p>Automatic identification uses selected strong peaks for speed. Final judgement should inspect the full theoretical peak set.</p></div>
+          </div>
+          <h3>Essential Concepts</h3>
+          <table class="doc-table">
+            <thead><tr><th>Concept</th><th>Meaning</th><th>In the software</th></tr></thead>
+            <tbody>
+              <tr><td>2θ</td><td>The horizontal axis of an XRD pattern.</td><td>Plot ranges, peak positions, tolerances, and shifts all use 2θ.</td></tr>
+              <tr><td>Background</td><td>Slowly varying intensity from sample or instrument effects.</td><td>The matching and PDF plots display background-removed experimental curves.</td></tr>
+              <tr><td>Peak detection</td><td>Finding local maxima from a continuous experimental pattern.</td><td>Minimum height, prominence, and peak count decide which peaks enter matching.</td></tr>
+              <tr><td>Peak shift</td><td>Global mismatch from sample displacement or calibration.</td><td><code>max_shift</code> and <code>shift_step</code> control the allowed global correction.</td></tr>
+              <tr><td>Multiphase sample</td><td>A pattern may contain several crystal phases.</td><td>The PDF module accepts up to five CIF files and computes weighted mixtures.</td></tr>
+            </tbody>
+          </table>
+          <div class="callout info">
+            <strong>Beginner rule:</strong> Do not trust only the top score. A reliable result should have good peak positions, enough matched peaks, a reasonable global shift, and a convincing full-peak PDF comparison.
+          </div>
+        </div>
+      </section>
+
       <section id="install">
         <div class="lang lang-zh">
-          <h2>1. 安装环境</h2>
+          <h2>3. 安装环境</h2>
           <p>建议使用 Python 3.9 或更高版本，并创建一个独立环境。</p>
           <pre><code>git clone https://github.com/Bin-Cao/XMatcher.git
 cd XMatcher
@@ -381,7 +883,7 @@ pip install -e .</code></pre>
 pytest</code></pre>
         </div>
         <div class="lang lang-en">
-          <h2>1. Install The Environment</h2>
+          <h2>3. Install The Environment</h2>
           <p>Use Python 3.9 or newer and create an isolated environment.</p>
           <pre><code>git clone https://github.com/Bin-Cao/XMatcher.git
 cd XMatcher
@@ -400,7 +902,7 @@ pytest</code></pre>
 
       <section id="release-db">
         <div class="lang lang-zh">
-          <h2>2. 从 Releases 下载数据库</h2>
+          <h2>4. 从 Releases 下载数据库</h2>
           <p>打开项目 GitHub Releases 页面。现在有两种下载方式：</p>
           <ul>
             <li><code>MP500_xrd_database.pkl</code>：推荐下载。它是已经构建好的 XMatcher 理论峰数据库，可以直接用于检索。</li>
@@ -419,7 +921,7 @@ pytest</code></pre>
           </div>
         </div>
         <div class="lang lang-en">
-          <h2>2. Download Databases From Releases</h2>
+          <h2>4. Download Databases From Releases</h2>
           <p>Open the project's GitHub Releases page. There are now two download paths:</p>
           <ul>
             <li><code>MP500_xrd_database.pkl</code>: recommended. This is the prebuilt XMatcher theoretical peak database and can be used directly for retrieval.</li>
@@ -441,7 +943,7 @@ pytest</code></pre>
 
       <section id="build-db">
         <div class="lang lang-zh">
-          <h2>3. 构建 XMatcher 理论峰数据库</h2>
+          <h2>5. 构建 XMatcher 理论峰数据库</h2>
           <p><code>build_database_parallel.py</code> 的作用是读取 <code>MP500.db</code> 中的晶体结构，调用 pymatgen 计算每个结构的理论 XRD 图谱，提取最强峰，并保存成 XMatcher 检索用的特征数据库。</p>
           <h3>小规模测试构建</h3>
           <pre><code>python build_database_parallel.py \
@@ -470,7 +972,7 @@ pytest</code></pre>
           </div>
         </div>
         <div class="lang lang-en">
-          <h2>3. Build The XMatcher Theoretical Peak Database</h2>
+          <h2>5. Build The XMatcher Theoretical Peak Database</h2>
           <p><code>build_database_parallel.py</code> reads crystal structures from <code>MP500.db</code>, uses pymatgen to calculate theoretical XRD patterns, extracts the strongest peaks, and saves the searchable feature database used by XMatcher.</p>
           <h3>Small Test Build</h3>
           <pre><code>python build_database_parallel.py \
@@ -502,7 +1004,7 @@ pytest</code></pre>
 
       <section id="first-run">
         <div class="lang lang-zh">
-          <h2>4. 运行第一次匹配</h2>
+          <h2>6. 运行第一次匹配</h2>
           <p>下面的脚本会读取示例实验数据，检测峰，然后在构建好的 <code>MP500_xrd_database.pkl</code> 里检索最相近的结构。</p>
           <pre><code>from XMatcher import XRDRetriever
 
@@ -529,7 +1031,7 @@ print(best["peak_matches"][:3])</code></pre>
           <pre><code>python quick_start.py</code></pre>
         </div>
         <div class="lang lang-en">
-          <h2>4. Run The First Search</h2>
+          <h2>6. Run The First Search</h2>
           <p>The script below reads an example experimental pattern, detects peaks, and retrieves the closest structures from the built <code>MP500_xrd_database.pkl</code>.</p>
           <pre><code>from XMatcher import XRDRetriever
 
@@ -559,7 +1061,7 @@ print(best["peak_matches"][:3])</code></pre>
 
       <section id="jupyter-api">
         <div class="lang lang-zh">
-          <h2>5. Jupyter API 说明</h2>
+          <h2>7. Jupyter API 说明</h2>
           <p>如果你希望在 notebook 里逐步导入实验 XRD、调整寻峰参数、执行全库检索并查看匹配峰对，请打开根目录下的 API 示例：</p>
           <pre><code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code></pre>
           <p>这个 notebook 默认使用 <code>MP500_xrd_database.pkl</code>，并把 <code>QUERY_ELEMENTS = None</code> 作为全库检索设置。你可以直接修改实验数据路径、峰检测参数和匹配参数。</p>
@@ -568,7 +1070,7 @@ print(best["peak_matches"][:3])</code></pre>
           </div>
         </div>
         <div class="lang lang-en">
-          <h2>5. Jupyter API Guide</h2>
+          <h2>7. Jupyter API Guide</h2>
           <p>For a step-by-step notebook workflow covering experimental XRD import, peak-detection tuning, full-database retrieval, and peak-match inspection, open the API example in the project root:</p>
           <pre><code>XMatcher_Jupyter_API_Guide_CN_EN.ipynb</code></pre>
           <p>The notebook uses <code>MP500_xrd_database.pkl</code> by default and sets <code>QUERY_ELEMENTS = None</code> for full-database retrieval. You can edit the experimental data path, peak-detection parameters, and matching parameters directly.</p>
@@ -578,74 +1080,259 @@ print(best["peak_matches"][:3])</code></pre>
         </div>
       </section>
 
-      <section id="local-ui">
-        <div class="lang lang-zh">
-          <h2>6. 高级本地识别界面</h2>
-          <p>如果希望用浏览器上传 XRD、调参数、查看多个候选和分数、对比实验谱与理论峰，并下载识别结果，可以使用根目录下的本地界面：</p>
-          <pre><code>XMatcher_Local_UI.html</code></pre>
-          <p>识别计算需要本机 Python API，因为浏览器不能直接运行 XMatcher、SciPy 和 <code>MP500_xrd_database.pkl</code>。先在项目根目录启动服务，再双击打开 HTML：</p>
-          <pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>
-          <h3>使用流程</h3>
-          <ol>
-            <li>确认 <code>MP500_xrd_database.pkl</code> 已在项目根目录；如果没有，可从 Releases 直接下载。</li>
-            <li>运行上面的 <code>xmatcher_local_api.py</code> 命令，终端保持打开。</li>
-            <li>双击打开 <code>XMatcher_Local_UI.html</code>，页面右上角显示 API connected 后即可使用。</li>
-            <li>上传实验 XRD 文件，或把两列 <code>2θ,intensity</code> 数据粘贴到文本框。</li>
-            <li>如果要全库检索，元素过滤留空；如果已知元素组成，填入例如 <code>Ti,O</code> 可加速并减少误匹配。</li>
-            <li>调整寻峰参数和匹配参数，点击“自动识别”。</li>
-            <li>点击候选表中的不同物相，图中会切换对应理论峰，便于和实验谱比较。</li>
-            <li>使用“下载 JSON”或“下载 CSV”保存识别结果。</li>
-          </ol>
-          <h3>支持的数据</h3>
-          <p>界面支持常见两列文本文件，例如 <code>.csv</code>、<code>.txt</code>、<code>.xy</code>、<code>.dat</code>，也支持简单 <code>.json</code> 和部分常见 <code>.xml</code>/<code>.xrdml</code>。最稳妥的格式是两列数值：第一列 2θ，第二列强度。</p>
-          <h3>界面参数</h3>
-          <ul>
-            <li><code>min_peak_height</code> 和 <code>min_peak_prominence</code>：控制寻峰严格程度。噪声峰太多时调大，弱峰漏检时调小。</li>
-            <li><code>n_peaks</code>：用于匹配的实验峰数量。复杂谱图可适当增加。</li>
-            <li><code>position_tolerance</code>：峰位容差。仪器偏移或样品位移较明显时可增大。</li>
-            <li><code>max_shift</code> 和 <code>shift_step</code>：整体 2θ 偏移扫描范围和步长。步长越小越精细，但更慢。</li>
-            <li><code>top_n</code>：返回候选数量。</li>
-          </ul>
-          <div class="callout">
-            <strong>全库检索：</strong> 元素过滤留空时，界面会搜索整个 <code>MP500_xrd_database.pkl</code>。全库检索可能耗时较长，属于正常现象。
+        </div>
+      </details>
+
+      <details id="module-app" class="manual-module">
+        <summary>
+          <div class="module-title">
+            <div class="lang lang-zh">
+              <h2>模块二：App 使用</h2>
+              <p>图形界面完整操作手册：上传实验谱、自动识别、候选判断、绘图编辑、PDF 全峰对比和结果导出。</p>
+              <span class="module-hint">点击展开阅读模块二</span>
+            </div>
+            <div class="lang lang-en">
+              <h2>Module 2: App Usage</h2>
+              <p>Complete graphical interface manual: upload patterns, identify phases, judge candidates, edit plots, compare PDF peaks, and export results.</p>
+              <span class="module-hint">Click to expand Module 2</span>
+            </div>
           </div>
+        </summary>
+        <div class="module-body">
+      <section id="local-ui" class="featured">
+        <div class="lang lang-zh">
+          <span class="section-kicker">App interface manual</span>
+          <h2>1. 本地 App 界面完整说明</h2>
+          <p><code>XMatcher_Local_UI.html</code> 是面向日常使用的软件界面。它把上传实验谱、寻峰、自动识别、候选物相查看、图像编辑、PDF 全峰对比和结果导出集中在一个页面中。初学者推荐先用 App 界面完成一次完整流程，再学习 Jupyter API。</p>
+
+          <h3>1.1 打开软件前的准备</h3>
+          <ol class="step-list">
+            <li><strong>确认数据库文件存在</strong> 项目根目录需要有 <code>MP500_xrd_database.pkl</code>。这是自动识别使用的理论峰特征数据库。</li>
+            <li><strong>下载 App 版本</strong> 如果你下载的是正式封装 App，直接打开 App 即可使用，不需要手动启动本地服务。App 会自动连接内置本地服务。</li>
+            <li><strong>源码/HTML 版本</strong> 只有在直接打开 <code>XMatcher_Local_UI.html</code> 进行开发或本地测试时，才需要手动启动 Python API：<pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>终端保持打开，页面顶部显示 API 已连接后即可使用。</li>
+            <li><strong>准备实验 XRD</strong> 最稳妥格式是两列数值：第一列 <code>2theta</code>，第二列 <code>intensity</code>。支持 <code>.csv</code>、<code>.txt</code>、<code>.xy</code>、<code>.dat</code>、简单 <code>.json</code> 和部分 <code>.xrdml</code>/<code>.xml</code>。</li>
+          </ol>
+
+          <h3>1.2 界面区域总览</h3>
+          <table class="doc-table">
+            <thead><tr><th>区域</th><th>用途</th><th>初学者怎么用</th></tr></thead>
+            <tbody>
+              <tr><td>顶部栏</td><td>显示软件版本、语言切换、下载地址、说明手册和 GitHub issue 入口。</td><td>如果界面语言不合适，直接点击 EN/CN/JA/KO 一键切换。</td></tr>
+              <tr><td>左侧控制面板</td><td>设置本地服务、上传实验谱、选择元素过滤、调整寻峰和匹配参数。</td><td>第一次使用只需要上传文件，元素不确定时留空，然后点击自动识别。</td></tr>
+              <tr><td>顶部指标条</td><td>显示输入点数、检测到的实验峰、扫描候选数、最佳分数和当前物相。</td><td>用于快速判断计算是否真的运行，以及是否返回了候选结果。</td></tr>
+              <tr><td>实验谱与理论峰对比</td><td>显示去背底后的实验谱、检测峰和当前候选的理论峰。</td><td>鼠标悬停查看数值；框选局部区域可放大；点击恢复全图重置视图。</td></tr>
+              <tr><td>候选物相</td><td>列出候选公式、MP ID、分数、覆盖率、匹配峰数、平移量和空间群。</td><td>点击不同行，图中理论峰会同步切换。MP ID 可跳转到 Materials Project。</td></tr>
+              <tr><td>PDF 全峰对比</td><td>上传实验 XRD 和最多五个 CIF，计算完整理论峰和多相加权混合谱。</td><td>自动识别后，用这个模块做最终确认。它比候选图中的部分峰标记更完整。</td></tr>
+              <tr><td>引用与页脚</td><td>提供论文引用、BibTeX、一键复制、软件下载和问题反馈链接。</td><td>论文或报告中使用软件结果时，复制引用信息即可。</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.3 第一次自动识别：推荐操作顺序</h3>
+          <ol class="step-list">
+            <li><strong>上传实验谱</strong> 在“上传 XRD”中选择文件。选择后界面会显示文件已上传，并在主图中显示实验谱。</li>
+            <li><strong>选择检索范围</strong> 如果完全不知道元素组成，元素过滤留空。如果知道样品只包含某些元素，例如 <code>Ba,Ti,O</code>，建议填写以减少误匹配。</li>
+            <li><strong>使用默认寻峰参数</strong> 初学者先不要急着改参数。默认值适合多数常规粉末谱图。</li>
+            <li><strong>点击自动识别</strong> 按钮会出现转圈图标，表示本地 API 正在计算。全库检索可能需要等待。</li>
+            <li><strong>查看候选表</strong> 默认返回 3 个候选。优先看分数、匹配峰数、实验覆盖率和整体平移，而不是只看排名。</li>
+            <li><strong>点击候选行</strong> 每点击一个候选，主图理论峰和匹配峰表都会更新。比较峰位是否整体对齐。</li>
+            <li><strong>进入 PDF 全峰对比</strong> 候选图中的理论峰标记不是全部衍射峰。最终确认应下载/准备 CIF，与实验谱一起在 PDF 模块中比较。</li>
+          </ol>
+
+          <h3>1.4 左侧参数怎么理解</h3>
+          <table class="doc-table">
+            <thead><tr><th>参数</th><th>作用</th><th>什么时候调整</th></tr></thead>
+            <tbody>
+              <tr><td>元素过滤</td><td>限制数据库候选范围。</td><td>已知样品元素时填写；不确定时留空做全库检索。</td></tr>
+              <tr><td>过滤模式 contains</td><td>候选中只要包含指定元素即可。</td><td>怀疑有掺杂、杂质、额外元素时使用。</td></tr>
+              <tr><td>过滤模式 exact</td><td>候选元素集合必须和输入元素一致。</td><td>样品组成明确、想强约束搜索时使用。</td></tr>
+              <tr><td>候选数</td><td>控制返回多少个识别结果。</td><td>默认 3 个。想人工比较更多可能性时可增加。</td></tr>
+              <tr><td>最小峰高</td><td>过滤太弱的峰。</td><td>噪声峰太多时增大；弱峰漏检时减小。</td></tr>
+              <tr><td>最小显著性</td><td>要求峰相对周围背景足够突出。</td><td>背景起伏明显或噪声多时增大。</td></tr>
+              <tr><td>最小峰距</td><td>两个峰之间的最小 2θ 间距。</td><td>峰被重复检测时增大；密集峰被合并时减小。</td></tr>
+              <tr><td>峰数量</td><td>参与匹配的最强实验峰数量。</td><td>如果匹配不上，软件会建议减小该值；多相复杂谱可适当增加。</td></tr>
+              <tr><td>平滑窗口</td><td>降低噪声，帮助寻峰和显示。</td><td>噪声大时增大；峰很窄时不要过大。</td></tr>
+              <tr><td>背景窗口</td><td>估计并扣除缓慢变化背景。</td><td>背景很强时适当调大；低背景数据保持默认即可。</td></tr>
+              <tr><td>峰位容差</td><td>允许实验峰和理论峰之间的 2θ 误差。</td><td>仪器校准或样品位移较明显时可从 0.2 增至 0.3-0.5。</td></tr>
+              <tr><td>最大平移 / 平移步长</td><td>搜索整体峰位偏移。</td><td>峰整体错开时增大最大平移；想更精细时减小步长，但会变慢。</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.5 主图的图像设置、局部放大和导出</h3>
+          <p>“实验谱与理论峰对比”模块的图像设置默认展开。可以调整画布大小、坐标轴字号、刻度字号、2θ 显示范围、X/Y 轴标题、实验曲线颜色、检测峰颜色、理论峰颜色、坐标轴颜色、网格颜色和曲线宽度。</p>
+          <ul>
+            <li>鼠标放在图上会显示当前位置的 2θ 和强度数值。</li>
+            <li>按住鼠标框选一段横轴范围，可局部放大。</li>
+            <li>点击“恢复全图”可清除局部放大。</li>
+            <li>PNG 适合汇报和幻灯片；SVG 适合论文作图后期编辑。</li>
+            <li>导出文件名会自动包含当前候选物相或 MP ID，便于整理。</li>
+          </ul>
+
+          <h3>1.6 如何判断候选结果是否可靠</h3>
+          <div class="callout warning">
+            <strong>重要：</strong> 自动识别给出的是候选，不是最终证明。软件会在匹配峰太少、峰位平移过大或实验覆盖率偏低时显示风险提示。
+          </div>
+          <table class="doc-table">
+            <thead><tr><th>观察项</th><th>较好的情况</th><th>需要谨慎的情况</th></tr></thead>
+            <tbody>
+              <tr><td>匹配峰数</td><td>多个强峰都能匹配。</td><td>只匹配 1-2 个峰，容易误判。</td></tr>
+              <tr><td>峰位平移</td><td>整体平移较小，理论峰和实验峰自然对齐。</td><td>需要很大的 2θ 平移才能匹配，可能是校准问题或错误候选。</td></tr>
+              <tr><td>实验覆盖率</td><td>主要实验峰能被候选解释。</td><td>大量实验峰没有理论峰对应，可能存在其他相或候选错误。</td></tr>
+              <tr><td>PDF 全峰对比</td><td>完整理论峰大多能在实验谱中找到对应位置。</td><td>理论强峰在实验谱中完全不存在，需重新判断。</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.7 PDF 全峰对比模块</h3>
+          <p>PDF 模块是相对独立的验证模块，默认折叠显示。点击模块标题后展开完整内容。它用于把实验 XRD 与 CIF 计算得到的全部理论峰进行比较，特别适合确认自动识别结果、检查多相混合和发现遗漏峰。</p>
+          <ol class="step-list">
+            <li><strong>上传实验 XRD</strong> 可选。如果不上传，模块会使用当前主界面已加载的实验谱；显示时使用去背底后的实验曲线。</li>
+            <li><strong>上传 CIF</strong> 最多五个 CIF。每个 CIF 单独一行显示，可设置含量、颜色，也可点击 <span class="kbd">x</span> 删除。</li>
+            <li><strong>设置 2θ 范围</strong> 控制计算和显示范围。范围越大计算和显示内容越多。</li>
+            <li><strong>设置峰宽</strong> 控制模拟混合谱中理论峰的展宽。峰宽越大，理论曲线越平滑。</li>
+            <li><strong>设置最小强度</strong> 用于隐藏非常弱的理论峰，避免图中标记过密。</li>
+            <li><strong>点击计算</strong> 计算完成后，显示加权混合谱、每个物相下方分层小竖线标记、PDF 物相摘要表。</li>
+            <li><strong>显示/隐藏 PDF 结果</strong> 可只看实验谱，也可叠加理论混合谱；隐藏时 X 轴范围保持对齐。</li>
+          </ol>
+          <div class="callout info">
+            <strong>为什么 PDF 峰画在图谱下方：</strong> 不同物相的完整理论峰可能非常密集。软件把不同 CIF 的峰放在不同高度的底部轨道，避免多相标记互相遮挡。
+          </div>
+
+          <h3>1.8 常见操作建议</h3>
+          <ul>
+            <li>如果没有匹配结果，先减小“峰数量”，例如从 20 改为 10 或 8；软件也会给出具体推荐值。</li>
+            <li>如果噪声峰很多，增大“最小峰高”和“最小显著性”。</li>
+            <li>如果主峰整体错开，适当增大“最大平移”，但过大的平移会降低可信度。</li>
+            <li>如果样品可能是多相，不要只看最高分；把多个候选 CIF 放进 PDF 模块做混合对比。</li>
+            <li>导出结果时，JSON 保留完整结构化结果；CSV 适合表格记录；PNG/SVG 用于图像汇报和论文制图。</li>
+          </ul>
         </div>
         <div class="lang lang-en">
-          <h2>6. Advanced Local UI</h2>
-          <p>Use the local browser UI to upload XRD files, tune parameters, inspect multiple scored candidates, compare experimental and theoretical peaks, and download identification results:</p>
-          <pre><code>XMatcher_Local_UI.html</code></pre>
-          <p>The identification calculation needs the local Python API because the browser cannot directly run XMatcher, SciPy, and <code>MP500_xrd_database.pkl</code>. Start the service in the project root, then open the HTML file:</p>
-          <pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>
-          <h3>Workflow</h3>
-          <ol>
-            <li>Make sure <code>MP500_xrd_database.pkl</code> is in the project root. If not, download it directly from Releases.</li>
-            <li>Run the <code>xmatcher_local_api.py</code> command above and keep the terminal open.</li>
-            <li>Open <code>XMatcher_Local_UI.html</code>. The top-right status should show API connected.</li>
-            <li>Upload an experimental XRD file, or paste two-column <code>2θ,intensity</code> data into the text box.</li>
-            <li>Leave the element filter blank for full-database retrieval. If the chemistry is known, enter values such as <code>Ti,O</code> to speed up matching and reduce false positives.</li>
-            <li>Tune peak-detection and matching parameters, then click the identify button.</li>
-            <li>Click different candidates in the result table to switch the theoretical peak overlay in the plot.</li>
-            <li>Use JSON or CSV export to save the identification results.</li>
+          <span class="section-kicker">App interface manual</span>
+          <h2>1. Complete Local App Interface Guide</h2>
+          <p><code>XMatcher_Local_UI.html</code> is the day-to-day software interface. It combines experimental pattern upload, peak detection, automatic identification, candidate inspection, plot editing, full-peak PDF comparison, and result export in one page. Beginners should complete one full workflow in the App before moving to the Jupyter API.</p>
+
+          <h3>1.1 Before Opening The Software</h3>
+          <ol class="step-list">
+            <li><strong>Check the database file</strong> The project root must contain <code>MP500_xrd_database.pkl</code>, the theoretical peak feature database used for identification.</li>
+            <li><strong>Use the downloaded App</strong> If you downloaded the packaged App release, open the App directly. You do not need to start the local service manually; the App connects to its local service automatically.</li>
+            <li><strong>Source/HTML version</strong> Only when opening <code>XMatcher_Local_UI.html</code> directly for development or local testing do you need to start the Python API manually:<pre><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></pre>Keep the terminal open and start using the page after the status shows API connected.</li>
+            <li><strong>Prepare experimental XRD</strong> The most reliable format has two numeric columns: <code>2theta</code> and <code>intensity</code>. Supported files include <code>.csv</code>, <code>.txt</code>, <code>.xy</code>, <code>.dat</code>, simple <code>.json</code>, and some <code>.xrdml</code>/<code>.xml</code>.</li>
           </ol>
-          <h3>Supported Data</h3>
-          <p>The UI supports common two-column text files such as <code>.csv</code>, <code>.txt</code>, <code>.xy</code>, and <code>.dat</code>, plus simple <code>.json</code> and some common <code>.xml</code>/<code>.xrdml</code> files. The most reliable format is two numeric columns: 2θ first, intensity second.</p>
-          <h3>Key Parameters</h3>
+
+          <h3>1.2 Interface Overview</h3>
+          <table class="doc-table">
+            <thead><tr><th>Area</th><th>Purpose</th><th>Beginner usage</th></tr></thead>
+            <tbody>
+              <tr><td>Header</td><td>Shows version, language switch, download link, manual, and GitHub issue link.</td><td>Click EN/CN/JA/KO to switch language instantly.</td></tr>
+              <tr><td>Left control panel</td><td>Local service, upload, element filters, peak detection, and matching parameters.</td><td>For the first run, upload a file, leave elements blank if unknown, then run identification.</td></tr>
+              <tr><td>Metric bar</td><td>Input points, detected peaks, scanned candidates, best score, and selected phase.</td><td>Use it to confirm that calculation ran and returned candidates.</td></tr>
+              <tr><td>XRD comparison plot</td><td>Shows background-removed experiment, detected peaks, and theoretical peaks for the selected candidate.</td><td>Hover for values, drag to zoom, reset to full range when needed.</td></tr>
+              <tr><td>Candidate phases</td><td>Lists formula, MP ID, score, coverage, matched peaks, shift, and space group.</td><td>Click rows to update the theoretical overlay. MP IDs link to Materials Project.</td></tr>
+              <tr><td>PDF full-peak comparison</td><td>Uploads experimental XRD and up to five CIF files, calculates full theoretical peaks and weighted mixtures.</td><td>Use it as final confirmation after automatic identification.</td></tr>
+              <tr><td>Citation/footer</td><td>Provides citation, BibTeX, copy buttons, download, and issue links.</td><td>Copy the citation when using software results in reports or papers.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.3 First Automatic Identification</h3>
+          <ol class="step-list">
+            <li><strong>Upload the experimental pattern</strong> Select the XRD file. The UI shows upload status and displays the pattern.</li>
+            <li><strong>Choose the search scope</strong> Leave elements blank if chemistry is unknown. Enter known elements such as <code>Ba,Ti,O</code> to reduce false positives.</li>
+            <li><strong>Start with defaults</strong> Beginners should keep the default peak-detection parameters for the first attempt.</li>
+            <li><strong>Run identification</strong> A spinner indicates real computation. Full-database searches may take time.</li>
+            <li><strong>Inspect candidates</strong> Three candidates are returned by default. Check score, matched-peak count, coverage, and global shift.</li>
+            <li><strong>Click candidate rows</strong> The plot and matched-peak table update with each selected candidate.</li>
+            <li><strong>Confirm in PDF module</strong> The candidate overlay does not mark all diffraction peaks. Use CIF files in the PDF module for final confirmation.</li>
+          </ol>
+
+          <h3>1.4 Understanding Left-Panel Parameters</h3>
+          <table class="doc-table">
+            <thead><tr><th>Parameter</th><th>Role</th><th>When to adjust</th></tr></thead>
+            <tbody>
+              <tr><td>Elements</td><td>Restricts candidate database entries.</td><td>Enter known chemistry; leave blank for full-database search.</td></tr>
+              <tr><td>contains</td><td>Candidates may include the specified elements.</td><td>Use for dopants, impurities, or possible extra elements.</td></tr>
+              <tr><td>exact</td><td>Candidate element set must exactly match input.</td><td>Use when composition is certain.</td></tr>
+              <tr><td>Top candidates</td><td>Controls returned results.</td><td>Default is 3; increase to inspect more alternatives.</td></tr>
+              <tr><td>Min height</td><td>Filters weak peaks.</td><td>Increase for noisy patterns; decrease if weak peaks are missed.</td></tr>
+              <tr><td>Min prominence</td><td>Requires peaks to stand out from local background.</td><td>Increase when baseline variation or noise creates false peaks.</td></tr>
+              <tr><td>Min distance</td><td>Minimum 2θ spacing between detected peaks.</td><td>Increase for duplicate detections; decrease for dense peaks.</td></tr>
+              <tr><td>Peak count</td><td>Number of strongest experimental peaks used for matching.</td><td>If no match is found, reduce this value; for complex multiphase patterns, increase cautiously.</td></tr>
+              <tr><td>Smooth window</td><td>Reduces noise for detection and display.</td><td>Increase for noisy data, but avoid over-smoothing narrow peaks.</td></tr>
+              <tr><td>Baseline window</td><td>Estimates and removes slowly varying background.</td><td>Increase for strong background; keep default for clean patterns.</td></tr>
+              <tr><td>Position tolerance</td><td>Allowed 2θ error between experiment and theory.</td><td>Try 0.3-0.5 when calibration or displacement is visible.</td></tr>
+              <tr><td>Max shift / shift step</td><td>Controls global 2θ shift search.</td><td>Increase max shift when all peaks are offset; reduce step for precision at the cost of speed.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.5 Plot Settings, Zoom, And Export</h3>
+          <p>The XRD comparison plot settings are open by default. You can edit canvas size, axis label size, tick size, 2θ display range, axis labels, experimental color, detected-peak color, theoretical-peak color, axis color, grid color, and curve width.</p>
           <ul>
-            <li><code>min_peak_height</code> and <code>min_peak_prominence</code>: peak-detection strictness. Increase them for noisy false peaks; decrease them if weak real peaks are missed.</li>
-            <li><code>n_peaks</code>: number of experimental peaks used for matching. Increase it for complex patterns.</li>
-            <li><code>position_tolerance</code>: peak-position tolerance. Increase it when calibration or sample displacement causes larger shifts.</li>
-            <li><code>max_shift</code> and <code>shift_step</code>: global 2θ shift scan range and step. Smaller steps are more precise but slower.</li>
-            <li><code>top_n</code>: number of candidates returned.</li>
+            <li>Hover over the plot to inspect 2θ and intensity values.</li>
+            <li>Drag over a horizontal region to zoom in.</li>
+            <li>Click reset zoom to restore the full pattern.</li>
+            <li>Use PNG for reports and slides; use SVG for publication-quality editing.</li>
+            <li>Exported filenames include the current candidate or MP ID when available.</li>
           </ul>
-          <div class="callout">
-            <strong>Full-database retrieval:</strong> Leaving the element filter blank searches the entire <code>MP500_xrd_database.pkl</code>. This can take a while for large databases.
+
+          <h3>1.6 Judging Candidate Reliability</h3>
+          <div class="callout warning">
+            <strong>Important:</strong> Automatic identification returns candidates, not proof. The UI warns when matched peaks are too few, shift is large, or coverage is low.
           </div>
+          <table class="doc-table">
+            <thead><tr><th>Check</th><th>Good sign</th><th>Use caution when</th></tr></thead>
+            <tbody>
+              <tr><td>Matched peaks</td><td>Several strong peaks match.</td><td>Only one or two peaks match.</td></tr>
+              <tr><td>Peak shift</td><td>Small global shift and natural alignment.</td><td>A large 2θ shift is required.</td></tr>
+              <tr><td>Experimental coverage</td><td>Main experimental peaks are explained.</td><td>Many experimental peaks have no theoretical counterpart.</td></tr>
+              <tr><td>PDF full-peak comparison</td><td>Most full theoretical peaks have reasonable experimental support.</td><td>Strong theoretical peaks are absent from the experiment.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>1.7 PDF Full-Peak Comparison Module</h3>
+          <p>The PDF module is a relatively independent validation module and is collapsed by default. Click its title to open the full controls. It compares experimental XRD with all theoretical peaks calculated from CIF files, making it useful for confirming automatic identification, checking multiphase mixtures, and finding missing peaks.</p>
+          <ol class="step-list">
+            <li><strong>Upload experimental XRD</strong> Optional. If omitted, the module uses the current main experimental pattern and displays a background-removed curve.</li>
+            <li><strong>Upload CIF files</strong> Up to five CIF files. Each appears as a separate row with weight, color, and an <span class="kbd">x</span> delete button.</li>
+            <li><strong>Set 2θ range</strong> Controls both calculation and display range.</li>
+            <li><strong>Set peak width</strong> Controls broadening of simulated theoretical peaks in the mixture profile.</li>
+            <li><strong>Set minimum intensity</strong> Hides very weak calculated peaks to keep the plot readable.</li>
+            <li><strong>Calculate</strong> The result shows the weighted mixture, phase-specific bottom markers, and a PDF phase summary table.</li>
+            <li><strong>Show/hide PDF result</strong> Toggle theoretical output while keeping the X axis aligned with the experimental plot.</li>
+          </ol>
+          <div class="callout info">
+            <strong>Why markers are below the plot:</strong> Full theoretical peaks from multiple phases can be dense. Separate bottom lanes keep phase markers visible without overlap.
+          </div>
+
+          <h3>1.8 Practical Advice</h3>
+          <ul>
+            <li>If no match is found, reduce Peak count first, for example from 20 to 10 or 8. The UI also gives a recommended value.</li>
+            <li>If noise creates many false peaks, increase Min height and Min prominence.</li>
+            <li>If all main peaks are shifted, increase Max shift carefully; large shifts reduce confidence.</li>
+            <li>For possible multiphase samples, do not rely only on the top candidate. Compare multiple CIFs in the PDF module.</li>
+            <li>Use JSON for complete structured output, CSV for tabular records, and PNG/SVG for figures.</li>
+          </ul>
         </div>
       </section>
+        </div>
+      </details>
 
+      <details id="module-faq" class="manual-module">
+        <summary>
+          <div class="module-title">
+            <div class="lang lang-zh">
+              <h2>模块三：常见问题</h2>
+              <p>实验数据格式、参数建议和常见故障处理。把原来的 7/8/9 独立整理为本模块的 1/2/3。</p>
+              <span class="module-hint">点击展开阅读模块三</span>
+            </div>
+            <div class="lang lang-en">
+              <h2>Module 3: FAQ</h2>
+              <p>Experimental data format, parameter suggestions, and troubleshooting. The former 7/8/9 sections are reorganized as 1/2/3 here.</p>
+              <span class="module-hint">Click to expand Module 3</span>
+            </div>
+          </div>
+        </summary>
+        <div class="module-body">
       <section id="input-data">
         <div class="lang lang-zh">
-          <h2>7. 实验 XRD 数据格式</h2>
+          <h2>1. 实验 XRD 数据格式</h2>
           <p>实验文件至少需要两列：第一列为 2θ，第二列为强度。支持逗号、制表符、空格和分号分隔。</p>
           <pre><code>two_theta,intensity
 10.00,5.2
@@ -654,7 +1341,7 @@ print(best["peak_matches"][:3])</code></pre>
           <p>读取器会自动排序、去除非法值、合并重复 2θ 点，并过滤负强度。</p>
         </div>
         <div class="lang lang-en">
-          <h2>7. Experimental XRD Input Format</h2>
+          <h2>1. Experimental XRD Input Format</h2>
           <p>The file needs at least two columns: 2θ in the first column and intensity in the second. Comma, tab, whitespace, and semicolon delimiters are supported.</p>
           <pre><code>two_theta,intensity
 10.00,5.2
@@ -666,7 +1353,7 @@ print(best["peak_matches"][:3])</code></pre>
 
       <section id="parameters">
         <div class="lang lang-zh">
-          <h2>8. 常用参数建议</h2>
+          <h2>2. 常用参数建议</h2>
           <ul>
             <li><code>elements</code>：已知元素组成时一定要填，能显著减少误匹配。</li>
             <li><code>element_filter_mode="exact"</code>：候选相必须只包含给定元素时使用。</li>
@@ -677,7 +1364,7 @@ print(best["peak_matches"][:3])</code></pre>
           </ul>
         </div>
         <div class="lang lang-en">
-          <h2>8. Parameter Suggestions</h2>
+          <h2>2. Parameter Suggestions</h2>
           <ul>
             <li><code>elements</code>: provide known elements whenever possible to reduce false positives.</li>
             <li><code>element_filter_mode="exact"</code>: use when candidates must contain exactly the given elements.</li>
@@ -691,34 +1378,71 @@ print(best["peak_matches"][:3])</code></pre>
 
       <section id="troubleshooting">
         <div class="lang lang-zh">
-          <h2>9. 常见问题</h2>
+          <h2>3. 常见问题</h2>
           <h3>找不到 <code>MP500.db</code></h3>
           <p>确认文件已经从 Releases 下载，并且 <code>build_database_parallel.py --db-path</code> 指向正确路径。相对路径以你运行命令的目录为准。</p>
           <h3>找不到 <code>MP500_xrd_database.pkl</code></h3>
           <p>说明还没有完成构建，或者输出文件不在当前目录。先运行构建命令，并让 <code>XRDRetriever(database_path=...)</code> 指向构建后的 <code>.pkl</code> 文件。</p>
           <h3>没有匹配结果</h3>
           <p>先尝试放宽 <code>element_filter_mode</code> 为 <code>contains</code>，或增大 <code>position_tolerance</code>。同时检查实验文件的 2θ 单位和范围是否正确。</p>
+          <h3>App 显示 API 未连接</h3>
+          <p>确认已经在项目根目录运行 <code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code>，并且终端没有报错。如果修改过 API 地址，确认界面中的地址仍为 <code>http://127.0.0.1:8765</code> 或实际服务地址。</p>
+          <h3>点击自动识别后没有候选</h3>
+          <p>优先减小“峰数量”。峰数量越大，软件要求越多实验强峰同时被候选解释；对于噪声较多、多相或弱峰明显的数据，过多峰会让检索过严。也可以适当降低“最小峰高”和“最小显著性”，检查是否漏检主要峰。</p>
+          <h3>PDF 模块提示 Unknown endpoint</h3>
+          <p>这通常表示正在运行旧版本本地 API，里面还没有 <code>/api/cif-xrd</code> 接口。关闭旧终端，重新运行最新的 <code>xmatcher_local_api.py</code>，或重新打开封装后的 App。</p>
+          <h3>PDF 计算失败</h3>
+          <p>先检查 CIF 文件是否有效，再确认本地环境包含 <code>pymatgen</code>。如果 2θ 范围设置错误，例如最小值大于最大值，也会导致计算失败。</p>
+          <h3>PDF 图和主图看起来不完全一样</h3>
+          <p>主图用于快速识别，会显示用于匹配的峰和当前候选理论峰；PDF 模块用于完整验证，会显示去背底实验谱、完整理论峰底部标记和多相混合谱。两者用途不同，最终确认以 PDF 全峰对比为准。</p>
           <h3>构建数据库很慢</h3>
           <p>理论 XRD 计算本身比较重。先用 <code>--max-entries</code> 小规模测试，再根据机器核心数调整 <code>--workers</code> 和 <code>--batch-size</code>。</p>
           <h3>pickle 安全警告</h3>
           <p>这是针对构建后 <code>.pkl</code> 特征数据库的安全边界提醒。只加载自己构建的输出文件或可信来源提供的预构建特征库。</p>
         </div>
         <div class="lang lang-en">
-          <h2>9. Troubleshooting</h2>
+          <h2>3. Troubleshooting</h2>
           <h3><code>MP500.db</code> cannot be found</h3>
           <p>Make sure the file was downloaded from Releases and <code>build_database_parallel.py --db-path</code> points to the correct location. Relative paths are resolved from the directory where you run the command.</p>
           <h3><code>MP500_xrd_database.pkl</code> cannot be found</h3>
           <p>The build has not finished, or the output file is not in the current directory. Run the build command first, then point <code>XRDRetriever(database_path=...)</code> to the built <code>.pkl</code> file.</p>
           <h3>No matches returned</h3>
           <p>Try <code>element_filter_mode="contains"</code> or increase <code>position_tolerance</code>. Also verify the 2θ unit and range in the experimental file.</p>
+          <h3>The App Shows API Not Connected</h3>
+          <p>Make sure <code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code> is running in the project root and the terminal has no error. If you changed the API URL, confirm it matches <code>http://127.0.0.1:8765</code> or the actual service address.</p>
+          <h3>No Candidate After Running Identification</h3>
+          <p>Reduce Peak count first. A larger peak count requires more experimental strong peaks to be explained simultaneously; noisy, multiphase, or weak-peak patterns can become too strict. Also check whether Min height and Min prominence missed important peaks.</p>
+          <h3>PDF Module Reports Unknown Endpoint</h3>
+          <p>This usually means an older local API is still running and does not expose <code>/api/cif-xrd</code>. Stop the old terminal and restart the latest <code>xmatcher_local_api.py</code>, or reopen the packaged App.</p>
+          <h3>PDF Calculation Fails</h3>
+          <p>Check that each CIF is valid, then confirm the local environment includes <code>pymatgen</code>. Invalid 2θ ranges, such as a minimum larger than the maximum, can also fail.</p>
+          <h3>The PDF Plot Looks Different From The Main Plot</h3>
+          <p>The main plot is for fast identification and selected candidate overlay; the PDF module is for full validation with background-removed experiment, bottom markers for all theoretical peaks, and multiphase mixture profiles. Use the PDF full-peak comparison for final confirmation.</p>
           <h3>Database building is slow</h3>
           <p>Theoretical XRD calculation is computationally heavy. Start with <code>--max-entries</code>, then tune <code>--workers</code> and <code>--batch-size</code> for your machine.</p>
           <h3>Pickle security warning</h3>
           <p>This safety boundary applies to the built <code>.pkl</code> feature database. Only load outputs built by yourself or trusted prebuilt feature databases.</p>
         </div>
       </section>
+
+
+        </div>
+      </details>
+
     </main>
   </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="lang lang-zh">XMatcher Official User Guide · Release V1.0.0 · Author: Dr. Bin Cao (曹斌)<br>XMatcher 目前没有单独论文；作为 XQueryer 相关研究的一部分，使用时建议引用 XQueryer 论文。</div>
+      <div class="lang lang-en">XMatcher Official User Guide · Release V1.0.0 · Author: Dr. Bin Cao<br>XMatcher currently has no separate publication; as part of the related XQueryer research work, please cite the XQueryer paper when using it.</div>
+      <div>
+        <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener">Download</a>
+        · <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener">Manual</a>
+        · <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener">Issues</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const buttons = {
@@ -736,6 +1460,13 @@ print(best["peak_matches"][:3])</code></pre>
 
     buttons.zh.addEventListener("click", () => setLanguage("zh"));
     buttons.en.addEventListener("click", () => setLanguage("en"));
+
+    document.querySelectorAll('nav a[href^="#module-"]').forEach((link) => {
+      link.addEventListener("click", () => {
+        const target = document.querySelector(link.getAttribute("href"));
+        if (target) target.open = true;
+      });
+    });
 
     const saved = localStorage.getItem("xmatcher-guide-lang");
     if (saved === "zh" || saved === "en") {

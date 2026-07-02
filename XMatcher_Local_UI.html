@@ -7,20 +7,23 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f3f5f8;
+      --bg: #eef2f6;
       --panel: #ffffff;
       --ink: #171b22;
       --muted: #657084;
       --line: #d8dde6;
       --line-strong: #c3cbd8;
-      --accent: #0f766e;
-      --accent-2: #1d4ed8;
+      --accent: #126b63;
+      --accent-2: #2558a7;
+      --chrome: #18212f;
+      --chrome-2: #243247;
       --warn: #b45309;
       --bad: #b91c1c;
       --good: #047857;
       --soft: #eef6f5;
       --soft-blue: #eff6ff;
       --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --sidebar-width: 400px;
     }
 
     * { box-sizing: border-box; }
@@ -32,14 +35,20 @@
       letter-spacing: 0;
     }
 
+    body.resizing {
+      user-select: none;
+      cursor: col-resize;
+    }
+
     header {
-      background: rgba(255, 255, 255, 0.96);
-      border-bottom: 1px solid var(--line);
-      padding: 16px 24px;
+      background: linear-gradient(180deg, var(--chrome) 0%, var(--chrome-2) 100%);
+      color: #f8fafc;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.35);
+      padding: 14px 24px;
       position: sticky;
       top: 0;
       z-index: 10;
-      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
     }
 
     .topbar {
@@ -51,34 +60,105 @@
       margin: 0 auto;
     }
 
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .app-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #f8fafc;
+      color: var(--accent);
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+      flex: 0 0 auto;
+    }
+
     h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 22px;
       line-height: 1.2;
     }
 
     .subtitle {
       margin: 5px 0 0;
-      color: var(--muted);
+      color: #cbd5e1;
       font-size: 13px;
       line-height: 1.45;
     }
 
-    .author {
-      margin: 8px 0 0;
-      color: #475569;
-      font-size: 13px;
-      line-height: 1.4;
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 10px;
+      padding: 3px 7px;
+      border: 1px solid rgba(226, 232, 240, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 750;
+      vertical-align: middle;
+      white-space: nowrap;
     }
 
-    .author a {
-      color: var(--accent-2);
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .quick-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .quick-links a {
+      color: #dbeafe;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(226, 232, 240, 0.2);
+      border-radius: 6px;
+      padding: 7px 10px;
       text-decoration: none;
+      font-size: 13px;
       font-weight: 650;
     }
 
-    .author a:hover {
-      text-decoration: underline;
+    .quick-links a:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .language-switch {
+      display: inline-flex;
+      border: 1px solid rgba(226, 232, 240, 0.22);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.28);
+    }
+
+    .language-switch button {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 7px 9px;
+      min-width: 42px;
+    }
+
+    .language-switch button.active {
+      background: #f8fafc;
+      color: #0f172a;
     }
 
     .status {
@@ -86,11 +166,11 @@
       align-items: center;
       gap: 10px;
       font-size: 13px;
-      color: var(--muted);
+      color: #e2e8f0;
       white-space: nowrap;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: #fff;
+      border: 1px solid rgba(226, 232, 240, 0.2);
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.22);
       padding: 8px 12px;
     }
 
@@ -106,27 +186,161 @@
     main {
       max-width: 1500px;
       margin: 0 auto;
-      padding: 18px 24px 32px;
+      padding: 18px 24px 30px;
       display: grid;
-      grid-template-columns: 400px minmax(0, 1fr);
-      gap: 18px;
+      grid-template-columns: var(--sidebar-width) 6px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    main.sidebar-collapsed {
+      grid-template-columns: 46px 6px minmax(0, 1fr);
     }
 
     section, .panel {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
 
     .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .sidebar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .sidebar-title {
+      color: #334155;
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .sidebar-toggle {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 6px;
+    }
+
+    main.sidebar-collapsed .sidebar {
+      overflow: hidden;
+    }
+
+    main.sidebar-collapsed .sidebar-top {
+      justify-content: center;
+      padding: 7px;
+    }
+
+    main.sidebar-collapsed .sidebar-title,
+    main.sidebar-collapsed .sidebar .panel {
+      display: none;
+    }
+
+    .splitter {
+      width: 6px;
+      min-height: calc(100vh - 160px);
+      border-radius: 8px;
+      cursor: col-resize;
+      background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
+      opacity: 0.55;
+    }
+
+    .splitter:hover,
+    body.resizing .splitter {
+      opacity: 1;
+      background: var(--accent-2);
     }
 
     .panel {
-      padding: 16px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      width: 100%;
+      border: 0;
+      border-radius: 0;
+      padding: 10px 12px;
+      background: #f8fafc;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .panel-title:hover:not(:disabled) {
+      background: #f1f5f9;
+    }
+
+    .panel-title::after {
+      content: "-";
+      color: #64748b;
+      font-weight: 800;
+      margin-left: 10px;
+    }
+
+    .panel.collapsed .panel-title::after {
+      content: "+";
+    }
+
+    .panel-body {
+      padding: 12px;
+    }
+
+    .panel.collapsed .panel-body {
+      display: none;
+    }
+
+    .resource-panel {
+      border-left: 4px solid var(--accent);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .link-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .link-list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      color: #1d4ed8;
+      background: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .link-list a:hover {
+      border-color: #bfdbfe;
+      background: #eff6ff;
     }
 
     h2 {
@@ -141,6 +355,31 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
+    }
+
+    .app-note {
+      margin: 8px 0 0;
+      padding: 8px 10px;
+      border: 1px solid #bbf7d0;
+      border-left: 3px solid var(--good);
+      border-radius: 6px;
+      background: #f0fdf4;
+      color: #166534;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .warning-note {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border: 1px solid #f59e0b;
+      border-left: 4px solid #d97706;
+      border-radius: 8px;
+      background: #fffbeb;
+      color: #92400e;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
     }
 
     .section-note {
@@ -165,6 +404,14 @@
       line-height: 1.38;
     }
 
+    .upload-status {
+      margin: 6px 0 0;
+      color: var(--good);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
     input, select, textarea, button {
       font: inherit;
     }
@@ -173,10 +420,10 @@
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 8px 9px;
+      padding: 7px 8px;
       background: #fff;
       color: var(--ink);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
@@ -188,13 +435,13 @@
       width: 100%;
       border: 1px dashed #a7b0bf;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       background: #fbfcfe;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     textarea {
-      min-height: 88px;
+      min-height: 74px;
       resize: vertical;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
@@ -215,19 +462,23 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     button {
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 8px 11px;
+      padding: 7px 10px;
       background: #fff;
       color: var(--ink);
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 650;
       transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .actions button {
+      min-height: 30px;
     }
 
     button:hover:not(:disabled) {
@@ -243,6 +494,7 @@
       border-color: var(--accent);
       background: var(--accent);
       color: white;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
     }
 
     button.primary:hover:not(:disabled) {
@@ -261,42 +513,298 @@
       cursor: not-allowed;
     }
 
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: -2px;
+      margin-right: 7px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .log .spinner {
+      border-color: rgba(180, 83, 9, 0.25);
+      border-top-color: var(--warn);
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .content {
       display: grid;
       grid-template-rows: auto auto minmax(320px, auto);
-      gap: 14px;
+      gap: 10px;
       min-width: 0;
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(5, minmax(120px, 1fr));
-      gap: 10px;
-      padding: 14px;
+      gap: 1px;
+      padding: 0;
+      overflow: hidden;
     }
 
     .metric {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      padding: 8px 10px;
+      background: #ffffff;
       min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+    }
+
+    .metric:last-child {
+      border-right: 0;
     }
 
     .metric .k {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
-      margin-bottom: 5px;
+      margin: 0;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .metric .v {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 700;
       overflow-wrap: anywhere;
+      text-align: right;
     }
 
     .chart-wrap {
       padding: 14px;
+    }
+
+    .plot-controls {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      margin: 8px 0 12px;
+      overflow: hidden;
+    }
+
+    .plot-controls summary {
+      border: 0;
+      padding: 9px 12px;
+      background: #f1f5f9;
+    }
+
+    .plot-control-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .plot-control-grid label {
+      margin-top: 0;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 31px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px;
+      background: #fff;
+    }
+
+    .plot-export-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding: 0 12px 12px;
+      flex-wrap: wrap;
+    }
+
+    .pdf-module {
+      padding: 0;
+      border: 1px solid #7dd3fc;
+      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+      box-shadow: 0 10px 28px rgba(14, 116, 144, 0.12);
+    }
+
+    .pdf-module-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      background: linear-gradient(90deg, #e0f2fe 0%, #f8fbff 100%);
+      border: 0;
+      list-style: none;
+    }
+
+    .pdf-module-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .pdf-module-summary::after {
+      content: "+";
+      width: 28px;
+      height: 28px;
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      display: inline-grid;
+      place-items: center;
+      color: #075985;
+      background: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .pdf-module[open] .pdf-module-summary {
+      border-bottom: 1px solid #bae6fd;
+    }
+
+    .pdf-module[open] .pdf-module-summary::after {
+      content: "-";
+    }
+
+    .pdf-module-summary h2 {
+      color: #075985;
+    }
+
+    .pdf-module-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border: 1px solid #7dd3fc;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #0369a1;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .pdf-module-body {
+      padding: 14px;
+    }
+
+    .pdf-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .pdf-controls {
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: #eff6ff;
+      padding: 12px;
+    }
+
+    .phase-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .phase-row {
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) 90px 54px auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .phase-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #334155;
+      font-weight: 650;
+    }
+
+    .phase-row input[type="number"] {
+      padding: 6px;
+    }
+
+    .phase-row input[type="color"] {
+      height: 28px;
+    }
+
+    .pdf-plot-wrap canvas {
+      height: 520px;
+      border-color: #93c5fd;
+    }
+
+    .pdf-settings-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .pdf-settings-grid label {
+      margin-top: 0;
+    }
+
+    .pdf-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pdf-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pdf-summary {
+      margin-top: 10px;
+      overflow: auto;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: #ffffff;
+      display: none;
+    }
+
+    .pdf-summary table {
+      margin: 0;
+      min-width: 640px;
+    }
+
+    .risk-note {
+      display: none;
+      margin: 8px 0 12px;
+      padding: 10px 12px;
+      border: 1px solid #facc15;
+      border-left: 4px solid #ca8a04;
+      border-radius: 8px;
+      background: #fefce8;
+      color: #854d0e;
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1.45;
     }
 
     .panel-heading {
@@ -325,6 +833,19 @@
       border: 1px solid var(--line-strong);
       border-radius: 8px;
       background: #fff;
+    }
+
+    .plot-shell {
+      position: relative;
+    }
+
+    .zoom-box {
+      position: absolute;
+      border: 1px solid #2563eb;
+      background: rgba(37, 99, 235, 0.14);
+      pointer-events: none;
+      display: none;
+      z-index: 2;
     }
 
     .legend {
@@ -426,9 +947,97 @@
       margin-top: 10px;
     }
 
+    .citation-panel {
+      padding: 16px;
+    }
+
+    .citation-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .citation-text {
+      margin: 0;
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .citation-block {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .citation-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      min-height: 28px;
+      padding: 6px 9px;
+      color: #1e40af;
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 0 24px 26px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer-inner {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    footer a {
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
     @media (max-width: 1100px) {
       main {
         grid-template-columns: 1fr;
+      }
+      main.sidebar-collapsed {
+        grid-template-columns: 1fr;
+      }
+      .splitter {
+        display: none;
+      }
+      main.sidebar-collapsed .sidebar .panel,
+      main.sidebar-collapsed .sidebar-title {
+        display: block;
       }
       .metrics {
         grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -437,223 +1046,355 @@
         align-items: flex-start;
         flex-direction: column;
       }
+      .toolbar {
+        justify-content: flex-start;
+      }
+      .citation-grid {
+        grid-template-columns: 1fr;
+      }
+      .plot-control-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+      .pdf-grid {
+        grid-template-columns: 1fr;
+      }
+      .pdf-settings-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="topbar">
-      <div>
-        <h1>XMatcher Local XRD Identification / 本地 XRD 物相识别</h1>
-        <p class="subtitle">Upload experimental XRD data, tune key parameters, run local matching, and compare experimental peaks with theoretical reflections.<br>上传实验 XRD，调整关键参数，调用本机 XMatcher 自动识别，并对比实验峰与理论峰。</p>
-        <p class="author">Author / 作者：<a href="https://bin-cao.github.io" target="_blank" rel="noopener">Dr. Bin Cao (曹斌)</a></p>
+      <div class="brand">
+        <div class="app-icon">XM</div>
+        <div>
+          <h1><span data-i18n="appTitle">XMatcher Local XRD Identification</span><span class="version-badge" data-i18n="releaseVersion">Release V1.0.0</span></h1>
+          <p class="subtitle" data-i18n="appSubtitle">Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.</p>
+        </div>
       </div>
-      <div class="status">
-        <span id="serverDot" class="dot"></span>
-        <span id="serverText">Checking local API...</span>
+      <div class="toolbar">
+        <div class="quick-links">
+          <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener" data-i18n="downloadLink">Download software</a>
+          <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener" data-i18n="manualLink">Manual</a>
+          <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener" data-i18n="issueLink">GitHub issues</a>
+        </div>
+        <div class="language-switch" aria-label="Language">
+          <button type="button" data-lang="en" class="active">EN</button>
+          <button type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="ja">日本語</button>
+          <button type="button" data-lang="ko">한국어</button>
+        </div>
+        <div class="status">
+          <span id="serverDot" class="dot"></span>
+          <span id="serverText" data-i18n="checkingApi">Checking local API...</span>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
     <aside class="sidebar">
-      <div class="panel">
-        <h2>1. Local API / 本地服务</h2>
-        <p class="section-note">Connects the page to the local XMatcher backend. / 连接本机 XMatcher 后端。</p>
-        <label for="apiUrl">API URL / API 地址</label>
-        <input id="apiUrl" type="text" value="http://127.0.0.1:8765">
-        <p class="hint">Run first in the project root / 先在项目根目录运行：<br><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></p>
-        <div class="actions">
-          <button id="checkServer" class="secondary">Check connection / 检查连接</button>
-        </div>
+      <div class="sidebar-top">
+        <span class="sidebar-title" data-i18n="controlPanel">Control panel</span>
+        <button id="toggleSidebar" class="sidebar-toggle" type="button" data-i18n-title="collapseSidebar" title="Collapse sidebar"><<</button>
       </div>
-
-      <div class="panel">
-        <h2>2. Upload XRD / 上传数据</h2>
-        <input id="fileInput" type="file" accept=".csv,.txt,.xy,.dat,.xrdml,.xml,.json">
-        <p class="hint">Supports CSV/TXT/XY/DAT, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2θ and intensity.<br>支持 CSV/TXT/XY/DAT、简单 JSON、常见 XRDML/XML。默认取前两列数值作为 2θ 和强度。</p>
-        <label for="manualData">Paste two-column data / 粘贴两列数据</label>
-        <textarea id="manualData" placeholder="two_theta,intensity&#10;20.12,100&#10;27.45,320"></textarea>
-        <div class="actions">
-          <button id="parseManual">Parse / 解析</button>
-          <button id="clearData">Clear / 清空</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>3. Search Scope / 检索范围</h2>
-        <p class="section-note">Use element filters to reduce false positives and speed up matching. / 用元素过滤可减少误匹配并加快检索。</p>
-        <label for="elements">Elements / 元素过滤</label>
-        <input id="elements" type="text" placeholder="例如 Ti,O；留空 = 全库">
-        <p class="field-help">Leave blank for full database search. Use comma or space separators. / 留空表示全库检索，可用逗号或空格分隔。</p>
-        <div class="grid2">
-          <div>
-            <label for="filterMode">Filter mode / 过滤模式</label>
-            <select id="filterMode">
-              <option value="contains">contains / 包含这些元素</option>
-              <option value="exact">exact / 元素集合完全一致</option>
-            </select>
-          </div>
-          <div>
-            <label for="topN">Top candidates / 候选数</label>
-            <input id="topN" type="number" value="10" min="1" max="100" step="1">
-            <p class="field-help">Number of returned matches. / 返回的候选物相数量。</p>
+      <div class="panel resource-panel">
+        <button class="panel-title" type="button" data-i18n="projectResources">Project resources</button>
+        <div class="panel-body">
+          <p class="section-note" data-i18n="projectNote">Get the software package, report problems, and cite the related XQueryer publication.</p>
+          <div class="link-list">
+            <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener"><span data-i18n="softwareDownload">Software download</span><span>DOI</span></a>
+            <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener"><span data-i18n="manualLink">Manual</span><span>Guide</span></a>
+            <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener"><span data-i18n="reportIssue">Report a problem</span><span>GitHub</span></a>
+            <a href="https://bin-cao.github.io" target="_blank" rel="noopener"><span data-i18n="authorInfo">Author: Dr. Bin Cao</span><span>Profile</span></a>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>4. Peak Detection / 寻峰参数</h2>
-        <p class="section-note">Controls preprocessing and experimental peak selection. / 控制预处理和实验峰筛选。</p>
-        <div class="grid2">
-          <div>
-            <label for="minPeakHeight">Min height / 最小峰高</label>
-            <input id="minPeakHeight" type="number" value="3" step="0.5">
-            <p class="field-help">Ignore weak peaks below this relative height. / 低于该相对高度的弱峰会被忽略。</p>
-          </div>
-          <div>
-            <label for="minPeakProminence">Min prominence / 最小显著性</label>
-            <input id="minPeakProminence" type="number" value="2" step="0.5">
-            <p class="field-help">Higher values keep only more isolated peaks. / 值越大，越偏向保留突出峰。</p>
-          </div>
-          <div>
-            <label for="minPeakDistance">Min distance / 最小峰距</label>
-            <input id="minPeakDistance" type="number" value="0.1" step="0.01">
-            <p class="field-help">Minimum 2θ spacing between detected peaks. / 相邻实验峰的最小 2θ 间距。</p>
-          </div>
-          <div>
-            <label for="nPeaks">Peak count / 峰数量</label>
-            <input id="nPeaks" type="number" value="4" min="1" max="80" step="1">
-            <p class="field-help">Top experimental peaks used for matching. / 用于匹配的最强实验峰数量。</p>
-          </div>
-          <div>
-            <label for="smoothWindow">Smooth window / 平滑窗口</label>
-            <input id="smoothWindow" type="number" value="7" min="3" step="2">
-            <p class="field-help">Odd window size for denoising. / 去噪平滑窗口，建议使用奇数。</p>
-          </div>
-          <div>
-            <label for="baselineWindowFraction">Baseline window / 背景窗口</label>
-            <input id="baselineWindowFraction" type="number" value="0.05" step="0.01">
-            <p class="field-help">Fraction used for baseline correction. / 用于背景扣除的窗口比例。</p>
+        <button class="panel-title" type="button" data-i18n="localApiTitle">1. Local API</button>
+        <div class="panel-body">
+          <p class="section-note" data-i18n="localApiNote">Connects the page to the local XMatcher backend.</p>
+          <p class="app-note" data-i18n="appAutoConnectNote">In the packaged app, this service is connected automatically.</p>
+          <label for="apiUrl" data-i18n="apiUrl">API URL</label>
+          <input id="apiUrl" type="text" value="http://127.0.0.1:8765">
+          <p class="hint"><span data-i18n="runFirst">Run first in the project root:</span><br><code>python xmatcher_local_api.py --database MP500_xrd_database.pkl</code></p>
+          <div class="actions">
+            <button id="checkServer" class="secondary" data-i18n="checkConnection">Check connection</button>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>5. Matching / 匹配参数</h2>
-        <p class="section-note">Controls peak alignment, score weighting, and minimum evidence for a phase. / 控制峰位校准、打分权重和候选物相的最低匹配证据。</p>
-        <div class="grid2">
-          <div>
-            <label for="positionTolerance">Position tolerance / 峰位容差</label>
-            <input id="positionTolerance" type="number" value="0.2" step="0.01">
-            <p class="field-help">Allowed 2θ error after shift correction. / 平移校正后的允许 2θ 误差。</p>
-          </div>
-          <div>
-            <label for="minMatchedPeaks">Min matched peaks / 最少匹配峰</label>
-            <input id="minMatchedPeaks" type="number" value="2" min="1" step="1">
-            <p class="field-help">Reject phases with fewer matched peaks. / 匹配峰数不足的候选会被排除。</p>
-          </div>
-          <div>
-            <label for="maxShift">Max shift / 最大平移</label>
-            <input id="maxShift" type="number" value="0.5" step="0.05">
-            <p class="field-help">Maximum global 2θ correction searched. / 搜索的最大整体 2θ 平移量。</p>
-          </div>
-          <div>
-            <label for="shiftStep">Shift step / 平移步长</label>
-            <input id="shiftStep" type="number" value="0.02" step="0.01">
-            <p class="field-help">Smaller is finer but slower. / 越小越精细，但计算更慢。</p>
-          </div>
-          <div>
-            <label for="positionWeight">Position weight / 峰位权重</label>
-            <input id="positionWeight" type="number" value="0.85" step="0.05">
-            <p class="field-help">Weight for 2θ agreement. / 峰位一致性的打分权重。</p>
-          </div>
-          <div>
-            <label for="intensityWeight">Intensity weight / 强度权重</label>
-            <input id="intensityWeight" type="number" value="0.15" step="0.05">
-            <p class="field-help">Weight for relative intensity agreement. / 相对强度一致性的打分权重。</p>
+        <button class="panel-title" type="button" data-i18n="uploadTitle">2. Upload XRD</button>
+        <div class="panel-body">
+          <input id="fileInput" type="file" accept=".csv,.txt,.xy,.dat,.xrdml,.xml,.json">
+          <p id="fileStatus" class="upload-status"></p>
+          <p class="hint" data-i18n="uploadHint">Supports CSV/TXT/XY/DAT, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2theta and intensity.</p>
+          <label for="manualData" data-i18n="pasteData">Paste two-column data</label>
+          <textarea id="manualData" placeholder="two_theta,intensity&#10;20.12,100&#10;27.45,320"></textarea>
+          <div class="actions">
+            <button id="parseManual" data-i18n="parse">Parse</button>
+            <button id="clearData" data-i18n="clear">Clear</button>
           </div>
         </div>
-        <label for="scoringMethod">Scoring method / 打分方法</label>
-        <select id="scoringMethod">
-          <option value="hybrid">hybrid</option>
-          <option value="weighted">weighted</option>
-          <option value="fom">fom</option>
-          <option value="combined">combined</option>
-        </select>
-        <p class="field-help">Hybrid is recommended for routine use. / 常规识别建议使用 hybrid。</p>
-        <div class="actions">
-          <button id="runMatch" class="primary">Run match / 自动识别</button>
-          <button id="downloadJson">JSON</button>
-          <button id="downloadCsv">CSV</button>
+      </div>
+
+      <div class="panel">
+        <button class="panel-title" type="button" data-i18n="scopeTitle">3. Search Scope</button>
+        <div class="panel-body">
+          <p class="section-note" data-i18n="scopeNote">Use element filters to reduce false positives and speed up matching.</p>
+          <label for="elements" data-i18n="elements">Elements</label>
+          <input id="elements" type="text" data-i18n-placeholder="elementsPlaceholder" placeholder="e.g. Ti,O; blank = full database">
+          <p class="field-help" data-i18n="elementsHelp">Leave blank for full database search. Use comma or space separators.</p>
+          <div class="grid2">
+            <div>
+              <label for="filterMode" data-i18n="filterMode">Filter mode</label>
+              <select id="filterMode">
+                <option value="contains" data-i18n="containsMode">contains</option>
+                <option value="exact" data-i18n="exactMode">exact</option>
+              </select>
+            </div>
+            <div>
+              <label for="topN" data-i18n="topCandidates">Top candidates</label>
+              <input id="topN" type="number" value="3" min="1" max="100" step="1">
+              <p class="field-help" data-i18n="topCandidatesHelp">Number of returned matches.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <button class="panel-title" type="button" data-i18n="peakTitle">4. Peak Detection</button>
+        <div class="panel-body">
+          <p class="section-note" data-i18n="peakNote">Controls preprocessing and experimental peak selection.</p>
+          <div class="grid2">
+            <div>
+              <label for="minPeakHeight" data-i18n="minHeight">Min height</label>
+              <input id="minPeakHeight" type="number" value="3" step="0.5">
+              <p class="field-help" data-i18n="minHeightHelp">Ignore weak peaks below this relative height.</p>
+            </div>
+            <div>
+              <label for="minPeakProminence" data-i18n="minProminence">Min prominence</label>
+              <input id="minPeakProminence" type="number" value="2" step="0.5">
+              <p class="field-help" data-i18n="minProminenceHelp">Higher values keep only more isolated peaks.</p>
+            </div>
+            <div>
+              <label for="minPeakDistance" data-i18n="minDistance">Min distance</label>
+              <input id="minPeakDistance" type="number" value="0.1" step="0.01">
+              <p class="field-help" data-i18n="minDistanceHelp">Minimum 2theta spacing between detected peaks.</p>
+            </div>
+            <div>
+              <label for="nPeaks" data-i18n="peakCount">Peak count</label>
+              <input id="nPeaks" type="number" value="4" min="1" max="80" step="1">
+              <p class="field-help" data-i18n="peakCountHelp">Top experimental peaks used for matching.</p>
+            </div>
+            <div>
+              <label for="smoothWindow" data-i18n="smoothWindow">Smooth window</label>
+              <input id="smoothWindow" type="number" value="7" min="3" step="2">
+              <p class="field-help" data-i18n="smoothWindowHelp">Odd window size for denoising.</p>
+            </div>
+            <div>
+              <label for="baselineWindowFraction" data-i18n="baselineWindow">Baseline window</label>
+              <input id="baselineWindowFraction" type="number" value="0.05" step="0.01">
+              <p class="field-help" data-i18n="baselineWindowHelp">Fraction used for baseline correction.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <button class="panel-title" type="button" data-i18n="matchingTitle">5. Matching</button>
+        <div class="panel-body">
+          <p class="section-note" data-i18n="matchingNote">Controls peak alignment, score weighting, and minimum evidence for a phase.</p>
+          <div class="grid2">
+            <div>
+              <label for="positionTolerance" data-i18n="positionTolerance">Position tolerance</label>
+              <input id="positionTolerance" type="number" value="0.2" step="0.01">
+              <p class="field-help" data-i18n="positionToleranceHelp">Allowed 2theta error after shift correction.</p>
+            </div>
+            <div>
+              <label for="minMatchedPeaks" data-i18n="minMatchedPeaks">Min matched peaks</label>
+              <input id="minMatchedPeaks" type="number" value="2" min="1" step="1">
+              <p class="field-help" data-i18n="minMatchedPeaksHelp">Reject phases with fewer matched peaks.</p>
+            </div>
+            <div>
+              <label for="maxShift" data-i18n="maxShift">Max shift</label>
+              <input id="maxShift" type="number" value="0.5" step="0.05">
+              <p class="field-help" data-i18n="maxShiftHelp">Maximum global 2theta correction searched.</p>
+            </div>
+            <div>
+              <label for="shiftStep" data-i18n="shiftStep">Shift step</label>
+              <input id="shiftStep" type="number" value="0.02" step="0.01">
+              <p class="field-help" data-i18n="shiftStepHelp">Smaller is finer but slower.</p>
+            </div>
+            <div>
+              <label for="positionWeight" data-i18n="positionWeight">Position weight</label>
+              <input id="positionWeight" type="number" value="0.85" step="0.05">
+              <p class="field-help" data-i18n="positionWeightHelp">Weight for 2theta agreement.</p>
+            </div>
+            <div>
+              <label for="intensityWeight" data-i18n="intensityWeight">Intensity weight</label>
+              <input id="intensityWeight" type="number" value="0.15" step="0.05">
+              <p class="field-help" data-i18n="intensityWeightHelp">Weight for relative intensity agreement.</p>
+            </div>
+          </div>
+          <label for="scoringMethod" data-i18n="scoringMethod">Scoring method</label>
+          <select id="scoringMethod">
+            <option value="hybrid">hybrid</option>
+            <option value="weighted">weighted</option>
+            <option value="fom">fom</option>
+            <option value="combined">combined</option>
+          </select>
+          <p class="field-help" data-i18n="scoringHelp">Hybrid is recommended for routine use.</p>
+          <div class="actions">
+            <button id="runMatch" class="primary" data-i18n="runMatch">Run match</button>
+            <button id="downloadJson">JSON</button>
+            <button id="downloadCsv">CSV</button>
+          </div>
         </div>
       </div>
     </aside>
 
+    <div id="splitter" class="splitter" role="separator" aria-orientation="vertical" tabindex="0"></div>
+
     <section class="content">
       <div class="metrics">
-        <div class="metric"><div class="k">Input points / 数据点</div><div id="mPoints" class="v">0</div></div>
-        <div class="metric"><div class="k">Detected peaks / 实验峰</div><div id="mPeaks" class="v">0</div></div>
-        <div class="metric"><div class="k">Candidates scanned / 扫描候选</div><div id="mCandidates" class="v">0</div></div>
-        <div class="metric"><div class="k">Best score / 最佳分数</div><div id="mBest" class="v">-</div></div>
-        <div class="metric"><div class="k">Selected phase / 当前物相</div><div id="mPhase" class="v">-</div></div>
+        <div class="metric"><div class="k" data-i18n="inputPoints">Input points</div><div id="mPoints" class="v">0</div></div>
+        <div class="metric"><div class="k" data-i18n="detectedPeaks">Detected peaks</div><div id="mPeaks" class="v">0</div></div>
+        <div class="metric"><div class="k" data-i18n="candidatesScanned">Candidates scanned</div><div id="mCandidates" class="v">0</div></div>
+        <div class="metric"><div class="k" data-i18n="bestScore">Best score</div><div id="mBest" class="v">-</div></div>
+        <div class="metric"><div class="k" data-i18n="selectedPhase">Selected phase</div><div id="mPhase" class="v">-</div></div>
       </div>
 
       <div class="panel chart-wrap">
         <div class="panel-heading">
           <div>
-            <h2>XRD Pattern Comparison / 实验谱与理论峰对比</h2>
-            <p>Theoretical peaks are drawn upward after applying estimated_shift. / 理论峰应用 estimated_shift 后向上显示。</p>
+            <h2 data-i18n="chartTitle">XRD Pattern Comparison</h2>
+            <p data-i18n="chartNote">Theoretical peaks are drawn upward after applying estimated_shift.</p>
+            <p class="warning-note" data-i18n="candidatePeakNote">Marked peaks are not all diffraction peaks. Download the identified CIF and compare it with the experimental XRD data in the PDF module.</p>
           </div>
         </div>
-        <canvas id="plot" width="1400" height="520"></canvas>
+        <details class="plot-controls" open>
+          <summary data-i18n="plotSettings">Plot settings</summary>
+          <div class="plot-control-grid">
+            <div>
+              <label for="plotWidth" data-i18n="plotWidth">Width</label>
+              <input id="plotWidth" type="number" value="1400" min="640" max="3000" step="20">
+            </div>
+            <div>
+              <label for="plotHeight" data-i18n="plotHeight">Height</label>
+              <input id="plotHeight" type="number" value="520" min="260" max="1800" step="20">
+            </div>
+            <div>
+              <label for="axisLabelSize" data-i18n="axisLabelSize">Axis label size</label>
+              <input id="axisLabelSize" type="number" value="16" min="8" max="48" step="1">
+            </div>
+            <div>
+              <label for="tickLabelSize" data-i18n="tickLabelSize">Tick/index size</label>
+              <input id="tickLabelSize" type="number" value="13" min="8" max="36" step="1">
+            </div>
+            <div>
+              <label for="plotRangeMin" data-i18n="displayRangeMin">Display 2theta min</label>
+              <input id="plotRangeMin" type="number" value="" step="0.1">
+            </div>
+            <div>
+              <label for="plotRangeMax" data-i18n="displayRangeMax">Display 2theta max</label>
+              <input id="plotRangeMax" type="number" value="" step="0.1">
+            </div>
+            <div>
+              <label for="xAxisLabel" data-i18n="xAxisLabel">X label</label>
+              <input id="xAxisLabel" type="text" value="2theta / degree">
+            </div>
+            <div>
+              <label for="yAxisLabel" data-i18n="yAxisLabel">Y label</label>
+              <input id="yAxisLabel" type="text" value="Relative intensity">
+            </div>
+            <div>
+              <label for="expColor" data-i18n="expColor">Experimental color</label>
+              <input id="expColor" type="color" value="#1d4ed8">
+            </div>
+            <div>
+              <label for="peakColor" data-i18n="peakColor">Peak color</label>
+              <input id="peakColor" type="color" value="#dc2626">
+            </div>
+            <div>
+              <label for="theoryColor" data-i18n="theoryColor">Theory color</label>
+              <input id="theoryColor" type="color" value="#0f766e">
+            </div>
+            <div>
+              <label for="axisColor" data-i18n="axisColor">Axis color</label>
+              <input id="axisColor" type="color" value="#111827">
+            </div>
+            <div>
+              <label for="gridColor" data-i18n="gridColor">Grid color</label>
+              <input id="gridColor" type="color" value="#e5e7eb">
+            </div>
+            <div>
+              <label for="curveWidth" data-i18n="curveWidth">Curve width</label>
+              <input id="curveWidth" type="number" value="1.4" min="0.5" max="8" step="0.1">
+            </div>
+          </div>
+          <div class="plot-export-actions">
+            <button id="resetPlotZoom" type="button" data-i18n="resetZoom">Reset zoom</button>
+            <button id="exportPng" type="button" data-i18n="exportPng">Export PNG</button>
+            <button id="exportSvg" type="button" data-i18n="exportSvg">Export SVG</button>
+          </div>
+        </details>
+        <div class="plot-shell">
+          <canvas id="plot" width="1400" height="520"></canvas>
+          <div id="plotZoomBox" class="zoom-box"></div>
+        </div>
         <div class="legend">
-          <span><i class="swatch" style="background:#1d4ed8"></i>Experimental profile / 实验谱线</span>
-          <span><i class="swatch" style="background:#dc2626"></i>Detected peaks / 检测峰</span>
-          <span><i class="swatch" style="background:#0f766e"></i>Theoretical peaks shifted / 平移后的理论峰</span>
+          <span><i id="legendExpSwatch" class="swatch" style="background:#1d4ed8"></i><span data-i18n="legendExp">Experimental profile</span></span>
+          <span><i id="legendPeakSwatch" class="swatch" style="background:#dc2626"></i><span data-i18n="legendDetected">Detected peaks</span></span>
+          <span><i id="legendTheorySwatch" class="swatch" style="background:#0f766e"></i><span data-i18n="legendTheory">Theoretical peaks shifted</span></span>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-heading">
           <div>
-            <h2>Candidate Phases / 候选物相</h2>
-            <p>Click a row to update the theoretical peaks and matched-peak table. / 点击候选行可更新理论峰和匹配峰表。</p>
+            <h2 data-i18n="candidatesTitle">Candidate Phases</h2>
+            <p data-i18n="candidatesNote">Click a row to update the theoretical peaks and matched-peak table.</p>
           </div>
         </div>
+        <div id="riskNote" class="risk-note"></div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>#</th>
-                <th>Formula / 化学式</th>
+                <th data-i18n="formula">Formula</th>
                 <th>MP ID</th>
-                <th>Elements / 元素</th>
-                <th>Score / 分数</th>
+                <th data-i18n="elementsShort">Elements</th>
+                <th data-i18n="score">Score</th>
                 <th>Weighted</th>
                 <th>FOM</th>
-                <th>Exp coverage / 覆盖率</th>
-                <th>Matched / 匹配峰</th>
+                <th data-i18n="expCoverage">Exp coverage</th>
+                <th data-i18n="matched">Matched</th>
                 <th>MAE</th>
-                <th>Shift / 平移</th>
-                <th>Spacegroup / 空间群</th>
+                <th data-i18n="shift">Shift</th>
+                <th data-i18n="spacegroup">Spacegroup</th>
               </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
           </table>
         </div>
         <details open>
-          <summary>Peak matches / 匹配峰对</summary>
+          <summary data-i18n="peakMatches">Peak matches</summary>
           <div class="matches">
             <table>
               <thead>
                 <tr>
-                  <th>Exp 2θ / 实验</th>
-                  <th>DB 2θ shifted / 平移后</th>
-                  <th>DB 2θ raw / 原始</th>
-                  <th>Delta / 偏差</th>
-                  <th>Exp intensity / 实验强度</th>
-                  <th>DB intensity / 理论强度</th>
+                  <th data-i18n="expTwoTheta">Exp 2theta</th>
+                  <th data-i18n="dbShifted">DB 2theta shifted</th>
+                  <th data-i18n="dbRaw">DB 2theta raw</th>
+                  <th data-i18n="delta">Delta</th>
+                  <th data-i18n="expIntensity">Exp intensity</th>
+                  <th data-i18n="dbIntensity">DB intensity</th>
                   <th>Cost</th>
                 </tr>
               </thead>
@@ -661,10 +1402,155 @@
             </table>
           </div>
         </details>
-        <div id="log" class="log">Waiting for XRD data. / 等待上传 XRD 文件。</div>
+        <div id="log" class="log" data-i18n="waitingData">Waiting for XRD data.</div>
+      </div>
+
+      <details class="panel pdf-module">
+        <summary class="pdf-module-summary">
+          <div>
+            <h2 data-i18n="pdfTitle">PDF Full-Peak Comparison</h2>
+            <p data-i18n="pdfNote">Upload experimental XRD and up to five CIF files to compare all calculated theoretical peaks and weighted phase mixtures.</p>
+            <span class="pdf-module-badge" data-i18n="pdfClickOpen">Click to open full PDF comparison module</span>
+          </div>
+        </summary>
+        <div class="pdf-module-body pdf-grid">
+          <div class="pdf-controls">
+            <label for="pdfXrdFile" data-i18n="pdfXrdFile">Experimental XRD</label>
+            <input id="pdfXrdFile" type="file" accept=".csv,.txt,.xy,.dat,.json,.xml,.xrdml">
+            <p id="pdfXrdStatus" class="upload-status"></p>
+            <p class="field-help" data-i18n="pdfXrdHelp">Optional. If omitted, the currently loaded XRD data is used.</p>
+            <label for="pdfCifFiles" data-i18n="pdfCifFiles">CIF files</label>
+            <input id="pdfCifFiles" type="file" accept=".cif" multiple>
+            <p id="pdfCifStatus" class="upload-status"></p>
+            <p class="field-help" data-i18n="pdfCifHelp">Up to five CIF files. Set each phase contribution below.</p>
+            <div class="grid2">
+              <div>
+                <label for="pdfRangeMin" data-i18n="pdfRangeMin">2theta min</label>
+                <input id="pdfRangeMin" type="number" value="5" step="1">
+                <p class="field-help" data-i18n="pdfRangeHelp">Only peaks inside this 2theta window are calculated and displayed.</p>
+              </div>
+              <div>
+                <label for="pdfRangeMax" data-i18n="pdfRangeMax">2theta max</label>
+                <input id="pdfRangeMax" type="number" value="90" step="1">
+                <p class="field-help" data-i18n="pdfRangeHelp">Only peaks inside this 2theta window are calculated and displayed.</p>
+              </div>
+              <div>
+                <label for="pdfFwhm" data-i18n="pdfFwhm">Peak width</label>
+                <input id="pdfFwhm" type="number" value="0.12" min="0.01" step="0.01">
+                <p class="field-help" data-i18n="pdfFwhmHelp">Controls simulated peak broadening for the mixed profile.</p>
+              </div>
+              <div>
+                <label for="pdfMinIntensity" data-i18n="pdfMinIntensity">Min intensity</label>
+                <input id="pdfMinIntensity" type="number" value="0.1" min="0" step="0.1">
+                <p class="field-help" data-i18n="pdfMinIntensityHelp">Hides calculated peaks weaker than this relative intensity.</p>
+              </div>
+            </div>
+            <div id="pdfPhaseList" class="phase-list"></div>
+            <div class="pdf-settings-grid">
+              <div>
+                <label for="pdfPlotWidth" data-i18n="plotWidth">Width</label>
+                <input id="pdfPlotWidth" type="number" value="1400" min="640" max="3000" step="20">
+              </div>
+              <div>
+                <label for="pdfPlotHeight" data-i18n="plotHeight">Height</label>
+                <input id="pdfPlotHeight" type="number" value="520" min="300" max="1800" step="20">
+              </div>
+              <div>
+                <label for="pdfAxisLabelSize" data-i18n="axisLabelSize">Axis label size</label>
+                <input id="pdfAxisLabelSize" type="number" value="16" min="8" max="48" step="1">
+              </div>
+              <div>
+                <label for="pdfTickLabelSize" data-i18n="tickLabelSize">Tick/index size</label>
+                <input id="pdfTickLabelSize" type="number" value="13" min="8" max="36" step="1">
+              </div>
+              <div>
+                <label for="pdfExpColor" data-i18n="expColor">Experimental color</label>
+                <input id="pdfExpColor" type="color" value="#1d4ed8">
+              </div>
+              <div>
+                <label for="pdfMixtureColor" data-i18n="pdfMixtureColor">Mixture color</label>
+                <input id="pdfMixtureColor" type="color" value="#0f172a">
+              </div>
+              <div>
+                <label for="pdfGridColor" data-i18n="gridColor">Grid color</label>
+                <input id="pdfGridColor" type="color" value="#e5e7eb">
+              </div>
+              <div>
+                <label for="pdfCurveWidth" data-i18n="curveWidth">Curve width</label>
+                <input id="pdfCurveWidth" type="number" value="1.4" min="0.5" max="8" step="0.1">
+              </div>
+            </div>
+            <div class="actions">
+              <button id="pdfNormalizeWeights" type="button" data-i18n="pdfNormalize">Normalize weights</button>
+              <button id="pdfCalculate" type="button" class="primary" data-i18n="pdfCalculate">Calculate PDF comparison</button>
+              <button id="pdfToggleResult" type="button" data-i18n="hidePdfResult">Hide PDF result</button>
+              <button id="pdfResetZoom" type="button" data-i18n="resetZoom">Reset zoom</button>
+              <button id="pdfExportPng" type="button" data-i18n="exportPng">Export PNG</button>
+              <button id="pdfExportSvg" type="button" data-i18n="exportSvg">Export SVG</button>
+            </div>
+          </div>
+          <div class="pdf-plot-wrap">
+            <div class="plot-shell">
+              <canvas id="pdfPlot" width="1400" height="520"></canvas>
+              <div id="pdfZoomBox" class="zoom-box"></div>
+            </div>
+            <div id="pdfLegend" class="pdf-legend"></div>
+            <div id="pdfSummary" class="pdf-summary"></div>
+            <div id="pdfLog" class="log" data-i18n="pdfWaiting">Upload CIF files to calculate full theoretical peaks.</div>
+          </div>
+        </div>
+      </details>
+
+      <div class="panel citation-panel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="citationTitle">Citation</h2>
+            <p data-i18n="citationNote">Please cite the related XQueryer article when this software supports your work.</p>
+          </div>
+        </div>
+        <div class="citation-grid">
+          <div class="citation-block">
+            <p id="citationPlain" class="citation-text">Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. National Science Review 12(12), nwaf421 (2025).</p>
+            <div class="citation-actions">
+              <button id="copyCitationText" class="copy-btn" type="button" data-i18n="copyCitation">Copy citation</button>
+            </div>
+          </div>
+          <div class="citation-block">
+            <pre><code id="citationBibtex">@article{cao2025xqueryer,
+  title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
+  author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
+  journal={National Science Review},
+  volume={12},
+  number={12},
+  pages={nwaf421},
+  year={2025},
+  publisher={Oxford University Press}
+}</code></pre>
+            <div class="citation-actions">
+              <button id="copyBibtex" class="copy-btn" type="button" data-i18n="copyBibtex">Copy BibTeX</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span data-i18n="footerProduct">XMatcher Local UI for powder XRD phase identification.</span>
+      <span>
+        <span data-i18n="releaseVersion">Release V1.0.0</span>
+        ·
+        <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener" data-i18n="footerDownload">Download</a>
+        ·
+        <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener" data-i18n="footerManual">Manual</a>
+        ·
+        <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener" data-i18n="footerIssues">Issues</a>
+        ·
+        <a href="https://bin-cao.github.io" target="_blank" rel="noopener" data-i18n="footerAuthor">Author</a>
+      </span>
+    </div>
+  </footer>
 
   <script>
     const state = {
@@ -674,19 +1560,714 @@
       results: [],
       selectedIndex: 0,
       fileName: null,
-      serverStats: null
+      serverStats: null,
+      plot: null,
+      hover: null,
+      pdfPlot: null,
+      pdfHover: null,
+      plotZoom: null,
+      pdfZoom: null,
+      dragZoom: null,
+      plotSettings: {
+        width: 1400,
+        height: 520,
+        axisLabelSize: 16,
+        tickLabelSize: 13,
+        xLabel: "2theta / degree",
+        yLabel: "Relative intensity",
+        expColor: "#1d4ed8",
+        peakColor: "#dc2626",
+        theoryColor: "#0f766e",
+        axisColor: "#111827",
+        gridColor: "#e5e7eb",
+        curveWidth: 1.4
+      },
+      pdf: {
+        xrd: null,
+        cifs: [],
+        result: null,
+        showResult: true,
+        colors: ["#0f766e", "#dc2626", "#7c3aed", "#ea580c", "#0891b2"]
+      },
+      pdfSettings: {
+        width: 1400,
+        height: 520,
+        axisLabelSize: 16,
+        tickLabelSize: 13,
+        expColor: "#1d4ed8",
+        mixtureColor: "#0f172a",
+        gridColor: "#e5e7eb",
+        curveWidth: 1.4
+      },
+      sidebarCollapsed: localStorage.getItem("xmatcher-sidebar-collapsed") === "true"
     };
 
     const $ = (id) => document.getElementById(id);
+    let currentLang = localStorage.getItem("xmatcher-lang") || "en";
+
+    const i18n = {
+      en: {
+        controlPanel: "Control panel",
+        collapseSidebar: "Collapse sidebar",
+        expandSidebar: "Expand sidebar",
+        appTitle: "XMatcher Local XRD Identification",
+        releaseVersion: "Official Release V1.0.0",
+        appSubtitle: "Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.",
+        downloadLink: "Download software",
+        manualLink: "Manual",
+        issueLink: "GitHub issues",
+        checkingApi: "Checking local API...",
+        projectResources: "Project resources",
+        projectNote: "Get the software package, report problems, and cite the related XQueryer publication.",
+        softwareDownload: "Software download",
+        reportIssue: "Report a problem",
+        authorInfo: "Author: Dr. Bin Cao",
+        localApiTitle: "1. Local API",
+        localApiNote: "Connects the page to the local XMatcher backend.",
+        appAutoConnectNote: "Packaged app distribution: the local service is connected automatically, so users do not need to start it manually.",
+        apiUrl: "API URL",
+        runFirst: "Run first in the project root:",
+        checkConnection: "Check connection",
+        uploadTitle: "2. Upload XRD",
+        uploadHint: "Supports CSV/TXT/XY/DAT, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2theta and intensity.",
+        pasteData: "Paste two-column data",
+        parse: "Parse",
+        clear: "Clear",
+        scopeTitle: "3. Search Scope",
+        scopeNote: "Use element filters to reduce false positives and speed up matching.",
+        elements: "Elements",
+        elementsPlaceholder: "e.g. Ti,O; blank = full database",
+        elementsHelp: "Leave blank for full database search. Use comma or space separators.",
+        filterMode: "Filter mode",
+        containsMode: "contains",
+        exactMode: "exact",
+        topCandidates: "Top candidates",
+        topCandidatesHelp: "Number of returned matches.",
+        peakTitle: "4. Peak Detection",
+        peakNote: "Controls preprocessing and experimental peak selection.",
+        minHeight: "Min height",
+        minHeightHelp: "Ignore weak peaks below this relative height.",
+        minProminence: "Min prominence",
+        minProminenceHelp: "Higher values keep only more isolated peaks.",
+        minDistance: "Min distance",
+        minDistanceHelp: "Minimum 2theta spacing between detected peaks.",
+        peakCount: "Peak count",
+        peakCountHelp: "Top experimental peaks used for matching.",
+        smoothWindow: "Smooth window",
+        smoothWindowHelp: "Odd window size for denoising.",
+        baselineWindow: "Baseline window",
+        baselineWindowHelp: "Fraction used for baseline correction.",
+        matchingTitle: "5. Matching",
+        matchingNote: "Controls peak alignment, score weighting, and minimum evidence for a phase.",
+        positionTolerance: "Position tolerance",
+        positionToleranceHelp: "Allowed 2theta error after shift correction.",
+        minMatchedPeaks: "Min matched peaks",
+        minMatchedPeaksHelp: "Reject phases with fewer matched peaks.",
+        maxShift: "Max shift",
+        maxShiftHelp: "Maximum global 2theta correction searched.",
+        shiftStep: "Shift step",
+        shiftStepHelp: "Smaller is finer but slower.",
+        positionWeight: "Position weight",
+        positionWeightHelp: "Weight for 2theta agreement.",
+        intensityWeight: "Intensity weight",
+        intensityWeightHelp: "Weight for relative intensity agreement.",
+        scoringMethod: "Scoring method",
+        scoringHelp: "Hybrid is recommended for routine use.",
+        runMatch: "Run match",
+        matchingBusy: "Calculating...",
+        inputPoints: "Points",
+        detectedPeaks: "Peaks",
+        candidatesScanned: "Scanned",
+        bestScore: "Best",
+        selectedPhase: "Phase",
+        chartTitle: "XRD Pattern Comparison",
+        chartNote: "Theoretical peaks are drawn upward after applying estimated_shift.",
+        plotSettings: "Plot settings",
+        plotWidth: "Width",
+        plotHeight: "Height",
+        axisLabelSize: "Axis label size",
+        tickLabelSize: "Tick/index size",
+        displayRangeMin: "Display 2theta min",
+        displayRangeMax: "Display 2theta max",
+        xAxisLabel: "X label",
+        yAxisLabel: "Y label",
+        expColor: "Experimental color",
+        peakColor: "Peak color",
+        theoryColor: "Theory color",
+        axisColor: "Axis color",
+        gridColor: "Grid color",
+        curveWidth: "Curve width",
+        exportPng: "Export PNG",
+        exportSvg: "Export SVG",
+        resetZoom: "Reset zoom",
+        pdfTitle: "PDF Full-Peak Comparison",
+        pdfNote: "Upload experimental XRD and up to five CIF files to compare all calculated theoretical peaks and weighted phase mixtures.",
+        pdfClickOpen: "Click to open full PDF comparison module",
+        pdfXrdFile: "Experimental XRD",
+        pdfXrdHelp: "Optional. If omitted, the currently loaded XRD data is used.",
+        pdfCifFiles: "CIF files",
+        pdfCifHelp: "Up to five CIF files. Set each phase contribution below.",
+        pdfRangeMin: "2theta min",
+        pdfRangeMax: "2theta max",
+        pdfRangeHelp: "Only peaks inside this 2theta window are calculated and displayed.",
+        pdfFwhm: "Peak width",
+        pdfFwhmHelp: "Controls simulated peak broadening for the mixed profile.",
+        pdfMinIntensity: "Min intensity",
+        pdfMinIntensityHelp: "Hides calculated peaks weaker than this relative intensity.",
+        pdfNormalize: "Normalize weights",
+        pdfCalculate: "Calculate PDF comparison",
+        pdfWaiting: "Upload CIF files to calculate full theoretical peaks.",
+        pdfNoCif: "Upload at least one CIF file.",
+        pdfTooManyCif: "Use at most five CIF files.",
+        pdfCalculating: "Calculating full theoretical peaks...",
+        pdfComplete: "PDF comparison complete: {count} phase(s).",
+        pdfFailed: "PDF calculation failed: {error}",
+        pdfExperimentProcessed: "Experiment, background removed",
+        pdfCifParseError: "PDF calculation failed: CIF parsing failed. Check that each uploaded file is a valid CIF.",
+        pdfDependencyError: "PDF calculation failed: pymatgen is required by the local API. Install the packaged dependencies or restart the packaged app.",
+        pdfRangeError: "PDF calculation failed: check that the 2theta minimum is smaller than the maximum.",
+        pdfSummaryTitle: "PDF phase summary",
+        pdfSummaryFile: "File",
+        pdfSummaryFormula: "Formula",
+        pdfSummaryWeight: "Weight",
+        pdfSummaryPeaks: "Peaks",
+        pdfExperiment: "Experiment",
+        pdfMixture: "Weighted mixture",
+        pdfMixtureColor: "Mixture color",
+        pdfWeight: "Weight",
+        pdfRestartApi: "The local API does not expose /api/cif-xrd yet. Restart the XMatcher local API or reopen the packaged app.",
+        fileUploaded: "{name} uploaded",
+        cifsUploaded: "{count} CIF file(s) uploaded",
+        hidePdfResult: "Hide PDF result",
+        showPdfResult: "Show PDF result",
+        legendExp: "Experimental profile",
+        legendDetected: "Detected peaks",
+        legendTheory: "Theoretical peaks shifted",
+        candidatesTitle: "Candidate Phases",
+        candidatesNote: "Click a row to update the theoretical peaks and matched-peak table.",
+        candidatePeakNote: "Marked peaks are not all diffraction peaks. Download the identified CIF and compare it with the experimental XRD data in the PDF module.",
+        formula: "Formula",
+        elementsShort: "Elements",
+        score: "Score",
+        expCoverage: "Exp coverage",
+        matched: "Matched",
+        shift: "Shift",
+        spacegroup: "Spacegroup",
+        peakMatches: "Peak matches",
+        expTwoTheta: "Exp 2theta",
+        dbShifted: "DB 2theta shifted",
+        dbRaw: "DB 2theta raw",
+        delta: "Delta",
+        expIntensity: "Exp intensity",
+        dbIntensity: "DB intensity",
+        waitingData: "Waiting for XRD data.",
+        citationTitle: "Citation",
+        citationNote: "Please cite the related XQueryer article when this software supports your work.",
+        copyCitation: "Copy citation",
+        copyBibtex: "Copy BibTeX",
+        copied: "Copied",
+        footerProduct: "XMatcher Local UI for powder XRD phase identification.",
+        footerDownload: "Download",
+        footerManual: "Manual",
+        footerIssues: "Issues",
+        footerAuthor: "Author",
+        apiConnected: "API connected: {count} entries",
+        apiConnectedLog: "Local API connected. Database entries: {count}.",
+        apiNotConnected: "API not connected",
+        apiConnectFailed: "Cannot connect to local API. Run python xmatcher_local_api.py --database MP500_xrd_database.pkl first. Error: {error}",
+        jsonFormatError: "JSON must contain two_theta/intensity arrays or a two-column array.",
+        xmlParseError: "Cannot parse this XML/XRDML. Export a two-column CSV/TXT file and try again.",
+        notEnoughData: "Not enough two-column numeric data was parsed.",
+        loadedData: "Loaded {file}, {count} data points.",
+        uploadFirst: "Upload or paste XRD data first.",
+        runningMatch: "Matching in progress. Full-database search can take longer; wait for the local API response...",
+        matchComplete: "Match complete: detected {peaks} experimental peaks and returned {results} candidates.",
+        noMatchHint: "No phase was matched. Current Peak count is {current}; recommended: try {suggested} (Top experimental peaks used for matching) and run matching again.",
+        resultRiskLowEvidence: "Low evidence: only {matched} peak(s) matched. Confirm this phase with full-peak comparison in the PDF module.",
+        resultRiskLargeShift: "Large 2theta shift ({shift}). Check sample displacement/calibration and confirm with the PDF module.",
+        resultRiskLowCoverage: "Low experimental coverage ({coverage}). Treat this identification as tentative and compare all peaks in the PDF module.",
+        matchFailed: "Match failed: {error}",
+        emptyPlot: "Upload XRD data to show the pattern",
+        noDownload: "No identification results to download.",
+        fileParseFailed: "File parsing failed: {error}",
+        pasteParseFailed: "Pasted data parsing failed: {error}",
+        cleared: "Cleared.",
+        yAxis: "Relative intensity",
+        xAxis: "2theta / degree",
+        hoverExp: "Exp",
+        hoverTheory: "Theory"
+      },
+      zh: {
+        controlPanel: "控制面板",
+        collapseSidebar: "折叠左侧面板",
+        expandSidebar: "展开左侧面板",
+        appTitle: "XMatcher 本地 XRD 物相识别",
+        releaseVersion: "正式发行版本 V1.0.0",
+        appSubtitle: "上传实验 XRD 数据，调整参数，在本机完成匹配，并对比实验峰与理论衍射峰。",
+        downloadLink: "软件下载",
+        manualLink: "说明手册",
+        issueLink: "GitHub 问题反馈",
+        checkingApi: "正在检查本地 API...",
+        projectResources: "项目资源",
+        projectNote: "下载软件、反馈问题，并引用相关的 XQueryer 论文。",
+        softwareDownload: "软件下载地址",
+        reportIssue: "提交问题",
+        authorInfo: "作者：Dr. Bin Cao（曹斌）",
+        localApiTitle: "1. 本地服务",
+        localApiNote: "将页面连接到本机 XMatcher 后端。",
+        appAutoConnectNote: "App 封装发放版本会自动连接本地服务，用户不需要手动启动。",
+        apiUrl: "API 地址",
+        runFirst: "先在项目根目录运行：",
+        checkConnection: "检查连接",
+        uploadTitle: "2. 上传 XRD",
+        uploadHint: "支持 CSV/TXT/XY/DAT、简单 JSON、常见 XRDML/XML。默认读取前两列数值作为 2theta 和强度。",
+        pasteData: "粘贴两列数据",
+        parse: "解析",
+        clear: "清空",
+        scopeTitle: "3. 检索范围",
+        scopeNote: "使用元素过滤可以减少误匹配并加快检索。",
+        elements: "元素过滤",
+        elementsPlaceholder: "例如 Ti,O；留空 = 全库",
+        elementsHelp: "留空表示全库检索，可用逗号或空格分隔。",
+        filterMode: "过滤模式",
+        containsMode: "包含这些元素",
+        exactMode: "元素集合完全一致",
+        topCandidates: "候选数",
+        topCandidatesHelp: "返回的候选物相数量。",
+        peakTitle: "4. 寻峰参数",
+        peakNote: "控制预处理和实验峰筛选。",
+        minHeight: "最小峰高",
+        minHeightHelp: "低于该相对高度的弱峰会被忽略。",
+        minProminence: "最小显著性",
+        minProminenceHelp: "值越大，越偏向保留突出峰。",
+        minDistance: "最小峰距",
+        minDistanceHelp: "相邻实验峰的最小 2theta 间距。",
+        peakCount: "峰数量",
+        peakCountHelp: "用于匹配的最强实验峰数量。",
+        smoothWindow: "平滑窗口",
+        smoothWindowHelp: "去噪平滑窗口，建议使用奇数。",
+        baselineWindow: "背景窗口",
+        baselineWindowHelp: "用于背景扣除的窗口比例。",
+        matchingTitle: "5. 匹配参数",
+        matchingNote: "控制峰位校准、打分权重和候选物相的最低匹配证据。",
+        positionTolerance: "峰位容差",
+        positionToleranceHelp: "平移校正后的允许 2theta 误差。",
+        minMatchedPeaks: "最少匹配峰",
+        minMatchedPeaksHelp: "匹配峰数不足的候选会被排除。",
+        maxShift: "最大平移",
+        maxShiftHelp: "搜索的最大整体 2theta 平移量。",
+        shiftStep: "平移步长",
+        shiftStepHelp: "越小越精细，但计算更慢。",
+        positionWeight: "峰位权重",
+        positionWeightHelp: "峰位一致性的打分权重。",
+        intensityWeight: "强度权重",
+        intensityWeightHelp: "相对强度一致性的打分权重。",
+        scoringMethod: "打分方法",
+        scoringHelp: "常规识别建议使用 hybrid。",
+        runMatch: "自动识别",
+        matchingBusy: "正在计算...",
+        inputPoints: "点数",
+        detectedPeaks: "峰数",
+        candidatesScanned: "候选",
+        bestScore: "最佳",
+        selectedPhase: "物相",
+        chartTitle: "实验谱与理论峰对比",
+        chartNote: "理论峰应用 estimated_shift 后向上显示。",
+        plotSettings: "图像设置",
+        plotWidth: "宽度",
+        plotHeight: "高度",
+        axisLabelSize: "XY 标签字号",
+        tickLabelSize: "刻度/index 字号",
+        displayRangeMin: "显示 2theta 最小值",
+        displayRangeMax: "显示 2theta 最大值",
+        xAxisLabel: "X 标签",
+        yAxisLabel: "Y 标签",
+        expColor: "实验曲线颜色",
+        peakColor: "峰标记颜色",
+        theoryColor: "理论峰颜色",
+        axisColor: "坐标轴颜色",
+        gridColor: "网格颜色",
+        curveWidth: "曲线线宽",
+        exportPng: "导出 PNG",
+        exportSvg: "导出 SVG",
+        resetZoom: "恢复全图",
+        pdfTitle: "PDF 全峰对比",
+        pdfNote: "上传实验 XRD 和最多五个 CIF，计算全部理论衍射峰，并对比加权多相混合结果。",
+        pdfClickOpen: "点击展开完整 PDF 对比模块",
+        pdfXrdFile: "实验 XRD",
+        pdfXrdHelp: "可选。未上传时使用当前已加载的 XRD 数据。",
+        pdfCifFiles: "CIF 文件",
+        pdfCifHelp: "最多五个 CIF 文件。可在下方指定每个晶体贡献含量。",
+        pdfRangeMin: "2theta 最小值",
+        pdfRangeMax: "2theta 最大值",
+        pdfRangeHelp: "只计算和显示该 2theta 范围内的理论峰。",
+        pdfFwhm: "峰宽",
+        pdfFwhmHelp: "控制混合谱模拟峰的展宽。",
+        pdfMinIntensity: "最小强度",
+        pdfMinIntensityHelp: "隐藏低于该相对强度的弱理论峰。",
+        pdfNormalize: "归一化含量",
+        pdfCalculate: "计算 PDF 对比",
+        pdfWaiting: "上传 CIF 文件后计算完整理论峰。",
+        pdfNoCif: "请至少上传一个 CIF 文件。",
+        pdfTooManyCif: "最多只能上传五个 CIF 文件。",
+        pdfCalculating: "正在计算完整理论峰...",
+        pdfComplete: "PDF 对比完成：{count} 个物相。",
+        pdfFailed: "PDF 计算失败：{error}",
+        pdfExperimentProcessed: "实验谱（已去背底）",
+        pdfCifParseError: "PDF 计算失败：CIF 解析失败。请检查上传文件是否为有效 CIF。",
+        pdfDependencyError: "PDF 计算失败：本地 API 需要 pymatgen。请安装封装依赖，或重新打开封装后的 App。",
+        pdfRangeError: "PDF 计算失败：请检查 2theta 最小值必须小于最大值。",
+        pdfSummaryTitle: "PDF 物相摘要",
+        pdfSummaryFile: "文件",
+        pdfSummaryFormula: "化学式",
+        pdfSummaryWeight: "含量",
+        pdfSummaryPeaks: "峰数量",
+        pdfExperiment: "实验谱",
+        pdfMixture: "加权混合",
+        pdfMixtureColor: "混合谱颜色",
+        pdfWeight: "含量",
+        pdfRestartApi: "当前本地 API 还没有 /api/cif-xrd 接口。请重启 XMatcher 本地 API，或重新打开封装后的 App。",
+        fileUploaded: "{name} 已经上传",
+        cifsUploaded: "已上传 {count} 个 CIF 文件",
+        hidePdfResult: "隐藏 PDF 结果",
+        showPdfResult: "显示 PDF 结果",
+        legendExp: "实验谱线",
+        legendDetected: "检测峰",
+        legendTheory: "平移后的理论峰",
+        candidatesTitle: "候选物相",
+        candidatesNote: "点击候选行可更新理论峰和匹配峰表。",
+        candidatePeakNote: "当前标记并非全部衍射峰。请将识别结果下载 CIF，并与实验 XRD 数据一起在 PDF 模块中对比。",
+        formula: "化学式",
+        elementsShort: "元素",
+        score: "分数",
+        expCoverage: "覆盖率",
+        matched: "匹配峰",
+        shift: "平移",
+        spacegroup: "空间群",
+        peakMatches: "匹配峰对",
+        expTwoTheta: "实验 2theta",
+        dbShifted: "平移后 DB 2theta",
+        dbRaw: "原始 DB 2theta",
+        delta: "偏差",
+        expIntensity: "实验强度",
+        dbIntensity: "理论强度",
+        waitingData: "等待上传 XRD 文件。",
+        citationTitle: "引用",
+        citationNote: "如果本软件支持了您的研究，请引用相关 XQueryer 论文。引用内容在所有语言版本中均保持英文。",
+        copyCitation: "复制引用",
+        copyBibtex: "复制 BibTeX",
+        copied: "已复制",
+        footerProduct: "XMatcher 本地 UI，用于粉末 XRD 物相识别。",
+        footerDownload: "下载",
+        footerManual: "说明手册",
+        footerIssues: "问题反馈",
+        footerAuthor: "作者",
+        apiConnected: "API 已连接：{count} 条",
+        apiConnectedLog: "本地 API 已连接，数据库 {count} 条。",
+        apiNotConnected: "API 未连接",
+        apiConnectFailed: "无法连接本地 API。先运行 python xmatcher_local_api.py --database MP500_xrd_database.pkl。错误：{error}",
+        jsonFormatError: "JSON 格式需要包含 two_theta/intensity 数组，或二维数组。",
+        xmlParseError: "无法解析该 XML/XRDML。请导出为两列 CSV/TXT 后再试。",
+        notEnoughData: "没有解析到足够的两列数值数据。",
+        loadedData: "已加载 {file}，{count} 个数据点。",
+        uploadFirst: "请先上传或粘贴 XRD 数据。",
+        runningMatch: "正在识别。全库检索可能需要较长时间，请等待本地 API 返回结果...",
+        matchComplete: "识别完成：检测到 {peaks} 个实验峰，返回 {results} 个候选。",
+        noMatchHint: "没有匹配到候选物相。当前“峰数量”为 {current}，建议先改为 {suggested}（用于匹配的最强实验峰数量），然后重新自动识别。",
+        resultRiskLowEvidence: "证据偏弱：仅匹配到 {matched} 个峰。建议在 PDF 模块中进行全峰对比确认。",
+        resultRiskLargeShift: "2theta 平移较大（{shift}）。请检查样品位移/仪器校准，并在 PDF 模块中确认。",
+        resultRiskLowCoverage: "实验峰覆盖率偏低（{coverage}）。该识别结果建议视为待确认，并在 PDF 模块中对比全部峰。",
+        matchFailed: "识别失败：{error}",
+        emptyPlot: "上传 XRD 文件后显示图谱",
+        noDownload: "没有可下载的识别结果。",
+        fileParseFailed: "文件解析失败：{error}",
+        pasteParseFailed: "粘贴数据解析失败：{error}",
+        cleared: "已清空。",
+        yAxis: "相对强度",
+        xAxis: "2theta / degree",
+        hoverExp: "实验",
+        hoverTheory: "理论"
+      }
+    };
+
+    i18n.ja = {...i18n.en,
+      controlPanel: "制御パネル", collapseSidebar: "左パネルを折りたたむ", expandSidebar: "左パネルを展開",
+      appTitle: "XMatcher ローカル XRD 相同定",
+      releaseVersion: "正式リリース V1.0.0",
+      appSubtitle: "実験 XRD データを読み込み、条件を調整し、ローカルで照合して実験ピークと理論反射を比較します。",
+      downloadLink: "ソフトウェアをダウンロード", manualLink: "マニュアル", issueLink: "GitHub Issues", checkingApi: "ローカル API を確認中...",
+      projectResources: "プロジェクト情報", projectNote: "ソフトウェアの入手、問題報告、関連 XQueryer 論文の引用はこちらです。",
+      softwareDownload: "ソフトウェアのダウンロード", reportIssue: "問題を報告", authorInfo: "著者: Dr. Bin Cao",
+      localApiTitle: "1. ローカル API", localApiNote: "ページをローカルの XMatcher バックエンドに接続します。", appAutoConnectNote: "配布用アプリではローカルサービスへ自動接続されるため、手動起動は不要です。", apiUrl: "API URL",
+      runFirst: "先にプロジェクトルートで実行:", checkConnection: "接続確認", uploadTitle: "2. XRD を読み込み",
+      uploadHint: "CSV/TXT/XY/DAT、簡易 JSON、一般的な XRDML/XML に対応します。先頭 2 つの数値列を 2theta と強度として読み込みます。",
+      pasteData: "2 列データを貼り付け", parse: "解析", clear: "クリア", scopeTitle: "3. 検索範囲",
+      scopeNote: "元素フィルタで誤同定を減らし、照合を高速化します。", elements: "元素", elementsPlaceholder: "例 Ti,O。空欄 = 全データベース",
+      elementsHelp: "空欄では全データベースを検索します。カンマまたは空白で区切ります。", filterMode: "フィルタ方式",
+      containsMode: "指定元素を含む", exactMode: "元素集合が完全一致", topCandidates: "候補数", topCandidatesHelp: "返す候補相の数。",
+      peakTitle: "4. ピーク検出", peakNote: "前処理と実験ピーク選択を制御します。", matchingTitle: "5. 照合",
+      minHeight: "最小高さ", minHeightHelp: "この相対高さ未満の弱いピークを無視します。",
+      minProminence: "最小プロミネンス", minProminenceHelp: "値を大きくすると、より孤立したピークだけを残します。",
+      minDistance: "最小距離", minDistanceHelp: "検出ピーク間の最小 2theta 間隔。",
+      peakCount: "ピーク数", peakCountHelp: "照合に使用する強い実験ピークの数。",
+      smoothWindow: "平滑化窓", smoothWindowHelp: "ノイズ低減用の奇数窓サイズ。",
+      baselineWindow: "ベースライン窓", baselineWindowHelp: "ベースライン補正に使う割合。",
+      matchingNote: "ピーク位置合わせ、スコア重み、候補相に必要な最小証拠を制御します。", runMatch: "照合を実行", matchingBusy: "計算中...",
+      positionTolerance: "位置許容差", positionToleranceHelp: "シフト補正後に許容する 2theta 誤差。",
+      minMatchedPeaks: "最小一致ピーク数", minMatchedPeaksHelp: "一致ピークが少ない相を除外します。",
+      maxShift: "最大シフト", maxShiftHelp: "探索する最大の全体 2theta シフト。",
+      shiftStep: "シフト刻み", shiftStepHelp: "小さいほど細かいですが遅くなります。",
+      positionWeight: "位置重み", positionWeightHelp: "2theta 一致度の重み。",
+      intensityWeight: "強度重み", intensityWeightHelp: "相対強度一致度の重み。",
+      scoringMethod: "スコア方法", scoringHelp: "通常は hybrid を推奨します。",
+      inputPoints: "点数", detectedPeaks: "ピーク", candidatesScanned: "候補", bestScore: "最高", selectedPhase: "相",
+      chartTitle: "XRD パターン比較", chartNote: "理論ピークは estimated_shift 適用後に上向きに描画されます。",
+      legendExp: "実験プロファイル", legendDetected: "検出ピーク", legendTheory: "シフト後の理論ピーク",
+      candidatesTitle: "候補相", candidatesNote: "行をクリックすると理論ピークと対応ピーク表が更新されます。",
+      candidatePeakNote: "表示されているピークは全回折ピークではありません。識別結果の CIF をダウンロードし、実験 XRD データとともに PDF モジュールで比較してください。",
+      formula: "組成式", elementsShort: "元素", score: "スコア", expCoverage: "実験カバー率", matched: "一致ピーク", shift: "シフト", spacegroup: "空間群",
+      peakMatches: "ピーク対応", expTwoTheta: "実験 2theta", dbShifted: "DB 2theta シフト後", dbRaw: "DB 2theta 元値", delta: "差分",
+      expIntensity: "実験強度", dbIntensity: "理論強度", waitingData: "XRD データ待機中。",
+      citationTitle: "引用", citationNote: "本ソフトウェアを研究に利用した場合は、関連する XQueryer 論文を引用してください。引用内容はすべての言語で英語のまま表示されます。", copyCitation: "引用をコピー", copyBibtex: "BibTeX をコピー", copied: "コピー済み",
+      footerProduct: "粉末 XRD 相同定用 XMatcher ローカル UI。", footerDownload: "ダウンロード", footerManual: "マニュアル", footerIssues: "Issues", footerAuthor: "著者",
+      apiConnected: "API 接続済み: {count} 件", apiConnectedLog: "ローカル API に接続しました。データベース: {count} 件。",
+      apiNotConnected: "API 未接続", apiConnectFailed: "ローカル API に接続できません。先に python xmatcher_local_api.py --database MP500_xrd_database.pkl を実行してください。エラー: {error}",
+      jsonFormatError: "JSON には two_theta/intensity 配列または 2 列配列が必要です。",
+      xmlParseError: "この XML/XRDML は解析できません。2 列 CSV/TXT に書き出して再試行してください。",
+      notEnoughData: "十分な 2 列数値データを解析できませんでした。",
+      loadedData: "{file} を読み込みました。データ点数: {count}。",
+      uploadFirst: "先に XRD データを読み込むか貼り付けてください。", runningMatch: "照合中です。全データベース検索は時間がかかる場合があります...",
+      matchComplete: "照合完了: 実験ピーク {peaks} 個を検出し、候補 {results} 件を返しました。", matchFailed: "照合失敗: {error}",
+      emptyPlot: "XRD データを読み込むとパターンを表示します", noDownload: "ダウンロード可能な同定結果がありません。",
+      fileParseFailed: "ファイル解析に失敗しました: {error}", pasteParseFailed: "貼り付けデータの解析に失敗しました: {error}", cleared: "クリアしました。",
+      yAxis: "相対強度", xAxis: "2theta / degree"
+    };
+    i18n.ko = {...i18n.en,
+      controlPanel: "제어 패널", collapseSidebar: "왼쪽 패널 접기", expandSidebar: "왼쪽 패널 펼치기",
+      appTitle: "XMatcher 로컬 XRD 상 식별",
+      releaseVersion: "공식 릴리스 V1.0.0",
+      appSubtitle: "실험 XRD 데이터를 불러오고 매개변수를 조정한 뒤 로컬에서 매칭하여 실험 피크와 이론 반사를 비교합니다.",
+      downloadLink: "소프트웨어 다운로드", manualLink: "매뉴얼", issueLink: "GitHub 이슈", checkingApi: "로컬 API 확인 중...",
+      projectResources: "프로젝트 리소스", projectNote: "소프트웨어를 받고 문제를 보고하며 관련 XQueryer 논문을 인용할 수 있습니다.",
+      softwareDownload: "소프트웨어 다운로드", reportIssue: "문제 보고", authorInfo: "저자: Dr. Bin Cao",
+      localApiTitle: "1. 로컬 API", localApiNote: "페이지를 로컬 XMatcher 백엔드에 연결합니다.", appAutoConnectNote: "배포용 앱에서는 로컬 서비스가 자동으로 연결되므로 사용자가 직접 시작할 필요가 없습니다.", apiUrl: "API URL",
+      runFirst: "먼저 프로젝트 루트에서 실행:", checkConnection: "연결 확인", uploadTitle: "2. XRD 업로드",
+      uploadHint: "CSV/TXT/XY/DAT, 간단한 JSON, 일반 XRDML/XML을 지원합니다. 처음 두 숫자 열을 2theta와 강도로 읽습니다.",
+      pasteData: "두 열 데이터 붙여넣기", parse: "파싱", clear: "지우기", scopeTitle: "3. 검색 범위",
+      scopeNote: "원소 필터로 오탐을 줄이고 매칭 속도를 높입니다.", elements: "원소", elementsPlaceholder: "예: Ti,O; 비우면 전체 DB",
+      elementsHelp: "비우면 전체 데이터베이스를 검색합니다. 쉼표 또는 공백으로 구분합니다.", filterMode: "필터 모드",
+      containsMode: "해당 원소 포함", exactMode: "원소 집합 완전 일치", topCandidates: "후보 수", topCandidatesHelp: "반환할 후보 상의 수입니다.",
+      peakTitle: "4. 피크 검출", peakNote: "전처리와 실험 피크 선택을 제어합니다.", matchingTitle: "5. 매칭",
+      minHeight: "최소 높이", minHeightHelp: "이 상대 높이보다 약한 피크는 무시합니다.",
+      minProminence: "최소 돌출도", minProminenceHelp: "값이 클수록 더 뚜렷한 피크만 남깁니다.",
+      minDistance: "최소 거리", minDistanceHelp: "검출 피크 사이의 최소 2theta 간격입니다.",
+      peakCount: "피크 수", peakCountHelp: "매칭에 사용할 강한 실험 피크 수입니다.",
+      smoothWindow: "평활 창", smoothWindowHelp: "노이즈 제거용 홀수 창 크기입니다.",
+      baselineWindow: "베이스라인 창", baselineWindowHelp: "베이스라인 보정에 사용할 비율입니다.",
+      matchingNote: "피크 정렬, 점수 가중치, 후보 상의 최소 근거를 제어합니다.", runMatch: "매칭 실행", matchingBusy: "계산 중...",
+      positionTolerance: "위치 허용오차", positionToleranceHelp: "시프트 보정 후 허용되는 2theta 오차입니다.",
+      minMatchedPeaks: "최소 매칭 피크", minMatchedPeaksHelp: "매칭 피크가 부족한 상은 제외합니다.",
+      maxShift: "최대 시프트", maxShiftHelp: "탐색할 최대 전체 2theta 시프트입니다.",
+      shiftStep: "시프트 간격", shiftStepHelp: "작을수록 정밀하지만 느립니다.",
+      positionWeight: "위치 가중치", positionWeightHelp: "2theta 일치도 가중치입니다.",
+      intensityWeight: "강도 가중치", intensityWeightHelp: "상대 강도 일치도 가중치입니다.",
+      scoringMethod: "점수 방식", scoringHelp: "일반 사용에는 hybrid를 권장합니다.",
+      inputPoints: "포인트", detectedPeaks: "피크", candidatesScanned: "후보", bestScore: "최고", selectedPhase: "상",
+      chartTitle: "XRD 패턴 비교", chartNote: "이론 피크는 estimated_shift 적용 후 위쪽으로 표시됩니다.",
+      legendExp: "실험 프로파일", legendDetected: "검출 피크", legendTheory: "시프트된 이론 피크",
+      candidatesTitle: "후보 상", candidatesNote: "행을 클릭하면 이론 피크와 매칭 피크 표가 갱신됩니다.",
+      candidatePeakNote: "표시된 피크는 전체 회절 피크가 아닙니다. 식별 결과 CIF를 다운로드한 뒤 실험 XRD 데이터와 함께 PDF 모듈에서 비교하세요.",
+      formula: "화학식", elementsShort: "원소", score: "점수", expCoverage: "실험 커버리지", matched: "매칭 피크", shift: "시프트", spacegroup: "공간군",
+      peakMatches: "피크 매칭", expTwoTheta: "실험 2theta", dbShifted: "DB 2theta 시프트 후", dbRaw: "DB 2theta 원본", delta: "편차",
+      expIntensity: "실험 강도", dbIntensity: "이론 강도", waitingData: "XRD 데이터를 기다리는 중입니다.",
+      citationTitle: "인용", citationNote: "이 소프트웨어가 연구에 사용되었다면 관련 XQueryer 논문을 인용해 주세요. 인용 내용은 모든 언어에서 영어로 유지됩니다.", copyCitation: "인용 복사", copyBibtex: "BibTeX 복사", copied: "복사됨",
+      footerProduct: "분말 XRD 상 식별용 XMatcher 로컬 UI.", footerDownload: "다운로드", footerManual: "매뉴얼", footerIssues: "이슈", footerAuthor: "저자",
+      apiConnected: "API 연결됨: {count} 항목", apiConnectedLog: "로컬 API가 연결되었습니다. 데이터베이스 {count} 항목.",
+      apiNotConnected: "API 연결 안 됨", apiConnectFailed: "로컬 API에 연결할 수 없습니다. 먼저 python xmatcher_local_api.py --database MP500_xrd_database.pkl 를 실행하세요. 오류: {error}",
+      jsonFormatError: "JSON에는 two_theta/intensity 배열 또는 두 열 배열이 필요합니다.",
+      xmlParseError: "이 XML/XRDML을 파싱할 수 없습니다. 두 열 CSV/TXT로 내보낸 뒤 다시 시도하세요.",
+      notEnoughData: "충분한 두 열 숫자 데이터를 파싱하지 못했습니다.",
+      loadedData: "{file}을 불러왔습니다. 데이터 포인트: {count}.",
+      uploadFirst: "먼저 XRD 데이터를 업로드하거나 붙여넣으세요.", runningMatch: "매칭 중입니다. 전체 DB 검색은 시간이 걸릴 수 있습니다...",
+      matchComplete: "매칭 완료: 실험 피크 {peaks}개를 검출하고 후보 {results}개를 반환했습니다.", matchFailed: "매칭 실패: {error}",
+      emptyPlot: "XRD 데이터를 업로드하면 패턴이 표시됩니다", noDownload: "다운로드할 식별 결과가 없습니다.",
+      fileParseFailed: "파일 파싱 실패: {error}", pasteParseFailed: "붙여넣은 데이터 파싱 실패: {error}", cleared: "지웠습니다.",
+      yAxis: "상대 강도", xAxis: "2theta / degree"
+    };
+
+    function t(key, params = {}) {
+      const template = (i18n[currentLang] && i18n[currentLang][key]) || i18n.en[key] || key;
+      return template.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+    }
+
+    function applyLanguage(lang) {
+      currentLang = i18n[lang] ? lang : "en";
+      localStorage.setItem("xmatcher-lang", currentLang);
+      document.documentElement.lang = {en: "en", zh: "zh-CN", ja: "ja", ko: "ko"}[currentLang];
+      document.title = `${t("appTitle")} UI`;
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        node.textContent = t(node.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+        node.placeholder = t(node.dataset.i18nPlaceholder);
+      });
+      document.querySelectorAll("[data-i18n-title]").forEach((node) => {
+        node.title = t(node.dataset.i18nTitle);
+      });
+      document.querySelectorAll("[data-lang]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.lang === currentLang);
+      });
+      syncSidebarToggle();
+      if ($("pdfToggleResult")) updatePdfToggleButton();
+      updateRiskNote();
+      renderPdfSummary();
+      drawPlot();
+    }
 
     function log(message, kind = "") {
       $("log").innerHTML = kind ? `<span class="${kind}">${escapeHtml(message)}</span>` : escapeHtml(message);
+    }
+
+    function setBusyLog(message) {
+      $("log").innerHTML = `<span class="warn-text"><span class="spinner"></span>${escapeHtml(message)}</span>`;
+    }
+
+    function setMatchingBusy(isBusy) {
+      const button = $("runMatch");
+      button.disabled = isBusy;
+      if (isBusy) {
+        button.innerHTML = `<span class="spinner"></span>${escapeHtml(t("matchingBusy"))}`;
+      } else {
+        button.textContent = t("runMatch");
+      }
+    }
+
+    function syncSidebarToggle() {
+      const main = document.querySelector("main");
+      if (!main) return;
+      main.classList.toggle("sidebar-collapsed", state.sidebarCollapsed);
+      const button = $("toggleSidebar");
+      if (button) {
+        button.textContent = state.sidebarCollapsed ? ">>" : "<<";
+        button.title = t(state.sidebarCollapsed ? "expandSidebar" : "collapseSidebar");
+        button.dataset.i18nTitle = state.sidebarCollapsed ? "expandSidebar" : "collapseSidebar";
+      }
+      requestAnimationFrame(drawPlot);
+    }
+
+    function setupPanels() {
+      document.querySelectorAll(".panel-title").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.closest(".panel")?.classList.toggle("collapsed");
+        });
+      });
+    }
+
+    function setupSidebarResize() {
+      const main = document.querySelector("main");
+      const splitter = $("splitter");
+      const savedWidth = Number(localStorage.getItem("xmatcher-sidebar-width"));
+      if (Number.isFinite(savedWidth) && savedWidth >= 280) {
+        document.documentElement.style.setProperty("--sidebar-width", `${savedWidth}px`);
+      }
+      $("toggleSidebar").addEventListener("click", () => {
+        state.sidebarCollapsed = !state.sidebarCollapsed;
+        localStorage.setItem("xmatcher-sidebar-collapsed", String(state.sidebarCollapsed));
+        syncSidebarToggle();
+      });
+      splitter.addEventListener("pointerdown", (event) => {
+        if (state.sidebarCollapsed || window.matchMedia("(max-width: 1100px)").matches) return;
+        event.preventDefault();
+        splitter.setPointerCapture(event.pointerId);
+        document.body.classList.add("resizing");
+      });
+      splitter.addEventListener("pointermove", (event) => {
+        if (!document.body.classList.contains("resizing")) return;
+        const rect = main.getBoundingClientRect();
+        const width = Math.max(280, Math.min(620, event.clientX - rect.left));
+        document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
+        localStorage.setItem("xmatcher-sidebar-width", String(Math.round(width)));
+        drawPlot();
+      });
+      const stopResize = () => document.body.classList.remove("resizing");
+      splitter.addEventListener("pointerup", stopResize);
+      splitter.addEventListener("pointercancel", stopResize);
+      syncSidebarToggle();
     }
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
       }[ch]));
+    }
+
+    function materialProjectId(mpid) {
+      return String(mpid ?? "").trim().replace(/\.cif$/i, "");
+    }
+
+    function materialProjectLink(mpid) {
+      const id = materialProjectId(mpid);
+      if (!id) return "";
+      return `https://next-gen.materialsproject.org/materials/${encodeURIComponent(id)}`;
+    }
+
+    function safeFileStem(value, fallback = "xmatcher") {
+      const stem = String(value || fallback)
+        .replace(/\.[^.]+$/, "")
+        .replace(/[^A-Za-z0-9._-]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 80);
+      return stem || fallback;
+    }
+
+    function selectedResultStem(prefix = "xmatcher_result") {
+      const selected = state.results[state.selectedIndex];
+      if (!selected) return prefix;
+      const id = materialProjectId(selected.mpid);
+      return safeFileStem(`${prefix}_${id || selected.formula || state.selectedIndex + 1}`, prefix);
+    }
+
+    function pdfResultStem(prefix = "xmatcher_pdf_comparison") {
+      const phaseCount = state.pdf.result?.phases?.length || state.pdf.cifs.length || 0;
+      const first = state.pdf.result?.phases?.[0]?.formula || state.pdf.cifs[0]?.name || "";
+      const suffix = phaseCount ? `${phaseCount}phases_${first}` : "empty";
+      return safeFileStem(`${prefix}_${suffix}`, prefix);
+    }
+
+    function noMatchRecommendation() {
+      const current = Math.max(1, Math.round(num("nPeaks")) || 1);
+      const suggested = Math.max(3, Math.min(current - 1, Math.ceil(current * 0.6)));
+      return {current, suggested: suggested >= current ? Math.max(1, current - 1) : suggested};
+    }
+
+    function selectedRiskMessages() {
+      const selected = state.results[state.selectedIndex];
+      if (!selected) return [];
+      const messages = [];
+      const matched = Number(selected.n_matched_peaks || 0);
+      const minMatched = Math.max(1, Math.round(num("minMatchedPeaks")) || 1);
+      const shift = Math.abs(Number(selected.estimated_shift || 0));
+      const coverage = Number(selected.experimental_coverage || 0);
+      if (matched <= Math.max(2, minMatched)) messages.push(t("resultRiskLowEvidence", {matched}));
+      if (shift >= 0.35) messages.push(t("resultRiskLargeShift", {shift: fmt(shift, 3)}));
+      if (Number.isFinite(coverage) && coverage > 0 && coverage < 0.45) messages.push(t("resultRiskLowCoverage", {coverage: fmt(coverage, 2)}));
+      return messages;
+    }
+
+    function updateRiskNote() {
+      const note = $("riskNote");
+      if (!note) return;
+      const messages = selectedRiskMessages();
+      note.style.display = messages.length ? "block" : "none";
+      note.innerHTML = messages.map(escapeHtml).join("<br>");
+    }
+
+    function pdfErrorMessage(message) {
+      if (/Unknown endpoint/i.test(message)) return t("pdfRestartApi");
+      if (/pymatgen/i.test(message)) return t("pdfDependencyError");
+      if (/two_theta_range|Invalid two_theta/i.test(message)) return t("pdfRangeError");
+      if (/CIF|structure|No structure|Parser|parse/i.test(message)) return t("pdfCifParseError");
+      return t("pdfFailed", {error: message});
     }
 
     function num(id) {
@@ -709,12 +2290,13 @@
         const data = await res.json();
         state.serverStats = data.database;
         $("serverDot").className = "dot ok";
-        $("serverText").textContent = `API connected: ${data.database.total_entries.toLocaleString()} entries`;
-        log(`本地 API 已连接，数据库 ${data.database.total_entries.toLocaleString()} 条。`, "ok-text");
+        const count = data.database.total_entries.toLocaleString();
+        $("serverText").textContent = t("apiConnected", {count});
+        log(t("apiConnectedLog", {count}), "ok-text");
       } catch (err) {
         $("serverDot").className = "dot bad";
-        $("serverText").textContent = "API not connected";
-        log(`无法连接本地 API。先运行 python xmatcher_local_api.py --database MP500_xrd_database.pkl。错误：${err.message}`, "error");
+        $("serverText").textContent = t("apiNotConnected");
+        log(t("apiConnectFailed", {error: err.message}), "error");
       }
     }
 
@@ -741,7 +2323,7 @@
       const x = obj.two_theta || obj.angle || obj.x;
       const y = obj.intensity || obj.y;
       if (Array.isArray(x) && Array.isArray(y)) return x.map((value, index) => [Number(value), Number(y[index])]);
-      throw new Error("JSON 格式需要包含 two_theta/intensity 数组，或二维数组。");
+      throw new Error(t("jsonFormatError"));
     }
 
     function parseXml(text) {
@@ -765,7 +2347,7 @@
           return y.map((value, index) => [start + index * step, value]);
         }
       }
-      throw new Error("无法解析该 XML/XRDML。请导出为两列 CSV/TXT 后再试。");
+      throw new Error(t("xmlParseError"));
     }
 
     function parseTextByName(text, name = "") {
@@ -775,7 +2357,7 @@
       else if (lower.endsWith(".xml") || lower.endsWith(".xrdml")) rows = parseXml(text);
       else rows = parseDelimited(text);
       rows = rows.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
-      if (rows.length < 3) throw new Error("没有解析到足够的两列数值数据。");
+      if (rows.length < 3) throw new Error(t("notEnoughData"));
       rows.sort((a, b) => a[0] - b[0]);
       const merged = [];
       for (const [x, y] of rows) {
@@ -799,6 +2381,8 @@
       state.detectedPeaks = [];
       state.results = [];
       state.selectedIndex = 0;
+      state.hover = null;
+      state.plotZoom = null;
       $("mPoints").textContent = data.two_theta.length.toLocaleString();
       $("mPeaks").textContent = "0";
       $("mCandidates").textContent = "0";
@@ -807,7 +2391,8 @@
       renderResults();
       renderMatches();
       drawPlot();
-      log(`已加载 ${fileName}，${data.two_theta.length.toLocaleString()} 个数据点。`);
+      $("fileStatus").textContent = t("fileUploaded", {name: fileName});
+      log(t("loadedData", {file: fileName, count: data.two_theta.length.toLocaleString()}));
     }
 
     async function handleFile(file) {
@@ -842,11 +2427,11 @@
 
     async function runMatch() {
       if (!state.raw) {
-        log("请先上传或粘贴 XRD 数据。", "error");
+        log(t("uploadFirst"), "error");
         return;
       }
-      $("runMatch").disabled = true;
-      log("正在识别。全库检索可能需要较长时间，请等待本地 API 返回结果...", "warn-text");
+      setMatchingBusy(true);
+      setBusyLog(t("runningMatch"));
       try {
         const payload = {
           two_theta: state.raw.two_theta,
@@ -874,11 +2459,17 @@
         renderResults();
         renderMatches();
         drawPlot();
-        log(`识别完成：检测到 ${state.detectedPeaks.length} 个实验峰，返回 ${state.results.length} 个候选。`, "ok-text");
+        log(t("matchComplete", {peaks: state.detectedPeaks.length, results: state.results.length}), "ok-text");
+        if (!state.results.length) {
+          const recommendation = noMatchRecommendation();
+          const hint = t("noMatchHint", recommendation);
+          log(hint, "warn-text");
+          window.alert(hint);
+        }
       } catch (err) {
-        log(`识别失败：${err.message}`, "error");
+        log(t("matchFailed", {error: err.message}), "error");
       } finally {
-        $("runMatch").disabled = false;
+        setMatchingBusy(false);
       }
     }
 
@@ -888,10 +2479,12 @@
       state.results.forEach((r, index) => {
         const tr = document.createElement("tr");
         if (index === state.selectedIndex) tr.classList.add("selected");
+        const mpid = materialProjectId(r.mpid);
+        const mpLink = materialProjectLink(r.mpid);
         tr.innerHTML = `
           <td>${index + 1}</td>
           <td><strong>${escapeHtml(r.formula)}</strong></td>
-          <td>${escapeHtml(r.mpid ?? "")}</td>
+          <td>${mpLink ? `<a href="${escapeHtml(mpLink)}" target="_blank" rel="noopener">${escapeHtml(mpid)}</a>` : ""}</td>
           <td>${(r.elements || []).map((e) => `<span class="pill">${escapeHtml(e)}</span>`).join(" ")}</td>
           <td>${fmt(r.score, 2)}</td>
           <td>${fmt(r.weighted_score, 2)}</td>
@@ -905,13 +2498,15 @@
         tr.addEventListener("click", () => {
           state.selectedIndex = index;
           renderResults();
-          renderMatches();
-          drawPlot();
-          $("mBest").textContent = fmt(r.score, 2);
-          $("mPhase").textContent = r.formula || "-";
+        renderMatches();
+        drawPlot();
+        $("mBest").textContent = fmt(r.score, 2);
+        $("mPhase").textContent = r.formula || "-";
+          updateRiskNote();
         });
         body.appendChild(tr);
       });
+      updateRiskNote();
     }
 
     function renderMatches() {
@@ -934,41 +2529,550 @@
       }
     }
 
+    function renderPdfSummary() {
+      const wrap = $("pdfSummary");
+      if (!wrap) return;
+      const phases = state.pdf.result?.phases || [];
+      if (!phases.length) {
+        wrap.style.display = "none";
+        wrap.innerHTML = "";
+        return;
+      }
+      const rows = phases.map((phase, index) => {
+        const color = state.pdf.cifs[index]?.color || state.pdf.colors[index % state.pdf.colors.length];
+        const file = phase.name || state.pdf.cifs[index]?.name || `phase ${index + 1}`;
+        const peaks = phase.peaks?.positions?.length || 0;
+        return `
+          <tr>
+            <td><span class="swatch" style="background:${escapeHtml(color)}"></span>${escapeHtml(file)}</td>
+            <td>${escapeHtml(phase.formula || "-")}</td>
+            <td>${fmt(phase.weight, 2)}%</td>
+            <td>${peaks}</td>
+          </tr>
+        `;
+      }).join("");
+      wrap.style.display = "block";
+      wrap.innerHTML = `
+        <div class="panel-heading" style="margin:0; padding:10px 12px 0;">
+          <h2 style="font-size:14px;">${escapeHtml(t("pdfSummaryTitle"))}</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>${escapeHtml(t("pdfSummaryFile"))}</th>
+              <th>${escapeHtml(t("pdfSummaryFormula"))}</th>
+              <th>${escapeHtml(t("pdfSummaryWeight"))}</th>
+              <th>${escapeHtml(t("pdfSummaryPeaks"))}</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderPdfPhaseList() {
+      const list = $("pdfPhaseList");
+      list.innerHTML = "";
+      state.pdf.cifs.forEach((phase, index) => {
+        const row = document.createElement("div");
+        row.className = "phase-row";
+        row.innerHTML = `
+          <div class="phase-name" title="${escapeHtml(phase.name)}">${escapeHtml(phase.name)}</div>
+          <input type="number" min="0" step="1" value="${escapeHtml(phase.weight)}" data-pdf-weight="${index}" aria-label="${t("pdfWeight")}">
+          <input type="color" value="${escapeHtml(phase.color)}" data-pdf-color="${index}" aria-label="color">
+          <button type="button" data-pdf-remove="${index}">x</button>
+        `;
+        list.appendChild(row);
+      });
+      list.querySelectorAll("[data-pdf-weight]").forEach((input) => {
+        input.addEventListener("input", () => {
+          state.pdf.cifs[Number(input.dataset.pdfWeight)].weight = Number(input.value) || 0;
+        });
+      });
+      list.querySelectorAll("[data-pdf-color]").forEach((input) => {
+        input.addEventListener("input", () => {
+          state.pdf.cifs[Number(input.dataset.pdfColor)].color = input.value;
+          drawPdfPlot();
+        });
+      });
+      list.querySelectorAll("[data-pdf-remove]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.pdf.cifs.splice(Number(button.dataset.pdfRemove), 1);
+          state.pdf.result = null;
+          renderPdfPhaseList();
+          renderPdfSummary();
+          $("pdfCifStatus").textContent = state.pdf.cifs.length ? t("cifsUploaded", {count: state.pdf.cifs.length}) : "";
+          updatePdfToggleButton();
+          drawPdfPlot();
+        });
+      });
+    }
+
+    async function handlePdfXrdFile(file) {
+      const text = await file.text();
+      state.pdf.xrd = parseTextByName(text, file.name);
+      $("pdfXrdStatus").textContent = t("fileUploaded", {name: file.name});
+      drawPdfPlot();
+    }
+
+    async function handlePdfCifFiles(files) {
+      const remaining = Math.max(0, 5 - state.pdf.cifs.length);
+      const selected = Array.from(files).slice(0, remaining);
+      if (files.length > remaining) {
+        $("pdfLog").innerHTML = `<span class="warn-text">${escapeHtml(t("pdfTooManyCif"))}</span>`;
+      }
+      for (let i = 0; i < selected.length; i++) {
+        const file = selected[i];
+        const colorIndex = state.pdf.cifs.length % state.pdf.colors.length;
+        state.pdf.cifs.push({
+          name: file.name,
+          content: await file.text(),
+          weight: state.pdf.cifs.length ? 0 : 100,
+          color: state.pdf.colors[colorIndex]
+        });
+      }
+      state.pdf.result = null;
+      state.pdfZoom = null;
+      state.pdfHover = null;
+      renderPdfPhaseList();
+      renderPdfSummary();
+      $("pdfCifStatus").textContent = t("cifsUploaded", {count: state.pdf.cifs.length});
+      updatePdfToggleButton();
+      drawPdfPlot();
+    }
+
+    function normalizePdfWeights() {
+      const total = state.pdf.cifs.reduce((sum, item) => sum + Number(item.weight || 0), 0) || 1;
+      state.pdf.cifs.forEach((item) => {
+        item.weight = Number((100 * Number(item.weight || 0) / total).toFixed(2));
+      });
+      renderPdfPhaseList();
+    }
+
+    async function calculatePdfComparison() {
+      if (!state.pdf.cifs.length) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(t("pdfNoCif"))}</span>`;
+        return;
+      }
+      $("pdfCalculate").disabled = true;
+      $("pdfCalculate").innerHTML = `<span class="spinner"></span>${escapeHtml(t("matchingBusy"))}`;
+      $("pdfLog").innerHTML = `<span class="warn-text"><span class="spinner"></span>${escapeHtml(t("pdfCalculating"))}</span>`;
+      try {
+        const payload = {
+          cifs: state.pdf.cifs.map((item) => ({name: item.name, content: item.content, weight: item.weight})),
+          two_theta_range: [num("pdfRangeMin"), num("pdfRangeMax")],
+          min_intensity: num("pdfMinIntensity"),
+          fwhm: num("pdfFwhm"),
+          wavelength: "CuKa",
+          normalize: true
+        };
+        const res = await fetch(`${getApiUrl()}/api/cif-xrd`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || data.status === "error") throw new Error(data.error || `HTTP ${res.status}`);
+      state.pdf.result = data;
+      state.pdfZoom = null;
+      state.pdfHover = null;
+      state.pdf.showResult = true;
+      updatePdfToggleButton();
+      $("pdfLog").innerHTML = `<span class="ok-text">${escapeHtml(t("pdfComplete", {count: data.phases.length}))}</span>`;
+        renderPdfSummary();
+        drawPdfPlot();
+      } catch (err) {
+        const message = String(err.message || "");
+        const detail = pdfErrorMessage(message);
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(detail)}</span>`;
+      } finally {
+        $("pdfCalculate").disabled = false;
+        $("pdfCalculate").textContent = t("pdfCalculate");
+      }
+    }
+
     function normalize(values, maxOut = 100) {
       const max = Math.max(...values.filter(Number.isFinite), 0);
       if (max <= 0) return values.map(() => 0);
       return values.map((v) => Math.max(0, Number(v)) * maxOut / max);
     }
 
+    function movingAverage(values, windowSize) {
+      const half = Math.floor(windowSize / 2);
+      const out = [];
+      for (let i = 0; i < values.length; i++) {
+        let sum = 0;
+        let count = 0;
+        for (let j = Math.max(0, i - half); j <= Math.min(values.length - 1, i + half); j++) {
+          sum += Number(values[j]) || 0;
+          count += 1;
+        }
+        out.push(count ? sum / count : 0);
+      }
+      return out;
+    }
+
+    function rollingMinimum(values, windowSize) {
+      const half = Math.floor(windowSize / 2);
+      const out = [];
+      for (let i = 0; i < values.length; i++) {
+        let min = Infinity;
+        for (let j = Math.max(0, i - half); j <= Math.min(values.length - 1, i + half); j++) {
+          min = Math.min(min, Number(values[j]) || 0);
+        }
+        out.push(Number.isFinite(min) ? min : 0);
+      }
+      return out;
+    }
+
+    function preprocessSpectrumForDisplay(raw) {
+      if (!raw?.two_theta?.length || !raw?.intensity?.length) return raw;
+      const n = raw.intensity.length;
+      let smoothWindow = Math.max(3, Math.round(num("smoothWindow")) || 7);
+      if (smoothWindow % 2 === 0) smoothWindow += 1;
+      const baselineFraction = Math.max(0.005, Math.min(0.5, num("baselineWindowFraction") || 0.05));
+      let baselineWindow = Math.max(3, Math.round(n * baselineFraction));
+      if (baselineWindow % 2 === 0) baselineWindow += 1;
+      const smoothed = movingAverage(raw.intensity.map(Number), smoothWindow);
+      const baseline = movingAverage(rollingMinimum(smoothed, baselineWindow), Math.min(baselineWindow, 51));
+      const intensity = smoothed.map((value, index) => Math.max(0, value - (baseline[index] || 0)));
+      return {two_theta: raw.two_theta, intensity};
+    }
+
+    function getPdfExperimentSpectrum() {
+      if (state.pdf.xrd) return preprocessSpectrumForDisplay(state.pdf.xrd);
+      if (state.processed) return state.processed;
+      return state.raw ? preprocessSpectrumForDisplay(state.raw) : null;
+    }
+
+    function nearestIndex(values, target) {
+      if (!values.length) return -1;
+      let lo = 0;
+      let hi = values.length - 1;
+      while (lo < hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (values[mid] < target) lo = mid + 1;
+        else hi = mid;
+      }
+      if (lo > 0 && Math.abs(values[lo - 1] - target) < Math.abs(values[lo] - target)) return lo - 1;
+      return lo;
+    }
+
+    function setupPlotHover() {
+      const canvas = $("plot");
+      canvas.addEventListener("mousemove", (event) => {
+        const plot = state.plot;
+        if (!plot) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const cx = (event.clientX - rect.left) * scaleX;
+        const cy = (event.clientY - rect.top) * scaleY;
+        const inside = cx >= plot.margin.left && cx <= canvas.width - plot.margin.right && cy >= plot.margin.top && cy <= canvas.height - plot.margin.bottom;
+        if (!inside) {
+          state.hover = null;
+          drawPlot();
+          return;
+        }
+        const xValue = plot.xMin + (cx - plot.margin.left) * (plot.xMax - plot.xMin) / plot.plotW;
+        const index = nearestIndex(plot.x, xValue);
+        const selected = state.results[state.selectedIndex];
+        let theory = null;
+        if (selected?.theoretical_peaks) {
+          const shift = Number(selected.estimated_shift || 0);
+          const positions = selected.theoretical_peaks.positions || [];
+          const intensities = normalize(selected.theoretical_peaks.intensities || []);
+          for (let i = 0; i < positions.length; i++) {
+            const shifted = Number(positions[i]) + shift;
+            if (!Number.isFinite(shifted)) continue;
+            const distance = Math.abs(plot.sx(shifted) - cx);
+            if (distance <= 8 && (!theory || distance < theory.distance)) {
+              theory = {x: shifted, y: intensities[i], distance};
+            }
+          }
+        }
+        state.hover = {
+          cx,
+          cy,
+          x: plot.x[index],
+          rawY: plot.rawY[index],
+          y: plot.y[index],
+          theory
+        };
+        drawPlot();
+      });
+      canvas.addEventListener("mouseleave", () => {
+        state.hover = null;
+        drawPlot();
+      });
+    }
+
+    function setupZoomBox(canvasId, boxId, getPlot, setZoom, redraw) {
+      const canvas = $(canvasId);
+      const box = $(boxId);
+      canvas.addEventListener("pointerdown", (event) => {
+        const plot = getPlot();
+        if (!plot) return;
+        const rect = canvas.getBoundingClientRect();
+        const cx = event.clientX - rect.left;
+        const cy = event.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const px = cx * scaleX;
+        const py = cy * scaleY;
+        if (px < plot.margin.left || px > canvas.width - plot.margin.right || py < plot.margin.top || py > canvas.height - plot.margin.bottom) return;
+        state.dragZoom = {canvasId, startX: cx, startY: cy, currentX: cx, currentY: cy};
+        canvas.setPointerCapture(event.pointerId);
+        box.style.display = "block";
+        box.style.left = `${cx}px`;
+        box.style.top = `${cy}px`;
+        box.style.width = "0px";
+        box.style.height = "0px";
+      });
+      canvas.addEventListener("pointermove", (event) => {
+        if (!state.dragZoom || state.dragZoom.canvasId !== canvasId) return;
+        const rect = canvas.getBoundingClientRect();
+        const cx = event.clientX - rect.left;
+        const cy = event.clientY - rect.top;
+        state.dragZoom.currentX = cx;
+        state.dragZoom.currentY = cy;
+        const left = Math.min(state.dragZoom.startX, cx);
+        const top = Math.min(state.dragZoom.startY, cy);
+        box.style.left = `${left}px`;
+        box.style.top = `${top}px`;
+        box.style.width = `${Math.abs(cx - state.dragZoom.startX)}px`;
+        box.style.height = `${Math.abs(cy - state.dragZoom.startY)}px`;
+      });
+      const finish = (event) => {
+        if (!state.dragZoom || state.dragZoom.canvasId !== canvasId) return;
+        const drag = state.dragZoom;
+        state.dragZoom = null;
+        box.style.display = "none";
+        const plot = getPlot();
+        if (!plot || Math.abs(drag.currentX - drag.startX) < 10) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const x1 = (Math.min(drag.startX, drag.currentX) * scaleX - plot.margin.left) * (plot.xMax - plot.xMin) / plot.plotW + plot.xMin;
+        const x2 = (Math.max(drag.startX, drag.currentX) * scaleX - plot.margin.left) * (plot.xMax - plot.xMin) / plot.plotW + plot.xMin;
+        if (Number.isFinite(x1) && Number.isFinite(x2) && x2 > x1) {
+          setZoom({xMin: x1, xMax: x2});
+          redraw();
+        }
+      };
+      canvas.addEventListener("pointerup", finish);
+      canvas.addEventListener("pointercancel", finish);
+    }
+
+    function resetPlotZoom() {
+      state.plotZoom = null;
+      state.hover = null;
+      $("plotRangeMin").value = "";
+      $("plotRangeMax").value = "";
+      drawPlot();
+    }
+
+    function resetPdfZoom() {
+      state.pdfZoom = null;
+      state.pdfHover = null;
+      drawPdfPlot();
+    }
+
+    function readPlotSettings() {
+      const rangeMin = $("plotRangeMin").value.trim() === "" ? NaN : Number($("plotRangeMin").value);
+      const rangeMax = $("plotRangeMax").value.trim() === "" ? NaN : Number($("plotRangeMax").value);
+      state.plotZoom = Number.isFinite(rangeMin) && Number.isFinite(rangeMax) && rangeMax > rangeMin ? {xMin: rangeMin, xMax: rangeMax} : null;
+      state.plotSettings = {
+        width: Math.max(640, Math.round(num("plotWidth")) || 1400),
+        height: Math.max(260, Math.round(num("plotHeight")) || 520),
+        axisLabelSize: Math.max(8, Math.round(num("axisLabelSize")) || 16),
+        tickLabelSize: Math.max(8, Math.round(num("tickLabelSize")) || 13),
+        xLabel: $("xAxisLabel").value.trim() || t("xAxis"),
+        yLabel: $("yAxisLabel").value.trim() || t("yAxis"),
+        expColor: $("expColor").value || "#1d4ed8",
+        peakColor: $("peakColor").value || "#dc2626",
+        theoryColor: $("theoryColor").value || "#0f766e",
+        axisColor: $("axisColor").value || "#111827",
+        gridColor: $("gridColor").value || "#e5e7eb",
+        curveWidth: Math.max(0.5, Number($("curveWidth").value) || 1.4)
+      };
+      localStorage.setItem("xmatcher-plot-settings", JSON.stringify(state.plotSettings));
+      drawPlot();
+    }
+
+    function setupPlotSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("xmatcher-plot-settings") || "{}");
+        state.plotSettings = {...state.plotSettings, ...saved};
+      } catch {}
+      const s = state.plotSettings;
+      $("plotWidth").value = s.width;
+      $("plotHeight").value = s.height;
+      $("axisLabelSize").value = s.axisLabelSize;
+      $("tickLabelSize").value = s.tickLabelSize;
+      $("xAxisLabel").value = s.xLabel;
+      $("yAxisLabel").value = s.yLabel;
+      $("expColor").value = s.expColor;
+      $("peakColor").value = s.peakColor;
+      $("theoryColor").value = s.theoryColor;
+      $("axisColor").value = s.axisColor;
+      $("gridColor").value = s.gridColor;
+      $("curveWidth").value = s.curveWidth;
+      [
+        "plotWidth", "plotHeight", "axisLabelSize", "tickLabelSize", "xAxisLabel", "yAxisLabel",
+        "expColor", "peakColor", "theoryColor", "axisColor", "gridColor", "curveWidth"
+      ].forEach((id) => $(id).addEventListener("input", readPlotSettings));
+      ["plotRangeMin", "plotRangeMax"].forEach((id) => $(id).addEventListener("input", readPlotSettings));
+    }
+
+    function readPdfSettings() {
+      const rangeMin = $("pdfRangeMin").value.trim() === "" ? NaN : Number($("pdfRangeMin").value);
+      const rangeMax = $("pdfRangeMax").value.trim() === "" ? NaN : Number($("pdfRangeMax").value);
+      state.pdfZoom = Number.isFinite(rangeMin) && Number.isFinite(rangeMax) && rangeMax > rangeMin ? {xMin: rangeMin, xMax: rangeMax} : null;
+      state.pdfSettings = {
+        width: Math.max(640, Math.round(num("pdfPlotWidth")) || 1400),
+        height: Math.max(300, Math.round(num("pdfPlotHeight")) || 520),
+        axisLabelSize: Math.max(8, Math.round(num("pdfAxisLabelSize")) || 16),
+        tickLabelSize: Math.max(8, Math.round(num("pdfTickLabelSize")) || 13),
+        expColor: $("pdfExpColor").value || "#1d4ed8",
+        mixtureColor: $("pdfMixtureColor").value || "#0f172a",
+        gridColor: $("pdfGridColor").value || "#e5e7eb",
+        curveWidth: Math.max(0.5, Number($("pdfCurveWidth").value) || 1.4)
+      };
+      localStorage.setItem("xmatcher-pdf-settings", JSON.stringify(state.pdfSettings));
+      drawPdfPlot();
+    }
+
+    function setupPdfSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("xmatcher-pdf-settings") || "{}");
+        state.pdfSettings = {...state.pdfSettings, ...saved};
+      } catch {}
+      const s = state.pdfSettings;
+      $("pdfPlotWidth").value = s.width;
+      $("pdfPlotHeight").value = s.height;
+      $("pdfAxisLabelSize").value = s.axisLabelSize;
+      $("pdfTickLabelSize").value = s.tickLabelSize;
+      $("pdfExpColor").value = s.expColor;
+      $("pdfMixtureColor").value = s.mixtureColor;
+      $("pdfGridColor").value = s.gridColor;
+      $("pdfCurveWidth").value = s.curveWidth;
+      ["pdfPlotWidth", "pdfPlotHeight", "pdfAxisLabelSize", "pdfTickLabelSize", "pdfExpColor", "pdfMixtureColor", "pdfGridColor", "pdfCurveWidth"].forEach((id) => {
+        $(id).addEventListener("input", readPdfSettings);
+      });
+      ["pdfRangeMin", "pdfRangeMax"].forEach((id) => $(id).addEventListener("input", readPdfSettings));
+    }
+
+    function updatePdfToggleButton() {
+      $("pdfToggleResult").textContent = t(state.pdf.showResult ? "hidePdfResult" : "showPdfResult");
+      $("pdfToggleResult").disabled = !state.pdf.result;
+    }
+
+    function togglePdfResult() {
+      if (!state.pdf.result) return;
+      state.pdf.showResult = !state.pdf.showResult;
+      updatePdfToggleButton();
+      drawPdfPlot();
+    }
+
+    function drawHoverOverlay(ctx, w, h) {
+      const hover = state.hover;
+      const plot = state.plot;
+      if (!hover || !plot) return;
+      const px = plot.sx(hover.x);
+      const py = plot.sy(hover.y);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(37, 88, 167, 0.55)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(px, plot.margin.top);
+      ctx.lineTo(px, h - plot.margin.bottom);
+      ctx.moveTo(plot.margin.left, py);
+      ctx.lineTo(w - plot.margin.right, py);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      const lines = [
+        `2theta: ${fmt(hover.x, 3)}`,
+        `${t("hoverExp")}: ${fmt(hover.rawY, 2)} (${fmt(hover.y, 1)}%)`
+      ];
+      if (hover.theory) {
+        lines.push(`${t("hoverTheory")}: ${fmt(hover.theory.x, 3)} / ${fmt(hover.theory.y, 1)}%`);
+      }
+      ctx.font = "12px ui-sans-serif, system-ui";
+      const boxW = Math.max(...lines.map((line) => ctx.measureText(line).width)) + 18;
+      const boxH = lines.length * 18 + 12;
+      let boxX = px + 12;
+      let boxY = py - boxH - 10;
+      if (boxX + boxW > w - 8) boxX = px - boxW - 12;
+      if (boxY < 8) boxY = py + 12;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.32)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 6);
+      else ctx.rect(boxX, boxY, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#f8fafc";
+      lines.forEach((line, index) => {
+        ctx.fillText(line, boxX + 9, boxY + 20 + index * 18);
+      });
+      ctx.restore();
+    }
+
     function drawPlot() {
       const canvas = $("plot");
       const ctx = canvas.getContext("2d");
+      const settings = state.plotSettings;
+      canvas.width = settings.width;
+      canvas.height = settings.height;
+      canvas.style.height = `${settings.height}px`;
+      $("legendExpSwatch").style.background = settings.expColor;
+      $("legendPeakSwatch").style.background = settings.peakColor;
+      $("legendTheorySwatch").style.background = settings.theoryColor;
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, w, h);
 
-      const margin = {left: 58, right: 24, top: 24, bottom: 48};
+      const margin = {
+        left: Math.max(58, settings.axisLabelSize * 3.6),
+        right: 24,
+        top: Math.max(24, settings.axisLabelSize + 8),
+        bottom: Math.max(48, settings.axisLabelSize + settings.tickLabelSize + 18)
+      };
       const plotW = w - margin.left - margin.right;
       const plotH = h - margin.top - margin.bottom;
 
       const raw = state.processed || state.raw;
       if (!raw) {
-        drawEmpty(ctx, w, h, "Upload XRD data to show the pattern / 上传 XRD 文件后显示图谱");
+        state.plot = null;
+        drawEmpty(ctx, w, h, t("emptyPlot"));
         return;
       }
 
       const x = raw.two_theta;
+      const rawY = raw.intensity;
       const y = normalize(raw.intensity);
-      const xMin = Math.min(...x);
-      const xMax = Math.max(...x);
+      const fullXMin = Math.min(...x);
+      const fullXMax = Math.max(...x);
+      const xMin = state.plotZoom?.xMin ?? fullXMin;
+      const xMax = state.plotZoom?.xMax ?? fullXMax;
       const yMin = 0;
       const yMax = 112;
       const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
       const sy = (value) => margin.top + (yMax - value) * plotH / (yMax - yMin);
+      state.plot = {margin, plotW, plotH, x, rawY, y, xMin, xMax, sx, sy};
 
-      ctx.strokeStyle = "#e5e7eb";
+      ctx.strokeStyle = settings.gridColor;
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (let i = 0; i <= 8; i++) {
@@ -978,15 +3082,15 @@
       }
       ctx.stroke();
 
-      ctx.strokeStyle = "#111827";
+      ctx.strokeStyle = settings.axisColor;
       ctx.beginPath();
       ctx.moveTo(margin.left, margin.top);
       ctx.lineTo(margin.left, h - margin.bottom);
       ctx.lineTo(w - margin.right, h - margin.bottom);
       ctx.stroke();
 
-      ctx.strokeStyle = "#1d4ed8";
-      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = settings.expColor;
+      ctx.lineWidth = settings.curveWidth;
       ctx.beginPath();
       for (let i = 0; i < x.length; i++) {
         const px = sx(x[i]);
@@ -996,7 +3100,7 @@
       }
       ctx.stroke();
 
-      ctx.fillStyle = "#dc2626";
+      ctx.fillStyle = settings.peakColor;
       for (const peak of state.detectedPeaks) {
         const px = sx(peak.two_theta);
         const py = sy(peak.intensity);
@@ -1010,8 +3114,8 @@
         const shift = Number(selected.estimated_shift || 0);
         const positions = selected.theoretical_peaks.positions || [];
         const intensities = normalize(selected.theoretical_peaks.intensities || []);
-        ctx.strokeStyle = "#0f766e";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = settings.theoryColor;
+        ctx.lineWidth = Math.max(1, settings.curveWidth + 0.6);
         for (let i = 0; i < positions.length; i++) {
           const px = sx(Number(positions[i]) + shift);
           if (px < margin.left || px > w - margin.right) continue;
@@ -1023,11 +3127,11 @@
       }
 
       ctx.fillStyle = "#475569";
-      ctx.font = "16px ui-sans-serif, system-ui";
-      ctx.fillText("Relative intensity / 相对强度", 14, 22);
-      ctx.fillText("2θ / degree", w / 2 - 36, h - 12);
+      ctx.font = `${settings.axisLabelSize}px ui-sans-serif, system-ui`;
+      ctx.fillText(settings.yLabel, 14, settings.axisLabelSize + 6);
+      ctx.fillText(settings.xLabel, w / 2 - ctx.measureText(settings.xLabel).width / 2, h - 12);
       ctx.fillStyle = "#64748b";
-      ctx.font = "13px ui-sans-serif, system-ui";
+      ctx.font = `${settings.tickLabelSize}px ui-sans-serif, system-ui`;
       for (let i = 0; i <= 6; i++) {
         const xv = xMin + i * (xMax - xMin) / 6;
         ctx.fillText(xv.toFixed(1), sx(xv) - 12, h - margin.bottom + 22);
@@ -1035,6 +3139,7 @@
       ctx.fillText("100", 20, sy(100) + 4);
       ctx.fillText("50", 26, sy(50) + 4);
       ctx.fillText("0", 36, sy(0) - 4);
+      drawHoverOverlay(ctx, w, h);
     }
 
     function drawEmpty(ctx, w, h, message) {
@@ -1045,6 +3150,427 @@
       ctx.textAlign = "center";
       ctx.fillText(message, w / 2, h / 2);
       ctx.textAlign = "left";
+    }
+
+    function drawPdfPlot() {
+      const canvas = $("pdfPlot");
+      const ctx = canvas.getContext("2d");
+      const settings = state.pdfSettings;
+      canvas.width = settings.width;
+      canvas.height = settings.height;
+      canvas.style.height = `${settings.height}px`;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+
+      const exp = getPdfExperimentSpectrum();
+      const sourceResult = state.pdf.result;
+      const result = state.pdf.showResult ? sourceResult : null;
+      if (!exp && !sourceResult) {
+        state.pdfPlot = null;
+        drawEmpty(ctx, w, h, t("pdfWaiting"));
+        $("pdfLegend").innerHTML = "";
+        return;
+      }
+
+      const xSets = [];
+      if (exp) xSets.push(exp.two_theta);
+      if (sourceResult?.mixture?.two_theta) xSets.push(sourceResult.mixture.two_theta);
+      if (!xSets.length) return;
+      const fullXMin = Math.min(...xSets.flat());
+      const fullXMax = Math.max(...xSets.flat());
+      const xMin = state.pdfZoom?.xMin ?? fullXMin;
+      const xMax = state.pdfZoom?.xMax ?? fullXMax;
+      const markerBand = sourceResult?.phases?.length ? Math.max(44, sourceResult.phases.length * 18 + 18) : 0;
+      const margin = {
+        left: Math.max(54, settings.axisLabelSize * 3.4),
+        right: 24,
+        top: Math.max(24, settings.axisLabelSize + 8),
+        bottom: Math.max(44, settings.axisLabelSize + settings.tickLabelSize + 16 + markerBand)
+      };
+      const plotW = w - margin.left - margin.right;
+      const plotH = h - margin.top - margin.bottom;
+      const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
+      const sy = (value) => margin.top + (112 - value) * plotH / 112;
+      state.pdfPlot = {margin, plotW, plotH, xMin, xMax, sx, sy, exp, result};
+
+      ctx.strokeStyle = settings.gridColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i <= 8; i++) {
+        const yy = margin.top + i * plotH / 8;
+        ctx.moveTo(margin.left, yy);
+        ctx.lineTo(w - margin.right, yy);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = "#111827";
+      ctx.beginPath();
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, h - margin.bottom);
+      ctx.lineTo(w - margin.right, h - margin.bottom);
+      ctx.stroke();
+
+      if (exp) {
+        const y = normalize(exp.intensity);
+        ctx.strokeStyle = settings.expColor;
+        ctx.lineWidth = settings.curveWidth;
+        ctx.beginPath();
+        exp.two_theta.forEach((value, index) => {
+          const px = sx(value);
+          const py = sy(y[index]);
+          if (index === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+      }
+
+      if (result?.mixture) {
+        const x = result.mixture.two_theta || [];
+        const y = normalize(result.mixture.intensity || []);
+        ctx.strokeStyle = settings.mixtureColor;
+        ctx.lineWidth = Math.max(1, settings.curveWidth + 0.8);
+        ctx.beginPath();
+        x.forEach((value, index) => {
+          const px = sx(value);
+          const py = sy(y[index]);
+          if (index === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+      }
+
+      if (result?.phases) {
+        const axisY = h - margin.bottom;
+        result.phases.forEach((phase, index) => {
+          const color = state.pdf.cifs[index]?.color || state.pdf.colors[index % state.pdf.colors.length];
+          const laneY = axisY + 18 + index * 18;
+          const positions = phase.peaks?.positions || [];
+          const intensities = normalize(phase.peaks?.intensities || []);
+          ctx.strokeStyle = color;
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.9;
+          ctx.lineWidth = 1.2;
+          positions.forEach((pos, i) => {
+            const px = sx(pos);
+            if (px < margin.left || px > w - margin.right) return;
+            const peakHeight = 5 + 9 * Math.max(0, Math.min(100, intensities[i] || 0)) / 100;
+            ctx.beginPath();
+            ctx.moveTo(px, laneY);
+            ctx.lineTo(px, laneY - peakHeight);
+            ctx.stroke();
+          });
+          ctx.globalAlpha = 1;
+          ctx.font = `${Math.max(10, settings.tickLabelSize - 1)}px ui-sans-serif, system-ui`;
+          ctx.fillText(phase.formula || state.pdf.cifs[index]?.name || `phase ${index + 1}`, margin.left + 4, laneY + 4);
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.fillStyle = "#475569";
+      ctx.font = `${settings.axisLabelSize}px ui-sans-serif, system-ui`;
+      ctx.fillText("Intensity", 14, settings.axisLabelSize + 4);
+      ctx.fillText("2theta / degree", w / 2 - 44, h - 12);
+      ctx.font = `${settings.tickLabelSize}px ui-sans-serif, system-ui`;
+      const tickY = h - margin.bottom + markerBand + 18;
+      for (let i = 0; i <= 6; i++) {
+        const xv = xMin + i * (xMax - xMin) / 6;
+        ctx.fillText(xv.toFixed(1), sx(xv) - 12, tickY);
+      }
+
+      const legend = [];
+      if (exp) legend.push(`<span><i class="swatch" style="background:${escapeHtml(settings.expColor)}"></i>${escapeHtml(t("pdfExperimentProcessed"))}</span>`);
+      if (result?.mixture) legend.push(`<span><i class="swatch" style="background:${escapeHtml(settings.mixtureColor)}"></i>${escapeHtml(t("pdfMixture"))}</span>`);
+      state.pdf.cifs.forEach((phase, index) => {
+        const formula = result?.phases?.[index]?.formula;
+        legend.push(`<span><i class="swatch" style="background:${escapeHtml(phase.color)}"></i>${escapeHtml(formula || phase.name)} ${escapeHtml(phase.weight)}%</span>`);
+      });
+      $("pdfLegend").innerHTML = legend.join("");
+      drawPdfHoverOverlay(ctx, w, h);
+    }
+
+    function setupPdfHover() {
+      const canvas = $("pdfPlot");
+      canvas.addEventListener("mousemove", (event) => {
+        const plot = state.pdfPlot;
+        if (!plot) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const cx = (event.clientX - rect.left) * scaleX;
+        const cy = (event.clientY - rect.top) * scaleY;
+        const inside = cx >= plot.margin.left && cx <= canvas.width - plot.margin.right && cy >= plot.margin.top && cy <= canvas.height - plot.margin.bottom;
+        if (!inside) {
+          state.pdfHover = null;
+          drawPdfPlot();
+          return;
+        }
+        const xValue = plot.xMin + (cx - plot.margin.left) * (plot.xMax - plot.xMin) / plot.plotW;
+        const lines = [`2theta: ${fmt(xValue, 3)}`];
+        if (plot.exp?.two_theta?.length) {
+          const idx = nearestIndex(plot.exp.two_theta, xValue);
+          const y = normalize(plot.exp.intensity || []);
+          lines.push(`${t("pdfExperimentProcessed")}: ${fmt(plot.exp.intensity[idx], 2)} (${fmt(y[idx], 1)}%)`);
+        }
+        if (plot.result?.mixture?.two_theta?.length) {
+          const idx = nearestIndex(plot.result.mixture.two_theta, xValue);
+          const y = normalize(plot.result.mixture.intensity || []);
+          lines.push(`${t("pdfMixture")}: ${fmt(y[idx], 1)}%`);
+        }
+        let nearestPeak = null;
+        (plot.result?.phases || []).forEach((phase, phaseIndex) => {
+          const positions = phase.peaks?.positions || [];
+          const intensities = normalize(phase.peaks?.intensities || []);
+          positions.forEach((pos, peakIndex) => {
+            const distance = Math.abs(plot.sx(pos) - cx);
+            if (distance <= 10 && (!nearestPeak || distance < nearestPeak.distance)) {
+              nearestPeak = {phase, phaseIndex, pos, intensity: intensities[peakIndex], distance};
+            }
+          });
+        });
+        if (nearestPeak) {
+          lines.push(`${nearestPeak.phase.formula || nearestPeak.phase.name}: ${fmt(nearestPeak.pos, 3)} / ${fmt(nearestPeak.intensity, 1)}%`);
+        }
+        state.pdfHover = {cx, cy, x: xValue, lines};
+        drawPdfPlot();
+      });
+      canvas.addEventListener("mouseleave", () => {
+        state.pdfHover = null;
+        drawPdfPlot();
+      });
+    }
+
+    function drawPdfHoverOverlay(ctx, w, h) {
+      const hover = state.pdfHover;
+      const plot = state.pdfPlot;
+      if (!hover || !plot) return;
+      const px = plot.sx(hover.x);
+      ctx.save();
+      ctx.strokeStyle = "rgba(37, 99, 235, 0.55)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(px, plot.margin.top);
+      ctx.lineTo(px, h - plot.margin.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "12px ui-sans-serif, system-ui";
+      const boxW = Math.max(...hover.lines.map((line) => ctx.measureText(line).width)) + 18;
+      const boxH = hover.lines.length * 18 + 12;
+      let boxX = px + 12;
+      let boxY = hover.cy - boxH - 10;
+      if (boxX + boxW > w - 8) boxX = px - boxW - 12;
+      if (boxY < 8) boxY = hover.cy + 12;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.32)";
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 6);
+      else ctx.rect(boxX, boxY, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#f8fafc";
+      hover.lines.forEach((line, index) => ctx.fillText(line, boxX + 9, boxY + 20 + index * 18));
+      ctx.restore();
+    }
+
+    function svgEscape(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[ch]));
+    }
+
+    function buildPlotGeometry() {
+      const raw = state.processed || state.raw;
+      if (!raw) return null;
+      const s = state.plotSettings;
+      const w = s.width;
+      const h = s.height;
+      const margin = {
+        left: Math.max(58, s.axisLabelSize * 3.6),
+        right: 24,
+        top: Math.max(24, s.axisLabelSize + 8),
+        bottom: Math.max(48, s.axisLabelSize + s.tickLabelSize + 18)
+      };
+      const plotW = w - margin.left - margin.right;
+      const plotH = h - margin.top - margin.bottom;
+      const x = raw.two_theta;
+      const y = normalize(raw.intensity);
+      const xMin = Math.min(...x);
+      const xMax = Math.max(...x);
+      const yMax = 112;
+      const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
+      const sy = (value) => margin.top + (yMax - value) * plotH / yMax;
+      return {raw, s, w, h, margin, plotW, plotH, x, y, xMin, xMax, sx, sy};
+    }
+
+    function exportPng() {
+      drawPlot();
+      $("plot").toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${selectedResultStem("xmatcher_result")}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    }
+
+    function exportSvg() {
+      const g = buildPlotGeometry();
+      if (!g) {
+        log(t("uploadFirst"), "error");
+        return;
+      }
+      const {s, w, h, margin, x, y, xMin, xMax, sx, sy} = g;
+      const parts = [];
+      parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`);
+      parts.push(`<rect width="100%" height="100%" fill="#ffffff"/>`);
+      for (let i = 0; i <= 8; i++) {
+        const yy = margin.top + i * (h - margin.top - margin.bottom) / 8;
+        parts.push(`<line x1="${margin.left}" y1="${yy}" x2="${w - margin.right}" y2="${yy}" stroke="${s.gridColor}" stroke-width="1"/>`);
+      }
+      parts.push(`<path d="M ${margin.left} ${margin.top} L ${margin.left} ${h - margin.bottom} L ${w - margin.right} ${h - margin.bottom}" fill="none" stroke="${s.axisColor}" stroke-width="1"/>`);
+      const points = x.map((value, index) => `${sx(value).toFixed(2)},${sy(y[index]).toFixed(2)}`).join(" ");
+      parts.push(`<polyline points="${points}" fill="none" stroke="${s.expColor}" stroke-width="${s.curveWidth}" stroke-linejoin="round" stroke-linecap="round"/>`);
+      for (const peak of state.detectedPeaks) {
+        parts.push(`<circle cx="${sx(peak.two_theta).toFixed(2)}" cy="${sy(peak.intensity).toFixed(2)}" r="4" fill="${s.peakColor}"/>`);
+      }
+      const selected = state.results[state.selectedIndex];
+      if (selected?.theoretical_peaks) {
+        const shift = Number(selected.estimated_shift || 0);
+        const positions = selected.theoretical_peaks.positions || [];
+        const intensities = normalize(selected.theoretical_peaks.intensities || []);
+        for (let i = 0; i < positions.length; i++) {
+          const px = sx(Number(positions[i]) + shift);
+          if (px < margin.left || px > w - margin.right) continue;
+          parts.push(`<line x1="${px.toFixed(2)}" y1="${sy(0).toFixed(2)}" x2="${px.toFixed(2)}" y2="${sy(intensities[i]).toFixed(2)}" stroke="${s.theoryColor}" stroke-width="${Math.max(1, s.curveWidth + 0.6)}"/>`);
+        }
+      }
+      parts.push(`<text x="14" y="${s.axisLabelSize + 6}" fill="#475569" font-family="Arial, sans-serif" font-size="${s.axisLabelSize}">${svgEscape(s.yLabel)}</text>`);
+      parts.push(`<text x="${w / 2}" y="${h - 12}" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="${s.axisLabelSize}">${svgEscape(s.xLabel)}</text>`);
+      for (let i = 0; i <= 6; i++) {
+        const xv = xMin + i * (xMax - xMin) / 6;
+        parts.push(`<text x="${sx(xv).toFixed(2)}" y="${h - margin.bottom + 22}" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="${s.tickLabelSize}">${xv.toFixed(1)}</text>`);
+      }
+      parts.push(`<text x="20" y="${sy(100) + 4}" fill="#64748b" font-family="Arial, sans-serif" font-size="${s.tickLabelSize}">100</text>`);
+      parts.push(`<text x="26" y="${sy(50) + 4}" fill="#64748b" font-family="Arial, sans-serif" font-size="${s.tickLabelSize}">50</text>`);
+      parts.push(`<text x="36" y="${sy(0) - 4}" fill="#64748b" font-family="Arial, sans-serif" font-size="${s.tickLabelSize}">0</text>`);
+      parts.push(`</svg>`);
+      download(`${selectedResultStem("xmatcher_result")}.svg`, parts.join("\n"), "image/svg+xml");
+    }
+
+    function exportPdfPng() {
+      drawPdfPlot();
+      $("pdfPlot").toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${pdfResultStem("xmatcher_pdf_comparison")}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    }
+
+    function exportPdfSvg() {
+      const exp = getPdfExperimentSpectrum();
+      const sourceResult = state.pdf.result;
+      const result = state.pdf.showResult ? sourceResult : null;
+      if (!exp && !sourceResult) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(t("pdfWaiting"))}</span>`;
+        return;
+      }
+      const s = state.pdfSettings;
+      const w = s.width;
+      const h = s.height;
+      const xSets = [];
+      if (exp) xSets.push(exp.two_theta);
+      if (sourceResult?.mixture?.two_theta) xSets.push(sourceResult.mixture.two_theta);
+      const xMin = Math.min(...xSets.flat());
+      const xMax = Math.max(...xSets.flat());
+      const markerBand = sourceResult?.phases?.length ? Math.max(44, sourceResult.phases.length * 18 + 18) : 0;
+      const margin = {
+        left: Math.max(54, s.axisLabelSize * 3.4),
+        right: 24,
+        top: Math.max(24, s.axisLabelSize + 8),
+        bottom: Math.max(44, s.axisLabelSize + s.tickLabelSize + 16 + markerBand)
+      };
+      const plotW = w - margin.left - margin.right;
+      const plotH = h - margin.top - margin.bottom;
+      const sx = (value) => margin.left + (value - xMin) * plotW / (xMax - xMin || 1);
+      const sy = (value) => margin.top + (112 - value) * plotH / 112;
+      const parts = [`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`, `<rect width="100%" height="100%" fill="#ffffff"/>`];
+      for (let i = 0; i <= 8; i++) {
+        const yy = margin.top + i * plotH / 8;
+        parts.push(`<line x1="${margin.left}" y1="${yy}" x2="${w - margin.right}" y2="${yy}" stroke="${s.gridColor}" stroke-width="1"/>`);
+      }
+      parts.push(`<path d="M ${margin.left} ${margin.top} L ${margin.left} ${h - margin.bottom} L ${w - margin.right} ${h - margin.bottom}" fill="none" stroke="#111827" stroke-width="1"/>`);
+      if (exp) {
+        const y = normalize(exp.intensity);
+        const points = exp.two_theta.map((value, index) => `${sx(value).toFixed(2)},${sy(y[index]).toFixed(2)}`).join(" ");
+        parts.push(`<polyline points="${points}" fill="none" stroke="${s.expColor}" stroke-width="${s.curveWidth}" stroke-linejoin="round" stroke-linecap="round"/>`);
+      }
+      if (result?.mixture) {
+        const y = normalize(result.mixture.intensity || []);
+        const points = (result.mixture.two_theta || []).map((value, index) => `${sx(value).toFixed(2)},${sy(y[index]).toFixed(2)}`).join(" ");
+        parts.push(`<polyline points="${points}" fill="none" stroke="${s.mixtureColor}" stroke-width="${Math.max(1, s.curveWidth + 0.8)}" stroke-linejoin="round" stroke-linecap="round"/>`);
+      }
+      if (result?.phases) {
+        const axisY = h - margin.bottom;
+        result.phases.forEach((phase, index) => {
+          const color = state.pdf.cifs[index]?.color || state.pdf.colors[index % state.pdf.colors.length];
+          const laneY = axisY + 18 + index * 18;
+          const positions = phase.peaks?.positions || [];
+          const intensities = normalize(phase.peaks?.intensities || []);
+          positions.forEach((pos, i) => {
+            const px = sx(pos);
+            if (px < margin.left || px > w - margin.right) return;
+            const peakHeight = 5 + 9 * Math.max(0, Math.min(100, intensities[i] || 0)) / 100;
+            parts.push(`<line x1="${px.toFixed(2)}" y1="${laneY.toFixed(2)}" x2="${px.toFixed(2)}" y2="${(laneY - peakHeight).toFixed(2)}" stroke="${color}" stroke-opacity="0.9" stroke-width="1.2"/>`);
+          });
+          parts.push(`<text x="${margin.left + 4}" y="${(laneY + 4).toFixed(2)}" fill="${color}" font-family="Arial, sans-serif" font-size="${Math.max(10, s.tickLabelSize - 1)}">${svgEscape(phase.formula || state.pdf.cifs[index]?.name || `phase ${index + 1}`)}</text>`);
+        });
+      }
+      parts.push(`<text x="14" y="${s.axisLabelSize + 4}" fill="#475569" font-family="Arial, sans-serif" font-size="${s.axisLabelSize}">Intensity</text>`);
+      parts.push(`<text x="${w / 2}" y="${h - 12}" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="${s.axisLabelSize}">2theta / degree</text>`);
+      const tickY = h - margin.bottom + markerBand + 18;
+      for (let i = 0; i <= 6; i++) {
+        const xv = xMin + i * (xMax - xMin) / 6;
+        parts.push(`<text x="${sx(xv).toFixed(2)}" y="${tickY.toFixed(2)}" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="${s.tickLabelSize}">${xv.toFixed(1)}</text>`);
+      }
+      parts.push(`</svg>`);
+      download(`${pdfResultStem("xmatcher_pdf_comparison")}.svg`, parts.join("\n"), "image/svg+xml");
+    }
+
+    async function copyText(text, button, labelKey) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        const original = t(labelKey);
+        button.textContent = t("copied");
+        setTimeout(() => {
+          button.textContent = original;
+        }, 1200);
+      } catch (err) {
+        log(`Copy failed: ${err.message}`, "error");
+      }
     }
 
     function download(name, content, type) {
@@ -1061,7 +3587,7 @@
 
     function downloadJson() {
       if (!state.results.length) {
-        log("没有可下载的识别结果。", "error");
+        log(t("noDownload"), "error");
         return;
       }
       download("xmatcher_results.json", JSON.stringify({
@@ -1075,7 +3601,7 @@
 
     function downloadCsv() {
       if (!state.results.length) {
-        log("没有可下载的识别结果。", "error");
+        log(t("noDownload"), "error");
         return;
       }
       const header = ["rank","entry_id","mpid","formula","elements","score","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
@@ -1093,25 +3619,54 @@
       if (!file) return;
       try {
         await handleFile(file);
+        event.target.value = "";
       } catch (err) {
-        log(`文件解析失败：${err.message}`, "error");
+        log(t("fileParseFailed", {error: err.message}), "error");
+      }
+    });
+    $("pdfXrdFile").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        await handlePdfXrdFile(file);
+        event.target.value = "";
+      } catch (err) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(t("fileParseFailed", {error: err.message}))}</span>`;
+      }
+    });
+    $("pdfCifFiles").addEventListener("change", async (event) => {
+      try {
+        await handlePdfCifFiles(event.target.files);
+        event.target.value = "";
+      } catch (err) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(err.message)}</span>`;
       }
     });
     $("parseManual").addEventListener("click", () => {
       try {
         setRawData(parseTextByName($("manualData").value, "manual.txt"), "pasted-data");
       } catch (err) {
-        log(`粘贴数据解析失败：${err.message}`, "error");
+        log(t("pasteParseFailed", {error: err.message}), "error");
       }
     });
     $("clearData").addEventListener("click", () => {
       state.raw = null;
+      state.pdf.xrd = null;
       state.processed = null;
       state.detectedPeaks = [];
       state.results = [];
       state.selectedIndex = 0;
+      state.hover = null;
+      state.plotZoom = null;
+      state.pdfZoom = null;
+      state.pdfHover = null;
+      state.pdf.result = null;
+      state.pdf.showResult = true;
       $("fileInput").value = "";
+      $("fileStatus").textContent = "";
       $("manualData").value = "";
+      $("pdfXrdStatus").textContent = "";
+      $("pdfCifStatus").textContent = "";
       $("mPoints").textContent = "0";
       $("mPeaks").textContent = "0";
       $("mCandidates").textContent = "0";
@@ -1119,15 +3674,54 @@
       $("mPhase").textContent = "-";
       renderResults();
       renderMatches();
+      renderPdfSummary();
+      updatePdfToggleButton();
       drawPlot();
-      log("已清空。");
+      drawPdfPlot();
+      log(t("cleared"));
     });
     $("runMatch").addEventListener("click", runMatch);
+    $("pdfNormalizeWeights").addEventListener("click", normalizePdfWeights);
+    $("pdfCalculate").addEventListener("click", calculatePdfComparison);
+    $("pdfToggleResult").addEventListener("click", togglePdfResult);
+    $("resetPlotZoom").addEventListener("click", resetPlotZoom);
+    $("pdfResetZoom").addEventListener("click", resetPdfZoom);
+    $("pdfExportPng").addEventListener("click", exportPdfPng);
+    $("pdfExportSvg").addEventListener("click", exportPdfSvg);
     $("downloadJson").addEventListener("click", downloadJson);
     $("downloadCsv").addEventListener("click", downloadCsv);
+    $("copyCitationText").addEventListener("click", () => {
+      copyText($("citationPlain").textContent.trim(), $("copyCitationText"), "copyCitation");
+    });
+    $("copyBibtex").addEventListener("click", () => {
+      copyText($("citationBibtex").textContent.trim(), $("copyBibtex"), "copyBibtex");
+    });
+    $("exportPng").addEventListener("click", exportPng);
+    $("exportSvg").addEventListener("click", exportSvg);
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => applyLanguage(button.dataset.lang));
+    });
+    setupPanels();
+    setupSidebarResize();
+    setupPlotSettings();
+    setupPdfSettings();
+    setupPlotHover();
+    setupPdfHover();
+    setupZoomBox("plot", "plotZoomBox", () => state.plot, (zoom) => {
+      state.plotZoom = zoom;
+      $("plotRangeMin").value = fmt(zoom.xMin, 2);
+      $("plotRangeMax").value = fmt(zoom.xMax, 2);
+      state.hover = null;
+    }, drawPlot);
+    setupZoomBox("pdfPlot", "pdfZoomBox", () => state.pdfPlot, (zoom) => {
+      state.pdfZoom = zoom;
+      $("pdfRangeMin").value = fmt(zoom.xMin, 2);
+      $("pdfRangeMax").value = fmt(zoom.xMax, 2);
+      state.pdfHover = null;
+    }, drawPdfPlot);
     window.addEventListener("resize", drawPlot);
 
-    drawPlot();
+    applyLanguage(currentLang);
     checkServer();
   </script>
 </body>

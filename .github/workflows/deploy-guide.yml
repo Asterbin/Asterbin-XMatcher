@@ -1,0 +1,61 @@
+name: Deploy XMatcher Guide
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "XMatcher_Guide.html"
+      - "XMatcher_Local_UI.html"
+      - ".github/workflows/deploy-guide.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static guide
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate guide script
+        run: |
+          node -e "const fs=require('fs'); const html=fs.readFileSync('XMatcher_Guide.html','utf8'); const m=html.match(/<script>([\s\S]*)<\/script>/); if (m) new Function(m[1]); console.log('XMatcher_Guide.html script syntax ok')"
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site
+          cp XMatcher_Guide.html _site/index.html
+          cp XMatcher_Guide.html _site/XMatcher_Guide.html
+          cp XMatcher_Local_UI.html _site/XMatcher_Local_UI.html
+          touch _site/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

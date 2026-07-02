@@ -11,6 +11,7 @@ import argparse
 import json
 import logging
 import math
+import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -186,6 +187,120 @@ def _match(payload: Dict) -> Dict:
     }
 
 
+def _calculate_cif_xrd(payload: Dict) -> Dict:
+    try:
+        from pymatgen.analysis.diffraction.xrd import XRDCalculator as PymatgenXRDCalculator
+        from pymatgen.io.cif import CifParser
+    except Exception as exc:
+        raise RuntimeError(f"pymatgen is required for CIF XRD calculation: {exc}") from exc
+
+    cifs = payload.get("cifs") or []
+    if not isinstance(cifs, list) or not cifs:
+        raise ValueError("At least one CIF is required")
+    if len(cifs) > 5:
+        raise ValueError("At most 5 CIF files are supported")
+
+    two_theta_range = payload.get("two_theta_range") or [5.0, 90.0]
+    if len(two_theta_range) != 2:
+        raise ValueError("two_theta_range must contain [min, max]")
+    t_min = float(two_theta_range[0])
+    t_max = float(two_theta_range[1])
+    if not math.isfinite(t_min) or not math.isfinite(t_max) or t_max <= t_min:
+        raise ValueError("Invalid two_theta_range")
+
+    wavelength = str(payload.get("wavelength") or "CuKa")
+    min_intensity = max(0.0, float(payload.get("min_intensity", 0.0)))
+    fwhm = max(0.01, float(payload.get("fwhm", 0.12)))
+    step = max(0.005, float(payload.get("step", 0.02)))
+    normalize = bool(payload.get("normalize", True))
+
+    calculator = PymatgenXRDCalculator(wavelength=wavelength)
+    phases = []
+    weights = []
+    grid = np.arange(t_min, t_max + step / 2, step, dtype=float)
+    mixture = np.zeros_like(grid)
+    sigma = fwhm / 2.354820045
+
+    for index, item in enumerate(cifs):
+        name = str(item.get("name") or f"phase_{index + 1}.cif")
+        content = str(item.get("content") or "")
+        weight = float(item.get("weight", 1.0))
+        if not content.strip():
+            raise ValueError(f"CIF content is empty for {name}")
+        if not math.isfinite(weight) or weight < 0:
+            raise ValueError(f"Invalid weight for {name}")
+        weights.append(weight)
+
+        with tempfile.NamedTemporaryFile("w", suffix=".cif", encoding="utf-8", delete=True) as handle:
+            handle.write(content)
+            handle.flush()
+            parser = CifParser(handle.name)
+            structures = parser.get_structures(primitive=False)
+        if not structures:
+            raise ValueError(f"No structure found in {name}")
+        structure = structures[0]
+        pattern = calculator.get_pattern(structure, two_theta_range=(t_min, t_max))
+        positions = np.asarray(pattern.x, dtype=float)
+        intensities = np.asarray(pattern.y, dtype=float)
+        if intensities.size and normalize and intensities.max() > 0:
+            intensities = 100.0 * intensities / intensities.max()
+        keep = intensities >= min_intensity
+        positions = positions[keep]
+        intensities = intensities[keep]
+        hkls = [pattern.hkls[i] for i in range(len(pattern.hkls)) if keep[i]]
+        d_spacings = np.asarray(getattr(pattern, "d_hkls", []), dtype=float)
+        if d_spacings.size == len(keep):
+            d_spacings = d_spacings[keep]
+        else:
+            d_spacings = np.asarray([], dtype=float)
+
+        broadened = np.zeros_like(grid)
+        for pos, intensity_value in zip(positions, intensities):
+            broadened += float(intensity_value) * np.exp(-0.5 * ((grid - pos) / sigma) ** 2)
+        mixture += weight * broadened
+
+        phases.append(
+            {
+                "name": name,
+                "weight": weight,
+                "formula": structure.composition.reduced_formula,
+                "spacegroup": None,
+                "peaks": {
+                    "positions": positions.tolist(),
+                    "intensities": intensities.tolist(),
+                    "hkls": hkls,
+                    "d_spacings": d_spacings.tolist(),
+                },
+                "profile": {
+                    "two_theta": grid.tolist(),
+                    "intensity": broadened.tolist(),
+                },
+            }
+        )
+
+    total_weight = sum(weights) or 1.0
+    mixture = mixture / total_weight
+    if mixture.size and normalize and mixture.max() > 0:
+        mixture = 100.0 * mixture / mixture.max()
+
+    return {
+        "status": "ok",
+        "phases": phases,
+        "mixture": {
+            "two_theta": grid.tolist(),
+            "intensity": mixture.tolist(),
+        },
+        "settings": {
+            "two_theta_range": [t_min, t_max],
+            "wavelength": wavelength,
+            "min_intensity": min_intensity,
+            "fwhm": fwhm,
+            "step": step,
+            "normalize": normalize,
+        },
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "XMatcherLocalAPI/1.0"
 
@@ -203,6 +318,10 @@ class Handler(BaseHTTPRequestHandler):
             if self.path.rstrip("/") == "/api/match":
                 payload = _read_json(self)
                 _json_response(self, 200, _match(payload))
+                return
+            if self.path.rstrip("/") == "/api/cif-xrd":
+                payload = _read_json(self)
+                _json_response(self, 200, _calculate_cif_xrd(payload))
                 return
             _json_response(self, 404, {"status": "error", "error": "Unknown endpoint"})
         except Exception as exc:
