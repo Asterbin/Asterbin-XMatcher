@@ -6,6 +6,10 @@ on:
     paths:
       - "XMatcher_Guide.html"
       - "XMatcher_Local_UI.html"
+      - "README.md"
+      - "docs/readme/README.zh-CN.md"
+      - "docs/readme/README.ja.md"
+      - "docs/readme/README.ko.md"
       - ".github/workflows/deploy-guide.yml"
   workflow_dispatch:
 
@@ -37,6 +41,11 @@ jobs:
           cp XMatcher_Guide.html _site/index.html
           cp XMatcher_Guide.html _site/XMatcher_Guide.html
           cp XMatcher_Local_UI.html _site/XMatcher_Local_UI.html
+          cp README.md _site/README.md
+          mkdir -p _site/docs/readme
+          cp docs/readme/README.zh-CN.md _site/docs/readme/README.zh-CN.md
+          cp docs/readme/README.ja.md _site/docs/readme/README.ja.md
+          cp docs/readme/README.ko.md _site/docs/readme/README.ko.md
           touch _site/.nojekyll
 
       - name: Configure GitHub Pages

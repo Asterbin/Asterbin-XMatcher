@@ -1,9 +1,53 @@
+<div align="center">
+
 # XMatcher
+
+**Local XRD Phase Identification Toolkit & App**
+
+[![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
+[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
+[![Download](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Language / 语言 / 言語 / 언어**  
+[English](README.md) | [中文](docs/readme/README.zh-CN.md) | [日本語](docs/readme/README.ja.md) | [한국어](docs/readme/README.ko.md)
+
+</div>
 
 XMatcher is a Python toolkit for experimental X-ray diffraction (XRD) phase
 matching against precomputed crystal-structure databases. It is designed around
 a production workflow: build a searchable theoretical peak database once, then
 perform fast and explainable retrieval for experimental patterns.
+
+## App Download
+
+For most users, the packaged XMatcher App is the recommended entry point. The
+App distribution connects to the local service automatically, so users do not
+need to start `xmatcher_local_api.py` manually.
+
+- App, database, and release files: https://doi.org/10.6084/m9.figshare.32812985
+- Online manual: https://asterbin.github.io/Asterbin-XMatcher
+- Issues and support: https://github.com/Asterbin/Asterbin-XMatcher/issues
+
+If you use the source/HTML version directly, start the local API first:
+
+```bash
+python xmatcher_local_api.py --database MP500_xrd_database.pkl
+```
+
+Then open [`XMatcher_Local_UI.html`](XMatcher_Local_UI.html).
+
+## Citation Note
+
+XMatcher is not XQueryer itself. It is a local XRD phase-identification software
+developed and organized as part of the related XQueryer research work. XMatcher
+currently does not have a separate publication. If this software supports your
+research, please cite the XQueryer paper:
+
+Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and
+Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder
+X-ray diffraction. *National Science Review* 12(12), nwaf421 (2025).
 
 ## What It Does
 
