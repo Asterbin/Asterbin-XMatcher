@@ -536,11 +536,18 @@
     }
 
     .content {
-      display: grid;
-      grid-template-rows: auto auto minmax(320px, auto);
+      display: flex;
+      flex-direction: column;
       gap: 10px;
       min-width: 0;
     }
+
+    .metrics { order: 1; }
+    #singlePhasePanel { order: 2; }
+    .chart-wrap { order: 3; }
+    #multiphasePanel { order: 4; }
+    .pdf-module:not(#singlePhasePanel):not(#multiphasePanel) { order: 5; }
+    .citation-panel { order: 6; }
 
     .metrics {
       display: grid;
@@ -622,6 +629,69 @@
       padding: 2px;
       background: #fff;
     }
+
+    /* Premium colour controls: semantic preview first, native picker on demand. */
+    .plot-control-grid .color-control,
+    .pdf-settings-grid .color-control {
+      position: relative;
+      display: grid;
+      gap: 7px;
+      align-content: start;
+      min-height: 78px;
+      padding: 9px;
+      border: 1px solid #dbe4ee;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 1px 1px rgba(15, 23, 42, 0.025);
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .plot-control-grid .color-control:hover,
+    .pdf-settings-grid .color-control:hover {
+      border-color: #b9cadb;
+      box-shadow: 0 6px 16px rgba(30, 64, 95, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .color-control > label:not(.color-swatch) {
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .045em;
+      color: #526274;
+      text-transform: uppercase;
+    }
+
+    .color-control .color-native {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .color-swatch {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 31px;
+      padding: 4px 7px 4px 4px;
+      border: 1px solid #e1e8f0;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .color-swatch:hover { border-color: #9db5cb; }
+    .color-swatch-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: var(--tone);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 2px 6px color-mix(in srgb, var(--tone) 28%, transparent);
+    }
+    .color-swatch-line { height: 3px; border-radius: 99px; background: var(--tone); opacity: .88; }
+    .color-swatch-value { font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: #64748b; letter-spacing: .02em; }
 
     .plot-export-actions {
       display: flex;
@@ -751,6 +821,26 @@
       border-color: #93c5fd;
     }
 
+    .automix-results {
+      margin-top: 12px;
+      min-height: 220px;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .automix-results h3 {
+      margin: 0;
+      padding: 12px 14px 6px;
+      font-size: 14px;
+      color: #075985;
+    }
+
+    .automix-results .field-help {
+      margin: 0;
+      padding: 0 14px 10px;
+    }
+
     .pdf-settings-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(120px, 1fr));
@@ -791,6 +881,27 @@
     .pdf-summary table {
       margin: 0;
       min-width: 640px;
+    }
+
+    .pdf-phase-peaks {
+      margin: 10px 12px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .pdf-phase-peaks summary {
+      cursor: pointer;
+      padding: 9px 10px;
+      color: #075985;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pdf-phase-peaks table {
+      margin: 0;
+      min-width: 700px;
     }
 
     .risk-note {
@@ -1025,6 +1136,150 @@
       text-decoration: underline;
     }
 
+    /* Product-style visual layer: high-contrast data surfaces, restrained motion,
+       and clear interactive affordances for a modern scientific workspace. */
+    :root {
+      --bg: #f4f7fb;
+      --panel: rgba(255, 255, 255, 0.88);
+      --line: #dbe3ef;
+      --line-strong: #b8c7dc;
+      --accent: #0f766e;
+      --accent-2: #2563eb;
+      --shadow: 0 18px 48px rgba(15, 23, 42, 0.09);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 9% -5%, rgba(45, 212, 191, 0.16), transparent 28rem),
+        radial-gradient(circle at 95% 4%, rgba(96, 165, 250, 0.17), transparent 25rem),
+        var(--bg);
+    }
+
+    header {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.22), transparent 25rem),
+        linear-gradient(118deg, #0b1324 0%, #142441 55%, #18335e 100%);
+      padding: 16px 24px;
+    }
+
+    .app-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(145deg, #2dd4bf 0%, #0f766e 48%, #2563eb 100%);
+      box-shadow: 0 12px 26px rgba(45, 212, 191, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.36);
+      animation: brand-float 6s ease-in-out infinite;
+    }
+
+    .app-icon svg { width: 27px; height: 27px; }
+    .version-badge { border-color: rgba(94, 234, 212, 0.36); color: #ccfbf1; background: rgba(20, 184, 166, 0.12); }
+    .quick-links a, .status { border-radius: 10px; backdrop-filter: blur(10px); }
+    .quick-links a { transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+    .quick-links a:hover { transform: translateY(-2px); border-color: rgba(147, 197, 253, .56); }
+    .dot.ok { box-shadow: 0 0 0 0 rgba(52, 211, 153, .58); animation: status-pulse 2.2s infinite; }
+
+    section, .panel, .sidebar-top {
+      border-radius: 14px;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, .02), 0 12px 28px rgba(15, 23, 42, .035);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+
+    .sidebar .panel:hover, .chart-wrap:hover, .citation-panel:hover {
+      border-color: #c7d5e8;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      padding: 12px 14px;
+      background: linear-gradient(90deg, #f8fbff, #ffffff);
+    }
+
+    .panel-title::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin-right: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2dd4bf, #2563eb);
+      box-shadow: 0 0 0 4px rgba(45, 212, 191, .11);
+    }
+
+    .panel-title::after { margin-left: auto; }
+    .metrics { gap: 10px; overflow: visible; background: transparent; }
+    .metric {
+      border: 1px solid rgba(219, 227, 239, .95);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, .86);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .04);
+      min-height: 58px;
+      padding: 11px 12px;
+      transition: transform .2s ease, box-shadow .2s ease;
+      animation: rise-in .45s both;
+    }
+    .metric:nth-child(2) { animation-delay: .05s; }
+    .metric:nth-child(3) { animation-delay: .1s; }
+    .metric:nth-child(4) { animation-delay: .15s; }
+    .metric:nth-child(5) { animation-delay: .2s; }
+    .metric:hover { transform: translateY(-3px); box-shadow: 0 15px 26px rgba(15, 23, 42, .09); }
+    .metric .v { color: #0f766e; font-size: 18px; letter-spacing: -.02em; }
+
+    input[type="text"], input[type="number"], select, textarea {
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .94);
+      transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 0 4px rgba(45, 212, 191, .13);
+      transform: translateY(-1px);
+    }
+
+    button {
+      border-radius: 9px;
+      padding: 8px 11px;
+      box-shadow: 0 1px 1px rgba(15, 23, 42, .04);
+    }
+    button.primary {
+      background: linear-gradient(135deg, #0f766e, #0d9488 54%, #2563eb);
+      border-color: transparent;
+      box-shadow: 0 8px 18px rgba(15, 118, 110, .22), inset 0 1px 0 rgba(255, 255, 255, .22);
+    }
+    button.primary:hover:not(:disabled) { background: linear-gradient(135deg, #0b5f59, #0f766e 54%, #1d4ed8); transform: translateY(-2px); }
+    #runMatch::before, #runMultiPhase::before, #pdfCalculate::before { margin-right: 7px; font-size: 14px; }
+    #runMatch::before { content: "✦"; }
+    #runMultiPhase::before { content: "◌"; font-size: 17px; line-height: 0; }
+    #pdfCalculate::before { content: "⌁"; font-size: 18px; line-height: 0; }
+    #runMatch:disabled::before, #runMultiPhase:disabled::before, #pdfCalculate:disabled::before { display: none; }
+    .plot-export-actions button::before { content: "↗"; margin-right: 5px; color: var(--accent-2); }
+    #resetPlotZoom::before, #resetMultiPlotZoom::before, #pdfResetZoom::before { content: "⟲"; }
+
+    .pdf-module {
+      border-radius: 16px;
+      border-color: #bde5f4;
+      box-shadow: 0 18px 42px rgba(14, 116, 144, .1);
+    }
+    .pdf-module-summary { padding: 18px; background: linear-gradient(105deg, #e6fffb 0%, #eff6ff 54%, #ffffff 100%); }
+    .pdf-module-summary::after { border-radius: 9px; transition: transform .2s ease, background .2s ease; }
+    .pdf-module[open] .pdf-module-summary::after { transform: rotate(180deg); background: #ecfeff; }
+    .pdf-module[open] > .pdf-module-body { animation: reveal .32s ease both; }
+    .pdf-controls { border-radius: 12px; background: linear-gradient(135deg, #f0fdfa, #eff6ff); }
+    .plot-controls { border-radius: 12px; }
+    canvas { border-radius: 12px; box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 22px rgba(15, 23, 42, .055); }
+    .automix-results, .pdf-summary { border-radius: 12px; box-shadow: 0 8px 20px rgba(15, 23, 42, .04); }
+    th { background: #f7faff; }
+    tbody tr { transition: background .14s ease, box-shadow .14s ease; }
+    tbody tr:hover, tbody tr.selected { background: linear-gradient(90deg, #ecfdf5, #eff6ff); box-shadow: inset 3px 0 0 #14b8a6; }
+    .pill { border-color: #cfe5e4; background: #f0fdfa; color: #0f766e; font-weight: 700; }
+
+    @keyframes brand-float { 50% { transform: translateY(-3px) rotate(-2deg); } }
+    @keyframes status-pulse { 70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); } }
+    @keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes reveal { from { opacity: .25; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+
     @media (max-width: 1100px) {
       main {
         grid-template-columns: 1fr;
@@ -1068,9 +1323,16 @@
   <header>
     <div class="topbar">
       <div class="brand">
-        <div class="app-icon">XM</div>
+        <div class="app-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 23.5 11 8.5l5 12 5-12 6 15" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 25.5h24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".72"/>
+            <circle cx="11" cy="8.5" r="1.8" fill="currentColor"/>
+            <circle cx="21" cy="8.5" r="1.8" fill="currentColor"/>
+          </svg>
+        </div>
         <div>
-          <h1><span data-i18n="appTitle">XMatcher Local XRD Identification</span><span class="version-badge" data-i18n="releaseVersion">Release V1.0.0</span></h1>
+          <h1><span data-i18n="appTitle">XMatcher Local XRD Identification</span><span class="version-badge" data-i18n="releaseVersion">Release V1.1.0</span></h1>
           <p class="subtitle" data-i18n="appSubtitle">Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.</p>
         </div>
       </div>
@@ -1250,9 +1512,6 @@
           </select>
           <p class="field-help" data-i18n="scoringHelp">Hybrid is recommended for routine use.</p>
           <div class="actions">
-            <button id="runMatch" class="primary" data-i18n="runMatch">Run match</button>
-            <button id="downloadJson">JSON</button>
-            <button id="downloadCsv">CSV</button>
           </div>
         </div>
       </div>
@@ -1269,7 +1528,7 @@
         <div class="metric"><div class="k" data-i18n="selectedPhase">Selected phase</div><div id="mPhase" class="v">-</div></div>
       </div>
 
-      <div class="panel chart-wrap">
+      <div id="singlePhaseChart" class="panel chart-wrap">
         <div class="panel-heading">
           <div>
             <h2 data-i18n="chartTitle">XRD Pattern Comparison</h2>
@@ -1314,23 +1573,23 @@
             </div>
             <div>
               <label for="expColor" data-i18n="expColor">Experimental color</label>
-              <input id="expColor" type="color" value="#1d4ed8">
+              <input id="expColor" type="color" value="#2f6db2">
             </div>
             <div>
               <label for="peakColor" data-i18n="peakColor">Peak color</label>
-              <input id="peakColor" type="color" value="#dc2626">
+              <input id="peakColor" type="color" value="#c84b45">
             </div>
             <div>
               <label for="theoryColor" data-i18n="theoryColor">Theory color</label>
-              <input id="theoryColor" type="color" value="#0f766e">
+              <input id="theoryColor" type="color" value="#167b72">
             </div>
             <div>
               <label for="axisColor" data-i18n="axisColor">Axis color</label>
-              <input id="axisColor" type="color" value="#111827">
+              <input id="axisColor" type="color" value="#334155">
             </div>
             <div>
               <label for="gridColor" data-i18n="gridColor">Grid color</label>
-              <input id="gridColor" type="color" value="#e5e7eb">
+              <input id="gridColor" type="color" value="#e5ebf1">
             </div>
             <div>
               <label for="curveWidth" data-i18n="curveWidth">Curve width</label>
@@ -1348,18 +1607,24 @@
           <div id="plotZoomBox" class="zoom-box"></div>
         </div>
         <div class="legend">
-          <span><i id="legendExpSwatch" class="swatch" style="background:#1d4ed8"></i><span data-i18n="legendExp">Experimental profile</span></span>
-          <span><i id="legendPeakSwatch" class="swatch" style="background:#dc2626"></i><span data-i18n="legendDetected">Detected peaks</span></span>
-          <span><i id="legendTheorySwatch" class="swatch" style="background:#0f766e"></i><span data-i18n="legendTheory">Theoretical peaks shifted</span></span>
+          <span><i id="legendExpSwatch" class="swatch" style="background:#2f6db2"></i><span data-i18n="legendExp">Experimental profile</span></span>
+          <span><i id="legendPeakSwatch" class="swatch" style="background:#c84b45"></i><span data-i18n="legendDetected">Detected peaks</span></span>
+          <span><i id="legendTheorySwatch" class="swatch" style="background:#167b72"></i><span data-i18n="legendTheory">Theoretical peaks shifted</span></span>
         </div>
       </div>
 
-      <div class="panel">
-        <div class="panel-heading">
+      <details class="panel pdf-module singlephase-module" id="singlePhasePanel">
+        <summary class="pdf-module-summary">
           <div>
-            <h2 data-i18n="candidatesTitle">Candidate Phases</h2>
-            <p data-i18n="candidatesNote">Click a row to update the theoretical peaks and matched-peak table.</p>
+            <h2 data-i18n="singlePhaseTitle">Single-phase automatic identification</h2>
+            <p data-i18n="singlePhaseNote">Run a database search and inspect ranked candidate phases.</p>
+            <span class="pdf-module-badge" data-i18n="singlePhaseBadge">Click to open single-phase identification</span>
           </div>
+        </summary>
+        <div id="singlePhaseBody" class="pdf-module-body">
+        <div class="pdf-controls">
+          <p class="section-note" data-i18n="candidatesNote">Click a row to update the theoretical peaks and matched-peak table.</p>
+          <div class="actions"><button id="runMatch" class="primary" data-i18n="runMatch">Run match</button><button id="downloadJson">JSON</button><button id="downloadCsv">CSV</button></div>
         </div>
         <div id="riskNote" class="risk-note"></div>
         <div class="table-wrap">
@@ -1403,7 +1668,64 @@
           </div>
         </details>
         <div id="log" class="log" data-i18n="waitingData">Waiting for XRD data.</div>
-      </div>
+        </div>
+      </details>
+
+      <details class="panel pdf-module automix-module" id="multiphasePanel">
+        <summary class="pdf-module-summary">
+          <div>
+            <h2 data-i18n="multiPhaseTitle">AutoMix multi-phase identification</h2>
+            <p data-i18n="multiPhaseNote">Fit small phase combinations to detected peaks.</p>
+            <span class="pdf-module-badge" data-i18n="multiPhaseDisclaimer">Contributions are relative diffraction contributions, not weight fractions.</span>
+          </div>
+        </summary>
+        <div class="pdf-module-body">
+          <details class="plot-controls" open>
+            <summary data-i18n="multiPlotSettings">AutoMix image settings</summary>
+            <div class="plot-control-grid">
+              <div><label for="multiPlotWidth" data-i18n="plotWidth">Width</label><input id="multiPlotWidth" type="number" value="1000" min="640" max="3000" step="20"></div>
+              <div><label for="multiPlotHeight" data-i18n="plotHeight">Height</label><input id="multiPlotHeight" type="number" value="320" min="260" max="1800" step="20"></div>
+              <div><label for="multiAxisLabelSize" data-i18n="axisLabelSize">Axis label size</label><input id="multiAxisLabelSize" type="number" value="18" min="8" max="48" step="1"></div>
+              <div><label for="multiTickLabelSize" data-i18n="tickLabelSize">Tick/index size</label><input id="multiTickLabelSize" type="number" value="16" min="8" max="36" step="1"></div>
+              <div><label for="multiRangeMin" data-i18n="displayRangeMin">Display 2theta min</label><input id="multiRangeMin" type="number" value="15" step="0.1"></div>
+              <div><label for="multiRangeMax" data-i18n="displayRangeMax">Display 2theta max</label><input id="multiRangeMax" type="number" value="90" step="0.1"></div>
+              <div><label for="multiXAxisLabel" data-i18n="xAxisLabel">X label</label><input id="multiXAxisLabel" type="text" value="2theta / degree"></div>
+              <div><label for="multiYAxisLabel" data-i18n="yAxisLabel">Y label</label><input id="multiYAxisLabel" type="text" value="Relative intensity"></div>
+              <div><label for="multiExpColor" data-i18n="expColor">Experimental color</label><input id="multiExpColor" type="color" value="#2f6db2"></div>
+              <div><label for="multiResidualColor" data-i18n="multiResidualColor">Residual color</label><input id="multiResidualColor" type="color" value="#c84b45"></div>
+              <div><label for="multiAxisColor" data-i18n="axisColor">Axis color</label><input id="multiAxisColor" type="color" value="#334155"></div>
+              <div><label for="multiGridColor" data-i18n="gridColor">Grid color</label><input id="multiGridColor" type="color" value="#e5ebf1"></div>
+              <div><label for="multiCurveWidth" data-i18n="curveWidth">Curve width</label><input id="multiCurveWidth" type="number" value="1.4" min="0.5" max="8" step="0.1"></div>
+            </div>
+            <div class="plot-export-actions"><button id="resetMultiPlotZoom" type="button" data-i18n="resetZoom">Reset zoom</button><button id="exportMultiPng" type="button" data-i18n="exportPng">Export PNG</button><button id="exportMultiSvg" type="button" data-i18n="exportSvg">Export SVG</button><button id="downloadMultiJson" type="button" data-i18n="exportJson">Export JSON</button><button id="downloadMultiCsv" type="button" data-i18n="exportCsv">Export CSV</button></div>
+          </details>
+          <div class="plot-shell"><canvas id="multiPlot" width="1400" height="520"></canvas><div id="multiPlotZoomBox" class="zoom-box"></div></div>
+          <div id="multiLegend" class="pdf-legend"></div>
+          <div class="pdf-controls">
+          <div class="grid2">
+            <div><label for="maxPhases" data-i18n="maxPhases">Maximum phases</label><input id="maxPhases" type="number" min="1" max="3" value="3"></div>
+            <div><label for="multiCandidatePool" data-i18n="multiCandidatePool">Candidate pool</label><input id="multiCandidatePool" type="number" min="2" max="30" value="8"><p class="field-help" data-i18n="multiCandidatePoolHelp">Number of leading single-phase candidates used to form AutoMix combinations. Keep it moderate: a larger pool makes combinations grow rapidly, slows the search, and can add noisy near-duplicates.</p></div>
+            <div><label for="multiPeakCount" data-i18n="multiPeakCount">AutoMix fitting peaks</label><input id="multiPeakCount" type="number" min="4" max="80" value="12"><p class="field-help" data-i18n="multiPeakCountHelp">Number of detected peaks used to fit phase contributions. Use more peaks for a minor phase; 12 is recommended.</p></div>
+          </div>
+          <div class="grid2 known-phase-controls">
+            <div>
+              <label for="multiKnownPhaseElements" data-i18n="multiKnownPhaseElements">Known phase: exact elements</label>
+              <textarea id="multiKnownPhaseElements" rows="3" data-i18n-placeholder="multiKnownPhaseElementsPlaceholder" placeholder="One phase per line, e.g. Na, Cl&#10;Mn, O"></textarea>
+              <p class="field-help" data-i18n="multiKnownPhaseElementsHelp">Each line is matched against the local database with an exact element set. It narrows a known component but does not choose between polymorphs.</p>
+            </div>
+            <div>
+              <label for="multiKnownPhaseMpids" data-i18n="multiKnownPhaseMpids">Known phase: MPID</label>
+              <textarea id="multiKnownPhaseMpids" rows="3" data-i18n-placeholder="multiKnownPhaseMpidsPlaceholder" placeholder="One MPID per line, e.g. mp-22862"></textarea>
+              <p class="field-help" data-i18n="multiKnownPhaseMpidsHelp">Each MPID directly selects its local database structure and gives it priority in the AutoMix candidate pool.</p>
+              <p class="field-help" data-i18n="multiKnownPhaseMpidsMinimum">Each specified MPID must contribute at least 3% of the relative diffraction contribution.</p>
+            </div>
+          </div>
+          <div class="actions"><button id="runMultiPhase" type="button" class="primary" data-i18n="runMultiPhase">Run AutoMix</button></div>
+          <div id="multiPhaseLog" class="log"></div>
+          </div>
+          <div id="multiPhaseResults" class="table-wrap automix-results" aria-label="AutoMix display panel"></div>
+        </div>
+      </details>
 
       <details class="panel pdf-module">
         <summary class="pdf-module-summary">
@@ -1465,15 +1787,19 @@
               </div>
               <div>
                 <label for="pdfExpColor" data-i18n="expColor">Experimental color</label>
-                <input id="pdfExpColor" type="color" value="#1d4ed8">
+                <input id="pdfExpColor" type="color" value="#2f6db2">
               </div>
               <div>
                 <label for="pdfMixtureColor" data-i18n="pdfMixtureColor">Mixture color</label>
-                <input id="pdfMixtureColor" type="color" value="#0f172a">
+                <input id="pdfMixtureColor" type="color" value="#263d52">
+              </div>
+              <div>
+                <label for="pdfAxisColor" data-i18n="axisColor">Axis color</label>
+                <input id="pdfAxisColor" type="color" value="#334155">
               </div>
               <div>
                 <label for="pdfGridColor" data-i18n="gridColor">Grid color</label>
-                <input id="pdfGridColor" type="color" value="#e5e7eb">
+                <input id="pdfGridColor" type="color" value="#e5ebf1">
               </div>
               <div>
                 <label for="pdfCurveWidth" data-i18n="curveWidth">Curve width</label>
@@ -1539,7 +1865,7 @@
     <div class="footer-inner">
       <span data-i18n="footerProduct">XMatcher Local UI for powder XRD phase identification.</span>
       <span>
-        <span data-i18n="releaseVersion">Release V1.0.0</span>
+        <span data-i18n="releaseVersion">Release V1.1.0</span>
         ·
         <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener" data-i18n="footerDownload">Download</a>
         ·
@@ -1558,11 +1884,17 @@
       processed: null,
       detectedPeaks: [],
       results: [],
+      multiphase: null,
+      selectedMultiPhaseIndex: 0,
+      multiPlotSettings: {width: 1000, height: 320, axisLabelSize: 18, tickLabelSize: 16, xLabel: "2theta / degree", yLabel: "Relative intensity", expColor: "#2f6db2", residualColor: "#c84b45", axisColor: "#334155", gridColor: "#e5ebf1", curveWidth: 1.4},
       selectedIndex: 0,
       fileName: null,
       serverStats: null,
       plot: null,
       hover: null,
+      multiPlot: null,
+      multiHover: null,
+      multiPlotZoom: null,
       pdfPlot: null,
       pdfHover: null,
       plotZoom: null,
@@ -1575,11 +1907,11 @@
         tickLabelSize: 13,
         xLabel: "2theta / degree",
         yLabel: "Relative intensity",
-        expColor: "#1d4ed8",
-        peakColor: "#dc2626",
-        theoryColor: "#0f766e",
-        axisColor: "#111827",
-        gridColor: "#e5e7eb",
+        expColor: "#2f6db2",
+        peakColor: "#c84b45",
+        theoryColor: "#167b72",
+        axisColor: "#334155",
+        gridColor: "#e5ebf1",
         curveWidth: 1.4
       },
       pdf: {
@@ -1587,16 +1919,17 @@
         cifs: [],
         result: null,
         showResult: true,
-        colors: ["#0f766e", "#dc2626", "#7c3aed", "#ea580c", "#0891b2"]
+        colors: ["#167b72", "#c84b45", "#7057a8", "#c98236", "#2f8299"]
       },
       pdfSettings: {
         width: 1400,
         height: 520,
         axisLabelSize: 16,
         tickLabelSize: 13,
-        expColor: "#1d4ed8",
-        mixtureColor: "#0f172a",
-        gridColor: "#e5e7eb",
+        expColor: "#2f6db2",
+        mixtureColor: "#263d52",
+        axisColor: "#334155",
+        gridColor: "#e5ebf1",
         curveWidth: 1.4
       },
       sidebarCollapsed: localStorage.getItem("xmatcher-sidebar-collapsed") === "true"
@@ -1611,7 +1944,7 @@
         collapseSidebar: "Collapse sidebar",
         expandSidebar: "Expand sidebar",
         appTitle: "XMatcher Local XRD Identification",
-        releaseVersion: "Official Release V1.0.0",
+        releaseVersion: "Official Release V1.1.0",
         appSubtitle: "Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.",
         downloadLink: "Download software",
         manualLink: "Manual",
@@ -1674,6 +2007,52 @@
         scoringMethod: "Scoring method",
         scoringHelp: "Hybrid is recommended for routine use.",
         runMatch: "Run match",
+        singlePhaseTitle: "Single-phase automatic identification",
+        singlePhaseNote: "Run a database search and inspect ranked candidate phases.",
+        singlePhaseBadge: "Click to open single-phase identification",
+        multiPhaseTitle: "AutoMix multi-phase identification",
+        multiPhaseNote: " Fit small phase combinations to detected peaks.",
+        multiPlotSettings: "AutoMix plot settings",
+        maxPhases: "Maximum phases",
+        multiCandidatePool: "Candidate pool",
+        multiCandidatePoolHelp: "Number of leading single-phase candidates used to form AutoMix combinations. Keep it moderate: a larger pool makes combinations grow rapidly, slows the search, and can add noisy near-duplicates.",
+        multiPeakCount: "AutoMix fitting peaks",
+        multiPeakCountHelp: "Number of detected peaks used to fit phase contributions. Use more peaks for a minor phase; 12 is recommended.",
+        multiKnownPhaseElements: "Known phase: exact elements",
+        multiKnownPhaseElementsPlaceholder: "One phase per line, e.g. Na, Cl\nMn, O",
+        multiKnownPhaseElementsHelp: "Each line is matched against the local database with an exact element set. Every accepted result must contain one matching phase; polymorphs remain ranked by diffraction evidence.",
+        multiKnownPhaseMpids: "Known phase: MPID",
+        multiKnownPhaseMpidsPlaceholder: "One MPID per line, e.g. mp-22862",
+        multiKnownPhaseMpidsHelp: "Each MPID directly selects its local database structure. Every accepted AutoMix result must include that exact structure.",
+        multiKnownPhaseMpidsMinimum: "Each specified MPID must contribute at least 3% of the relative diffraction contribution.",
+        multiKnownPhaseResolved: "Known-phase constraints: {entries} local entries resolved.",
+        multiPhaseDisclaimer: "Contributions are relative diffraction contributions, not weight fractions.",
+        runMultiPhase: "Run AutoMix",
+        multiPhaseRunning: "Searching phase combinations...",
+        multiPhaseComplete: "AutoMix complete: {count} combinations ranked.",
+        multiPhaseContributionConstraint: "No valid AutoMix combination: at least one specified MPID is below the required 3% relative diffraction contribution. Try increasing the detected peak count or verify the MPID and XRD pattern.",
+        multiPhaseEmpty: "AutoMix found no usable phase combination. Try clearing or broadening the element scope, increasing detected peaks, or relaxing the peak tolerance.",
+        multiPhaseDisplayTitle: "AutoMix full-peak comparison",
+        multiPhaseDisplayNote: "Click a combination to compare the experimental profile with every shifted theoretical peak. Main-plot stick heights show theoretical relative intensity scaled by each phase's diffraction contribution; the bottom lane marks positions only.",
+        multiPhaseCombinations: "AutoMix phase combinations",
+        multiPhaseSelectedAttribution: "Selected-combination peak attribution",
+        multiPhaseBest: "Selected",
+        multiPhaseTheory: "Theoretical peak",
+        multiPhaseTheoryLane: "Top 10 theoretical peak positions (equal-height bottom lane)",
+        multiPhaseResidual: "Unexplained peak",
+        multiResidualColor: "Residual color",
+        multiPhaseTablePhases: "Phases / relative contribution",
+        multiPhaseExplainedIntensity: "Explained intensity",
+        multiPhaseUnexplainedPeaks: "Unexplained peaks",
+        multiPhaseTwoTheta: "2theta",
+        multiPhaseAssignedPhase: "Assigned phase",
+        multiPhaseFittedIntensity: "Fitted intensity",
+        multiPhaseResidualIntensity: "Residual intensity",
+        multiPhaseUnexplained: "Unexplained",
+        multiPhaseOverlap: "overlap",
+        multiPhaseFallback: "AutoMix combination search fell back to the best single-phase recommendation.",
+        exportJson: "Export JSON",
+        exportCsv: "Export CSV",
         matchingBusy: "Calculating...",
         inputPoints: "Points",
         detectedPeaks: "Peaks",
@@ -1731,6 +2110,14 @@
         pdfSummaryFormula: "Formula",
         pdfSummaryWeight: "Weight",
         pdfSummaryPeaks: "Peaks",
+        pdfPeakTable: "Peak table",
+        pdfPeakHkl: "HKL",
+        pdfPeakAngle: "2theta (degree)",
+        pdfPeakDSpacing: "d spacing (angstrom)",
+        pdfPeakIntensity: "Relative intensity (%)",
+        pdfExportExcel: "Export Excel",
+        pdfNoPeakExport: "Calculate PDF comparison before exporting peak tables.",
+        pdfExcelExportFailed: "Excel export failed: {error}",
         pdfExperiment: "Experiment",
         pdfMixture: "Weighted mixture",
         pdfMixtureColor: "Mixture color",
@@ -1802,7 +2189,7 @@
         collapseSidebar: "折叠左侧面板",
         expandSidebar: "展开左侧面板",
         appTitle: "XMatcher 本地 XRD 物相识别",
-        releaseVersion: "正式发行版本 V1.0.0",
+        releaseVersion: "正式发行版本 V1.1.0",
         appSubtitle: "上传实验 XRD 数据，调整参数，在本机完成匹配，并对比实验峰与理论衍射峰。",
         downloadLink: "软件下载",
         manualLink: "说明手册",
@@ -1865,6 +2252,52 @@
         scoringMethod: "打分方法",
         scoringHelp: "常规识别建议使用 hybrid。",
         runMatch: "自动识别",
+        singlePhaseTitle: "单相自动识别",
+        singlePhaseNote: "运行数据库检索并查看排序后的候选物相。",
+        singlePhaseBadge: "点击展开单相自动识别",
+        multiPhaseTitle: "AutoMix 自动多相识别",
+        multiPhaseNote: " 对检测峰拟合少量相组合。",
+        multiPlotSettings: "AutoMix 图像设置",
+        maxPhases: "最多相数",
+        multiCandidatePool: "候选池",
+        multiCandidatePoolHelp: "用于组成 AutoMix 相组合的前列单相候选数量。不要设置过大：组合数量会快速增长，计算变慢，也更容易出现噪声或近似重复结果。",
+        multiPeakCount: "AutoMix 拟合峰数",
+        multiPeakCountHelp: "用于拟合各相贡献的检测峰数量。少量相可适当增加；建议使用 12 个峰。",
+        multiKnownPhaseElements: "已知相：精确元素",
+        multiKnownPhaseElementsPlaceholder: "每行一个相，例如 Na, Cl\nMn, O",
+        multiKnownPhaseElementsHelp: "每一行均以元素集合完全一致的方式匹配本地数据库。每个有效结果都必须包含一个匹配相；多晶型仍由衍射证据排序。",
+        multiKnownPhaseMpids: "已知相：MPID",
+        multiKnownPhaseMpidsPlaceholder: "每行一个 MPID，例如 mp-22862",
+        multiKnownPhaseMpidsHelp: "每个 MPID 会直接定位本地数据库中的结构。每个有效 AutoMix 结果都必须包含该指定结构。",
+        multiKnownPhaseMpidsMinimum: "每个指定 MPID 的相对衍射贡献必须至少为 3%。",
+        multiKnownPhaseResolved: "已知相约束：已定位 {entries} 个本地数据库条目。",
+        multiPhaseDisclaimer: "贡献值为相对衍射贡献，不等同于质量分数。",
+        runMultiPhase: "运行 AutoMix",
+        multiPhaseRunning: "正在搜索相组合...",
+        multiPhaseComplete: "AutoMix 完成：已排序 {count} 个组合。",
+        multiPhaseContributionConstraint: "没有满足条件的 AutoMix 组合：至少一个指定 MPID 的相对衍射贡献低于要求的 3%。请增加检测峰数，或核对 MPID 与 XRD 图谱。",
+        multiPhaseEmpty: "AutoMix 未找到可用的相组合。请尝试清空或放宽元素范围、增加检测峰数，或适当增大峰位容差。",
+        multiPhaseDisplayTitle: "AutoMix 全峰对比",
+        multiPhaseDisplayNote: "点击任一组合，可将实验曲线与各相平移后的全部理论峰对比。主图理论棒的高度表示按物相相对衍射贡献缩放后的理论相对强度；下方轨道仅标记峰位。",
+        multiPhaseCombinations: "AutoMix 相组合",
+        multiPhaseSelectedAttribution: "当前组合的检测峰归属",
+        multiPhaseBest: "当前",
+        multiPhaseTheory: "理论峰",
+        multiPhaseTheoryLane: "理论强度前 10 的峰位（下方等高轨道）",
+        multiPhaseResidual: "未解释峰",
+        multiResidualColor: "残峰颜色",
+        multiPhaseTablePhases: "物相 / 相对衍射贡献",
+        multiPhaseExplainedIntensity: "已解释强度",
+        multiPhaseUnexplainedPeaks: "未解释峰数",
+        multiPhaseTwoTheta: "2theta",
+        multiPhaseAssignedPhase: "归属物相",
+        multiPhaseFittedIntensity: "拟合强度",
+        multiPhaseResidualIntensity: "残余强度",
+        multiPhaseUnexplained: "未解释",
+        multiPhaseOverlap: "重叠",
+        multiPhaseFallback: "AutoMix 组合搜索已回退至最佳单相推荐结果。",
+        exportJson: "导出 JSON",
+        exportCsv: "导出 CSV",
         matchingBusy: "正在计算...",
         inputPoints: "点数",
         detectedPeaks: "峰数",
@@ -1922,6 +2355,14 @@
         pdfSummaryFormula: "化学式",
         pdfSummaryWeight: "含量",
         pdfSummaryPeaks: "峰数量",
+        pdfPeakTable: "峰表",
+        pdfPeakHkl: "HKL",
+        pdfPeakAngle: "2theta（度）",
+        pdfPeakDSpacing: "d 间距（Å）",
+        pdfPeakIntensity: "相对强度（%）",
+        pdfExportExcel: "导出 Excel",
+        pdfNoPeakExport: "请先计算 PDF 对比后再导出峰表。",
+        pdfExcelExportFailed: "Excel 导出失败：{error}",
         pdfExperiment: "实验谱",
         pdfMixture: "加权混合",
         pdfMixtureColor: "混合谱颜色",
@@ -1953,7 +2394,7 @@
         dbIntensity: "理论强度",
         waitingData: "等待上传 XRD 文件。",
         citationTitle: "引用",
-        citationNote: "如果本软件支持了您的研究，请引用相关 XQueryer 论文。引用内容在所有语言版本中均保持英文。",
+        citationNote: "如果本软件支持了您的研究，请引用相关 XQueryer 论文。",
         copyCitation: "复制引用",
         copyBibtex: "复制 BibTeX",
         copied: "已复制",
@@ -1993,7 +2434,7 @@
     i18n.ja = {...i18n.en,
       controlPanel: "制御パネル", collapseSidebar: "左パネルを折りたたむ", expandSidebar: "左パネルを展開",
       appTitle: "XMatcher ローカル XRD 相同定",
-      releaseVersion: "正式リリース V1.0.0",
+      releaseVersion: "正式リリース V1.1.0",
       appSubtitle: "実験 XRD データを読み込み、条件を調整し、ローカルで照合して実験ピークと理論反射を比較します。",
       downloadLink: "ソフトウェアをダウンロード", manualLink: "マニュアル", issueLink: "GitHub Issues", checkingApi: "ローカル API を確認中...",
       projectResources: "プロジェクト情報", projectNote: "ソフトウェアの入手、問題報告、関連 XQueryer 論文の引用はこちらです。",
@@ -2020,6 +2461,26 @@
       positionWeight: "位置重み", positionWeightHelp: "2theta 一致度の重み。",
       intensityWeight: "強度重み", intensityWeightHelp: "相対強度一致度の重み。",
       scoringMethod: "スコア方法", scoringHelp: "通常は hybrid を推奨します。",
+      multiPhaseTitle: "AutoMix 自動多相同定", multiPhaseNote: "検出ピークに少数の相組合せをフィットします。",
+      multiPeakCount: "AutoMix フィットピーク数", multiPeakCountHelp: "相の寄与をフィットする検出ピーク数です。微量相には増やしてください。推奨値は 12 です。",
+      multiPlotSettings: "AutoMix プロット設定", maxPhases: "最大相数", multiCandidatePool: "候補プール",
+      multiCandidatePoolHelp: "AutoMix の組合せを作る上位単相候補の数です。大きくしすぎないでください。組合せ数が急増し、計算が遅くなり、ノイズや類似結果が増えます。",
+      multiKnownPhaseElements: "既知相：元素の完全一致", multiKnownPhaseElementsPlaceholder: "1 行に 1 相、例: Na, Cl\nMn, O",
+      multiKnownPhaseElementsHelp: "各行は元素集合が完全一致するローカル候補を検索します。すべての有効結果に一致する相が 1 つ以上必要で、多形は回折証拠で順位付けされます。",
+      multiKnownPhaseMpids: "既知相：MPID", multiKnownPhaseMpidsPlaceholder: "1 行に 1 MPID、例: mp-22862",
+      multiKnownPhaseMpidsHelp: "各 MPID はローカルデータベース中の構造を直接指定します。すべての有効な AutoMix 結果にその構造が含まれます。",
+      multiKnownPhaseMpidsMinimum: "指定した各 MPID の相対回折寄与は 3% 以上である必要があります。",
+      multiKnownPhaseResolved: "既知相の制約: {entries} 件のローカル項目を特定しました。",
+      multiPhaseDisclaimer: "寄与率は相対的な回折寄与であり、重量分率ではありません。", runMultiPhase: "AutoMix を実行", multiPhaseRunning: "相組合せを探索中...",
+      multiPhaseComplete: "AutoMix 完了: {count} 件の組合せを順位付けしました。", multiPhaseEmpty: "AutoMix は使用可能な相組合せを見つけられませんでした。元素範囲、ピーク数、またはピーク位置許容差を調整してください。",
+      multiPhaseContributionConstraint: "有効な AutoMix 組合せはありません。指定 MPID の少なくとも 1 つが必要な相対回折寄与 3% 未満です。検出ピーク数を増やすか、MPID と XRD パターンを確認してください。",
+      multiPhaseDisplayTitle: "AutoMix 全ピーク比較", multiPhaseDisplayNote: "組合せをクリックすると、実験プロファイルと各相のシフト済み全理論ピークを比較できます。主図のスティック高は相対回折寄与でスケールした理論相対強度、下部レーンは位置のみを示します。",
+      multiPhaseCombinations: "AutoMix 相組合せ", multiPhaseSelectedAttribution: "選択した組合せの検出ピーク帰属", multiPhaseBest: "選択中",
+      multiPhaseTheory: "理論ピーク", multiPhaseTheoryLane: "理論強度上位 10 本のピーク位置（下部等高レーン）", multiPhaseResidual: "未説明ピーク", multiResidualColor: "残差色",
+      multiPhaseTablePhases: "相 / 相対回折寄与", multiPhaseExplainedIntensity: "説明された強度", multiPhaseUnexplainedPeaks: "未説明ピーク数",
+      multiPhaseTwoTheta: "2theta", multiPhaseAssignedPhase: "帰属相", multiPhaseFittedIntensity: "フィット強度", multiPhaseResidualIntensity: "残差強度",
+      multiPhaseUnexplained: "未説明", multiPhaseOverlap: "重なり", multiPhaseFallback: "AutoMix 組合せ探索は最良の単相推奨に戻りました。", exportJson: "JSON を出力", exportCsv: "CSV を出力",
+      plotWidth: "幅", plotHeight: "高さ", expColor: "実験プロファイル色", gridColor: "グリッド色", curveWidth: "線幅", resetZoom: "全体表示に戻す", exportPng: "PNG を出力", exportSvg: "SVG を出力",
       inputPoints: "点数", detectedPeaks: "ピーク", candidatesScanned: "候補", bestScore: "最高", selectedPhase: "相",
       chartTitle: "XRD パターン比較", chartNote: "理論ピークは estimated_shift 適用後に上向きに描画されます。",
       legendExp: "実験プロファイル", legendDetected: "検出ピーク", legendTheory: "シフト後の理論ピーク",
@@ -2028,7 +2489,7 @@
       formula: "組成式", elementsShort: "元素", score: "スコア", expCoverage: "実験カバー率", matched: "一致ピーク", shift: "シフト", spacegroup: "空間群",
       peakMatches: "ピーク対応", expTwoTheta: "実験 2theta", dbShifted: "DB 2theta シフト後", dbRaw: "DB 2theta 元値", delta: "差分",
       expIntensity: "実験強度", dbIntensity: "理論強度", waitingData: "XRD データ待機中。",
-      citationTitle: "引用", citationNote: "本ソフトウェアを研究に利用した場合は、関連する XQueryer 論文を引用してください。引用内容はすべての言語で英語のまま表示されます。", copyCitation: "引用をコピー", copyBibtex: "BibTeX をコピー", copied: "コピー済み",
+      citationTitle: "引用", citationNote: "本ソフトウェアを研究に利用した場合は、関連する XQueryer 論文を引用してください。", copyCitation: "引用をコピー", copyBibtex: "BibTeX をコピー", copied: "コピー済み",
       footerProduct: "粉末 XRD 相同定用 XMatcher ローカル UI。", footerDownload: "ダウンロード", footerManual: "マニュアル", footerIssues: "Issues", footerAuthor: "著者",
       apiConnected: "API 接続済み: {count} 件", apiConnectedLog: "ローカル API に接続しました。データベース: {count} 件。",
       apiNotConnected: "API 未接続", apiConnectFailed: "ローカル API に接続できません。先に python xmatcher_local_api.py --database MP500_xrd_database.pkl を実行してください。エラー: {error}",
@@ -2045,7 +2506,7 @@
     i18n.ko = {...i18n.en,
       controlPanel: "제어 패널", collapseSidebar: "왼쪽 패널 접기", expandSidebar: "왼쪽 패널 펼치기",
       appTitle: "XMatcher 로컬 XRD 상 식별",
-      releaseVersion: "공식 릴리스 V1.0.0",
+      releaseVersion: "공식 릴리스 V1.1.0",
       appSubtitle: "실험 XRD 데이터를 불러오고 매개변수를 조정한 뒤 로컬에서 매칭하여 실험 피크와 이론 반사를 비교합니다.",
       downloadLink: "소프트웨어 다운로드", manualLink: "매뉴얼", issueLink: "GitHub 이슈", checkingApi: "로컬 API 확인 중...",
       projectResources: "프로젝트 리소스", projectNote: "소프트웨어를 받고 문제를 보고하며 관련 XQueryer 논문을 인용할 수 있습니다.",
@@ -2072,6 +2533,26 @@
       positionWeight: "위치 가중치", positionWeightHelp: "2theta 일치도 가중치입니다.",
       intensityWeight: "강도 가중치", intensityWeightHelp: "상대 강도 일치도 가중치입니다.",
       scoringMethod: "점수 방식", scoringHelp: "일반 사용에는 hybrid를 권장합니다.",
+      multiPhaseTitle: "AutoMix 자동 다상 식별", multiPhaseNote: "검출된 피크에 소수의 상 조합을 피팅합니다.",
+      multiPeakCount: "AutoMix 피팅 피크 수", multiPeakCountHelp: "상 기여도를 피팅하는 검출 피크 수입니다. 소량 상에는 값을 높이세요. 권장값은 12입니다.",
+      multiPlotSettings: "AutoMix 그래프 설정", maxPhases: "최대 상 수", multiCandidatePool: "후보 풀",
+      multiCandidatePoolHelp: "AutoMix 조합에 사용할 상위 단상 후보 수입니다. 너무 크게 설정하지 마세요. 조합 수가 빠르게 늘어나 계산이 느려지고 노이즈나 유사 결과가 늘 수 있습니다.",
+      multiKnownPhaseElements: "알려진 상: 정확한 원소", multiKnownPhaseElementsPlaceholder: "상마다 한 줄, 예: Na, Cl\nMn, O",
+      multiKnownPhaseElementsHelp: "각 줄은 원소 집합이 완전히 일치하는 로컬 후보를 찾습니다. 모든 유효 결과에는 일치하는 상이 하나 이상 포함되며 다형은 회절 증거로 순위가 정해집니다.",
+      multiKnownPhaseMpids: "알려진 상: MPID", multiKnownPhaseMpidsPlaceholder: "MPID마다 한 줄, 예: mp-22862",
+      multiKnownPhaseMpidsHelp: "각 MPID는 로컬 데이터베이스 구조를 직접 지정합니다. 모든 유효한 AutoMix 결과에는 해당 구조가 포함됩니다.",
+      multiKnownPhaseMpidsMinimum: "지정한 각 MPID의 상대 회절 기여도는 최소 3%여야 합니다.",
+      multiKnownPhaseResolved: "알려진 상 제약: 로컬 항목 {entries}개를 확인했습니다.",
+      multiPhaseDisclaimer: "기여도는 상대 회절 기여도이며 질량 분율이 아닙니다.", runMultiPhase: "AutoMix 실행", multiPhaseRunning: "상 조합 검색 중...",
+      multiPhaseComplete: "AutoMix 완료: {count}개 조합의 순위를 매겼습니다.", multiPhaseEmpty: "AutoMix가 사용할 수 있는 상 조합을 찾지 못했습니다. 원소 범위, 피크 수 또는 피크 위치 허용오차를 조정해 보세요.",
+      multiPhaseContributionConstraint: "유효한 AutoMix 조합이 없습니다. 지정한 MPID 중 하나 이상이 필요한 상대 회절 기여도 3%에 미치지 못합니다. 검출 피크 수를 늘리거나 MPID와 XRD 패턴을 확인하세요.",
+      multiPhaseDisplayTitle: "AutoMix 전체 피크 비교", multiPhaseDisplayNote: "조합을 클릭하면 실험 프로파일과 각 상의 이동된 전체 이론 피크를 비교할 수 있습니다. 주 그래프 막대 높이는 상의 상대 회절 기여도로 조정된 이론 상대 강도이며, 하단 레인은 위치만 표시합니다.",
+      multiPhaseCombinations: "AutoMix 상 조합", multiPhaseSelectedAttribution: "선택한 조합의 검출 피크 귀속", multiPhaseBest: "선택됨",
+      multiPhaseTheory: "이론 피크", multiPhaseTheoryLane: "이론 강도 상위 10개 피크 위치(하단 동일 높이 레인)", multiPhaseResidual: "미설명 피크", multiResidualColor: "잔차 색상",
+      multiPhaseTablePhases: "상 / 상대 회절 기여도", multiPhaseExplainedIntensity: "설명된 강도", multiPhaseUnexplainedPeaks: "미설명 피크 수",
+      multiPhaseTwoTheta: "2theta", multiPhaseAssignedPhase: "귀속 상", multiPhaseFittedIntensity: "피팅 강도", multiPhaseResidualIntensity: "잔차 강도",
+      multiPhaseUnexplained: "미설명", multiPhaseOverlap: "중첩", multiPhaseFallback: "AutoMix 조합 검색이 최상의 단상 추천으로 되돌아갔습니다.", exportJson: "JSON 내보내기", exportCsv: "CSV 내보내기",
+      plotWidth: "너비", plotHeight: "높이", expColor: "실험 프로파일 색상", gridColor: "격자 색상", curveWidth: "선 두께", resetZoom: "전체 보기로 복원", exportPng: "PNG 내보내기", exportSvg: "SVG 내보내기",
       inputPoints: "포인트", detectedPeaks: "피크", candidatesScanned: "후보", bestScore: "최고", selectedPhase: "상",
       chartTitle: "XRD 패턴 비교", chartNote: "이론 피크는 estimated_shift 적용 후 위쪽으로 표시됩니다.",
       legendExp: "실험 프로파일", legendDetected: "검출 피크", legendTheory: "시프트된 이론 피크",
@@ -2080,7 +2561,7 @@
       formula: "화학식", elementsShort: "원소", score: "점수", expCoverage: "실험 커버리지", matched: "매칭 피크", shift: "시프트", spacegroup: "공간군",
       peakMatches: "피크 매칭", expTwoTheta: "실험 2theta", dbShifted: "DB 2theta 시프트 후", dbRaw: "DB 2theta 원본", delta: "편차",
       expIntensity: "실험 강도", dbIntensity: "이론 강도", waitingData: "XRD 데이터를 기다리는 중입니다.",
-      citationTitle: "인용", citationNote: "이 소프트웨어가 연구에 사용되었다면 관련 XQueryer 논문을 인용해 주세요. 인용 내용은 모든 언어에서 영어로 유지됩니다.", copyCitation: "인용 복사", copyBibtex: "BibTeX 복사", copied: "복사됨",
+      citationTitle: "인용", citationNote: "이 소프트웨어가 연구에 사용되었다면 관련 XQueryer 논문을 인용해 주세요.", copyCitation: "인용 복사", copyBibtex: "BibTeX 복사", copied: "복사됨",
       footerProduct: "분말 XRD 상 식별용 XMatcher 로컬 UI.", footerDownload: "다운로드", footerManual: "매뉴얼", footerIssues: "이슈", footerAuthor: "저자",
       apiConnected: "API 연결됨: {count} 항목", apiConnectedLog: "로컬 API가 연결되었습니다. 데이터베이스 {count} 항목.",
       apiNotConnected: "API 연결 안 됨", apiConnectFailed: "로컬 API에 연결할 수 없습니다. 먼저 python xmatcher_local_api.py --database MP500_xrd_database.pkl 를 실행하세요. 오류: {error}",
@@ -2122,6 +2603,9 @@
       updateRiskNote();
       renderPdfSummary();
       drawPlot();
+      renderMultiPhaseResults();
+      drawMultiPhasePlot();
+      renderMultiPhaseLog();
     }
 
     function log(message, kind = "") {
@@ -2380,6 +2864,7 @@
       state.processed = null;
       state.detectedPeaks = [];
       state.results = [];
+      state.multiphase = null;
       state.selectedIndex = 0;
       state.hover = null;
       state.plotZoom = null;
@@ -2389,8 +2874,10 @@
       $("mBest").textContent = "-";
       $("mPhase").textContent = "-";
       renderResults();
+      renderMultiPhaseResults();
       renderMatches();
       drawPlot();
+      drawMultiPhasePlot();
       $("fileStatus").textContent = t("fileUploaded", {name: fileName});
       log(t("loadedData", {file: fileName, count: data.two_theta.length.toLocaleString()}));
     }
@@ -2473,6 +2960,229 @@
       }
     }
 
+    function renderMultiPhaseResults() {
+      const wrap = $("multiPhaseResults");
+      const results = state.multiphase?.results || [];
+      if (!results.length) {
+        wrap.innerHTML = "";
+        return;
+      }
+      state.selectedMultiPhaseIndex = Math.max(0, Math.min(state.selectedMultiPhaseIndex, results.length - 1));
+      const rows = results.map((result, index) => {
+        const phases = result.phases.map((phase) => `${escapeHtml(phase.formula || "-")} <span class="pill">${fmt(phase.relative_contribution, 1)}%</span>`).join(" + ");
+        const unexplained = (result.peak_attribution || []).filter((peak) => !peak.assigned_formula).length;
+        return `<tr class="${index === state.selectedMultiPhaseIndex ? "selected" : ""}" data-multiphase-result="${index}" tabindex="0" role="button" aria-label="${escapeHtml(t("multiPhaseBest"))} ${index + 1}"><td>${index + 1}</td><td>${phases}</td><td>${fmt(result.score, 2)}</td><td>${fmt(result.explained_intensity_percent, 1)}%</td><td>${unexplained}</td></tr>`;
+      }).join("");
+      const selected = results[state.selectedMultiPhaseIndex];
+      const peakRows = (selected.peak_attribution || []).map((peak) => `<tr>
+        <td>${fmt(peak.two_theta, 4)}</td><td>${fmt(peak.intensity, 2)}</td>
+        <td>${escapeHtml(peak.assigned_formula || t("multiPhaseUnexplained"))}${peak.overlap ? ` (${escapeHtml(t("multiPhaseOverlap"))})` : ""}</td>
+        <td>${fmt(peak.fitted_intensity, 2)}</td><td>${fmt(peak.residual_intensity, 2)}</td>
+      </tr>`).join("");
+      wrap.innerHTML = `
+        <h3>${escapeHtml(t("multiPhaseDisplayTitle"))}</h3>
+        <p class="field-help">${escapeHtml(t("multiPhaseDisplayNote"))}</p>
+        <h3>${escapeHtml(t("multiPhaseCombinations"))}</h3>
+        <table><thead><tr><th>#</th><th>${escapeHtml(t("multiPhaseTablePhases"))}</th><th>${escapeHtml(t("score"))}</th><th>${escapeHtml(t("multiPhaseExplainedIntensity"))}</th><th>${escapeHtml(t("multiPhaseUnexplainedPeaks"))}</th></tr></thead><tbody>${rows}</tbody></table>
+        <h3>${escapeHtml(t("multiPhaseSelectedAttribution"))}</h3>
+        <table><thead><tr><th>${escapeHtml(t("multiPhaseTwoTheta"))}</th><th>${escapeHtml(t("expIntensity"))}</th><th>${escapeHtml(t("multiPhaseAssignedPhase"))}</th><th>${escapeHtml(t("multiPhaseFittedIntensity"))}</th><th>${escapeHtml(t("multiPhaseResidualIntensity"))}</th></tr></thead><tbody>${peakRows}</tbody></table>`;
+      wrap.querySelectorAll("[data-multiphase-result]").forEach((row) => {
+        const select = () => {
+          state.selectedMultiPhaseIndex = Number(row.dataset.multiphaseResult);
+          state.multiHover = null;
+          renderMultiPhaseResults();
+          drawMultiPhasePlot();
+        };
+        row.addEventListener("click", select);
+        row.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(); }
+        });
+      });
+    }
+
+    function readMultiPlotSettings() {
+      const rangeMin = $("multiRangeMin").value.trim() === "" ? NaN : Number($("multiRangeMin").value);
+      const rangeMax = $("multiRangeMax").value.trim() === "" ? NaN : Number($("multiRangeMax").value);
+      state.multiPlotZoom = Number.isFinite(rangeMin) && Number.isFinite(rangeMax) && rangeMax > rangeMin ? {xMin: rangeMin, xMax: rangeMax} : null;
+      state.multiPlotSettings = {
+        width: Math.max(640, Math.round(num("multiPlotWidth")) || 1000),
+        height: Math.max(260, Math.round(num("multiPlotHeight")) || 320),
+        axisLabelSize: Math.max(8, Math.round(num("multiAxisLabelSize")) || 18),
+        tickLabelSize: Math.max(8, Math.round(num("multiTickLabelSize")) || 16),
+        xLabel: $("multiXAxisLabel").value.trim() || t("xAxis"),
+        yLabel: $("multiYAxisLabel").value.trim() || t("yAxis"),
+        expColor: $("multiExpColor").value,
+        residualColor: $("multiResidualColor").value,
+        axisColor: $("multiAxisColor").value,
+        gridColor: $("multiGridColor").value,
+        curveWidth: Math.max(0.5, num("multiCurveWidth") || 1.4)
+      };
+      drawMultiPhasePlot();
+    }
+
+    function drawMultiPhasePlot() {
+      const canvas = $("multiPlot"), raw = state.processed || state.raw, selected = state.multiphase?.results?.[state.selectedMultiPhaseIndex];
+      if (!canvas || !raw?.two_theta?.length) return;
+      const s = state.multiPlotSettings, w = canvas.width = s.width, h = canvas.height = s.height, ctx = canvas.getContext("2d");
+      const colors = ["#167b72", "#7057a8", "#c98236"], phases = selected?.phases || [];
+      const laneStep = Math.max(28, s.tickLabelSize * 1.8);
+      const markerBand = phases.length ? phases.length * laneStep + 16 : 0;
+      const fullXMin = Math.min(...raw.two_theta), fullXMax = Math.max(...raw.two_theta);
+      const xMin = state.multiPlotZoom?.xMin ?? fullXMin, xMax = state.multiPlotZoom?.xMax ?? fullXMax;
+      ctx.font = `${Math.max(10, s.tickLabelSize - 2)}px ui-sans-serif, system-ui`;
+      const phaseLabelWidth = phases.length ? Math.max(...phases.map((phase) => ctx.measureText(`${phase.formula || "-"} ${fmt(phase.relative_contribution, 1)}%`).width)) + 16 : 0;
+      const margin = {left: Math.max(62, s.axisLabelSize * 3.6, phaseLabelWidth), right: 24, top: Math.max(24, s.axisLabelSize + 8), bottom: Math.max(68, s.tickLabelSize + s.axisLabelSize + markerBand + 24)};
+      const plotW = w - margin.left - margin.right, plotH = h - margin.top - margin.bottom;
+      if (plotW <= 40 || plotH <= 40) return;
+      const sx = (x) => margin.left + (x - xMin) * plotW / (xMax - xMin || 1), sy = (y) => margin.top + (105 - y) * plotH / 105, y = normalize(raw.intensity || []);
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = s.gridColor; ctx.beginPath();
+      for (let i = 0; i <= 8; i++) { const yy = margin.top + i * plotH / 8; ctx.moveTo(margin.left, yy); ctx.lineTo(w - margin.right, yy); }
+      ctx.stroke(); ctx.strokeStyle = s.axisColor; ctx.beginPath(); ctx.moveTo(margin.left, margin.top); ctx.lineTo(margin.left, h - margin.bottom); ctx.lineTo(w - margin.right, h - margin.bottom); ctx.stroke();
+      ctx.save(); ctx.beginPath(); ctx.rect(margin.left, margin.top, plotW, plotH); ctx.clip();
+      ctx.strokeStyle = s.expColor; ctx.lineWidth = s.curveWidth; ctx.beginPath(); raw.two_theta.forEach((x, i) => i ? ctx.lineTo(sx(x), sy(y[i])) : ctx.moveTo(sx(x), sy(y[i]))); ctx.stroke();
+      const maxRaw = Math.max(...(raw.intensity || [1]), 1);
+      state.multiPlot = {margin, plotW, plotH, xMin, xMax, sx, raw, y, selected, phases};
+      phases.forEach((phase, phaseIndex) => {
+        const markers = scaledPhaseTheoryPeaks(phase);
+        ctx.strokeStyle = colors[phaseIndex % colors.length];
+        ctx.lineWidth = 1.5;
+        markers.forEach(({position, intensity}) => {
+          const px = sx(position);
+          if (px < margin.left || px > w - margin.right) return;
+          ctx.beginPath(); ctx.moveTo(px, sy(0)); ctx.lineTo(px, sy(intensity)); ctx.stroke();
+        });
+      });
+      (selected?.peak_attribution || []).filter((peak) => !peak.assigned_formula).forEach((peak) => { const fitted = Math.min(100, 100 * Number(peak.residual_intensity || 0) / maxRaw); ctx.strokeStyle = s.residualColor; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sx(peak.two_theta), sy(0)); ctx.lineTo(sx(peak.two_theta), sy(fitted)); ctx.stroke(); });
+      ctx.restore();
+      const axisY = h - margin.bottom;
+      phases.forEach((phase, phaseIndex) => {
+        const color = colors[phaseIndex % colors.length], laneY = axisY + s.tickLabelSize + 18 + phaseIndex * laneStep;
+        const positions = phase.theoretical_peaks?.positions || [], intensities = phase.theoretical_peaks?.intensities || [];
+        const markers = strongestTheoryMarkers(positions, intensities);
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.globalAlpha = 0.9; ctx.lineWidth = 1.2;
+        ctx.globalAlpha = 0.22; ctx.beginPath(); ctx.moveTo(margin.left, laneY); ctx.lineTo(w - margin.right, laneY); ctx.stroke();
+        ctx.globalAlpha = 0.9;
+        markers.forEach(({position}) => {
+          const px = sx(Number(position) + Number(phase.estimated_shift || 0));
+          if (px < margin.left || px > w - margin.right) return;
+          ctx.beginPath(); ctx.moveTo(px, laneY); ctx.lineTo(px, laneY - 13); ctx.stroke();
+        });
+        ctx.font = `${Math.max(10, s.tickLabelSize - 2)}px ui-sans-serif, system-ui`;
+        ctx.textAlign = "right";
+        ctx.fillText(`${phase.formula || "-"} ${fmt(phase.relative_contribution, 1)}%`, margin.left - 8, laneY + 4);
+        ctx.textAlign = "start";
+      });
+      ctx.globalAlpha = 1;
+      const tickCount = Math.max(2, Math.min(8, Math.floor(plotW / Math.max(76, s.tickLabelSize * 4.6))));
+      ctx.fillStyle = s.axisColor;
+      ctx.font = `${s.axisLabelSize}px ui-sans-serif, system-ui`;
+      ctx.fillText(s.yLabel, 14, margin.top - 7);
+      ctx.textAlign = "center";
+      ctx.fillText(s.xLabel, w / 2, h - 10);
+      ctx.font = `${s.tickLabelSize}px ui-sans-serif, system-ui`;
+      for (let i = 0; i <= tickCount; i++) { const xv = xMin + i * (xMax - xMin) / tickCount; ctx.fillText(xv.toFixed(1), sx(xv), axisY + s.tickLabelSize + 3); }
+      ctx.textAlign = "start";
+      $("multiLegend").innerHTML = [`<span><i class="swatch" style="background:${s.expColor}"></i>${escapeHtml(t("legendExp"))}</span>`, ...phases.map((phase, i) => `<span><i class="swatch" style="background:${colors[i % colors.length]}"></i>${escapeHtml(phase.formula)} ${fmt(phase.relative_contribution, 1)}% · ${escapeHtml(t("multiPhaseTheoryLane"))}</span>`), `<span><i class="swatch" style="background:${s.residualColor}"></i>${escapeHtml(t("multiPhaseResidual"))}</span>`].join("");
+      drawMultiPhaseHoverOverlay(ctx, w, h);
+    }
+
+    function setupMultiPhaseHover() {
+      const canvas = $("multiPlot");
+      canvas.addEventListener("mousemove", (event) => {
+        const plot = state.multiPlot;
+        if (!plot) return;
+        const rect = canvas.getBoundingClientRect();
+        const cx = (event.clientX - rect.left) * canvas.width / rect.width;
+        const cy = (event.clientY - rect.top) * canvas.height / rect.height;
+        const inside = cx >= plot.margin.left && cx <= canvas.width - plot.margin.right && cy >= plot.margin.top && cy <= canvas.height - 8;
+        if (!inside) { state.multiHover = null; drawMultiPhasePlot(); return; }
+        const xValue = plot.xMin + (cx - plot.margin.left) * (plot.xMax - plot.xMin) / plot.plotW;
+        let nearest = null;
+        (plot.phases || []).forEach((phase, phaseIndex) => {
+          scaledPhaseTheoryPeaks(phase).forEach(({position, intensity}) => {
+            const distance = Math.abs(plot.sx(position) - cx);
+            if (distance <= 8 && (!nearest || distance < nearest.distance)) nearest = {phase, phaseIndex, position, intensity, distance};
+          });
+        });
+        const index = nearestIndex(plot.raw.two_theta, xValue);
+        const lines = [`${t("multiPhaseTwoTheta")}: ${fmt(xValue, 3)}`, `${t("legendExp")}: ${fmt(plot.raw.intensity[index], 2)} (${fmt(plot.y[index], 1)}%)`];
+        if (nearest) lines.push(`${nearest.phase.formula || "-"} ${t("multiPhaseTheory")}: ${fmt(nearest.position, 3)} / ${fmt(nearest.intensity, 1)}%`);
+        state.multiHover = {cx, cy, x: xValue, lines};
+        drawMultiPhasePlot();
+      });
+      canvas.addEventListener("mouseleave", () => { state.multiHover = null; drawMultiPhasePlot(); });
+    }
+
+    function drawMultiPhaseHoverOverlay(ctx, w, h) {
+      const hover = state.multiHover, plot = state.multiPlot;
+      if (!hover || !plot) return;
+      const px = plot.sx(hover.x);
+      ctx.save(); ctx.strokeStyle = "rgba(37, 99, 235, 0.55)"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(px, plot.margin.top); ctx.lineTo(px, h - plot.margin.bottom); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = "12px ui-sans-serif, system-ui";
+      const boxW = Math.max(...hover.lines.map((line) => ctx.measureText(line).width)) + 18, boxH = hover.lines.length * 18 + 12;
+      let boxX = px + 12, boxY = hover.cy - boxH - 10;
+      if (boxX + boxW > w - 8) boxX = px - boxW - 12;
+      if (boxY < 8) boxY = hover.cy + 12;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.92)"; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 6); else ctx.rect(boxX, boxY, boxW, boxH); ctx.fill();
+      ctx.fillStyle = "#f8fafc"; hover.lines.forEach((line, index) => ctx.fillText(line, boxX + 9, boxY + 20 + index * 18)); ctx.restore();
+    }
+
+    function resetMultiPlotZoom() {
+      state.multiPlotZoom = null;
+      state.multiHover = null;
+      $("multiRangeMin").value = "";
+      $("multiRangeMax").value = "";
+      drawMultiPhasePlot();
+    }
+
+    function renderMultiPhaseLog() {
+      const data = state.multiphase;
+      if (!data) return;
+      const count = data.results?.length || 0;
+      const message = count ? (data.fallback_used ? t("multiPhaseFallback") : t("multiPhaseComplete", {count})) : (data.constraint_error === "required_contribution_below_minimum" ? t("multiPhaseContributionConstraint") : t("multiPhaseEmpty"));
+      const known = Number(data.known_phase_constraints?.resolved_entry_count || 0);
+      const knownNote = known ? `<br>${escapeHtml(t("multiKnownPhaseResolved", {entries: known}))}` : "";
+      $("multiPhaseLog").innerHTML = `<span class="${count ? "ok-text" : "warn-text"}">${escapeHtml(message)}</span>${knownNote}<br>${escapeHtml(t("multiPhaseDisclaimer"))}`;
+    }
+
+    async function runMultiPhase() {
+      if (!state.raw) {
+        log(t("uploadFirst"), "error");
+        return;
+      }
+      const button = $("runMultiPhase");
+      button.disabled = true;
+      button.innerHTML = `<span class="spinner"></span>${escapeHtml(t("multiPhaseRunning"))}`;
+      $("multiPhaseLog").innerHTML = `<span class="warn-text">${escapeHtml(t("multiPhaseRunning"))}</span>`;
+      try {
+        const payload = {
+          two_theta: state.raw.two_theta, intensity: state.raw.intensity,
+          params: {...getParams(), multiphase_n_peaks: Math.round(num("multiPeakCount"))},
+          elements: getElements(), element_filter_mode: $("filterMode").value,
+          max_phases: Math.round(num("maxPhases")), candidate_pool: Math.round(num("multiCandidatePool")), top_n: 10,
+          known_phase_elements: $("multiKnownPhaseElements").value,
+          known_phase_mpids: $("multiKnownPhaseMpids").value
+        };
+        const res = await fetch(`${getApiUrl()}/api/multiphase-match`, {
+          method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || data.status === "error") throw new Error(data.error || `HTTP ${res.status}`);
+        state.multiphase = data;
+        state.selectedMultiPhaseIndex = 0;
+        state.multiHover = null;
+        state.multiPlotZoom = null;
+        renderMultiPhaseResults();
+        drawMultiPhasePlot();
+        renderMultiPhaseLog();
+      } catch (err) {
+        $("multiPhaseLog").innerHTML = `<span class="error">${escapeHtml(err.message)}</span>`;
+      } finally {
+        button.disabled = false;
+        button.textContent = t("runMultiPhase");
+      }
+    }
+
     function renderResults() {
       const body = $("resultsBody");
       body.innerHTML = "";
@@ -2529,6 +3239,16 @@
       }
     }
 
+    function formatPdfHkl(hklRecords) {
+      if (!Array.isArray(hklRecords)) return "-";
+      return hklRecords.map((record) => {
+        if (!record || typeof record !== "object") return String(record ?? "");
+        const hkl = Array.isArray(record.hkl) ? record.hkl.join(" ") : String(record.hkl ?? "");
+        const multiplicity = record.multiplicity === undefined ? "" : ` ×${record.multiplicity}`;
+        return hkl ? `(${hkl})${multiplicity}` : multiplicity.trim();
+      }).filter(Boolean).join("; ") || "-";
+    }
+
     function renderPdfSummary() {
       const wrap = $("pdfSummary");
       if (!wrap) return;
@@ -2542,6 +3262,14 @@
         const color = state.pdf.cifs[index]?.color || state.pdf.colors[index % state.pdf.colors.length];
         const file = phase.name || state.pdf.cifs[index]?.name || `phase ${index + 1}`;
         const peaks = phase.peaks?.positions?.length || 0;
+        const peakRows = Array.from({length: peaks}, (_, peakIndex) => `
+          <tr>
+            <td>${escapeHtml(formatPdfHkl(phase.peaks?.hkls?.[peakIndex]))}</td>
+            <td>${fmt(phase.peaks?.positions?.[peakIndex], 4)}</td>
+            <td>${fmt(phase.peaks?.d_spacings?.[peakIndex], 5)}</td>
+            <td>${fmt(phase.peaks?.intensities?.[peakIndex], 2)}</td>
+          </tr>
+        `).join("");
         return `
           <tr>
             <td><span class="swatch" style="background:${escapeHtml(color)}"></span>${escapeHtml(file)}</td>
@@ -2549,6 +3277,23 @@
             <td>${fmt(phase.weight, 2)}%</td>
             <td>${peaks}</td>
           </tr>
+          <tr><td colspan="4" style="padding:0;">
+            <details class="pdf-phase-peaks">
+              <summary>${escapeHtml(file)} — ${escapeHtml(t("pdfPeakTable"))} (${peaks})</summary>
+              <div class="actions" style="padding:0 10px 10px;">
+                <button type="button" data-pdf-export-phase="${index}">${escapeHtml(t("pdfExportExcel"))}</button>
+              </div>
+              <div class="table-wrap"><table>
+                <thead><tr>
+                  <th>${escapeHtml(t("pdfPeakHkl"))}</th>
+                  <th>${escapeHtml(t("pdfPeakAngle"))}</th>
+                  <th>${escapeHtml(t("pdfPeakDSpacing"))}</th>
+                  <th>${escapeHtml(t("pdfPeakIntensity"))}</th>
+                </tr></thead>
+                <tbody>${peakRows}</tbody>
+              </table></div>
+            </details>
+          </td></tr>
         `;
       }).join("");
       wrap.style.display = "block";
@@ -2568,6 +3313,9 @@
           <tbody>${rows}</tbody>
         </table>
       `;
+      wrap.querySelectorAll("[data-pdf-export-phase]").forEach((button) => {
+        button.addEventListener("click", () => exportPdfPeakTableExcel(Number(button.dataset.pdfExportPhase), button));
+      });
     }
 
     function renderPdfPhaseList() {
@@ -2695,6 +3443,26 @@
       const max = Math.max(...values.filter(Number.isFinite), 0);
       if (max <= 0) return values.map(() => 0);
       return values.map((v) => Math.max(0, Number(v)) * maxOut / max);
+    }
+
+    function strongestTheoryMarkers(positions, intensities, limit = 10) {
+      return (positions || []).map((position, index) => ({
+        position: Number(position), intensity: Number(intensities?.[index] || 0), index
+      })).filter((item) => Number.isFinite(item.position))
+        .sort((a, b) => b.intensity - a.intensity)
+        .slice(0, limit)
+        .sort((a, b) => a.position - b.position);
+    }
+
+    function scaledPhaseTheoryPeaks(phase) {
+      const positions = phase?.theoretical_peaks?.positions || [];
+      const normalizedIntensities = normalize(phase?.theoretical_peaks?.intensities || []);
+      const contribution = Math.max(0, Number(phase?.relative_contribution || 0)) / 100;
+      const shift = Number(phase?.estimated_shift || 0);
+      return positions.map((position, index) => ({
+        position: Number(position) + shift,
+        intensity: Math.min(100, Math.max(0, Number(normalizedIntensities[index] || 0) * contribution))
+      })).filter((peak) => Number.isFinite(peak.position) && Number.isFinite(peak.intensity));
     }
 
     function movingAverage(values, windowSize) {
@@ -2888,11 +3656,11 @@
         tickLabelSize: Math.max(8, Math.round(num("tickLabelSize")) || 13),
         xLabel: $("xAxisLabel").value.trim() || t("xAxis"),
         yLabel: $("yAxisLabel").value.trim() || t("yAxis"),
-        expColor: $("expColor").value || "#1d4ed8",
-        peakColor: $("peakColor").value || "#dc2626",
-        theoryColor: $("theoryColor").value || "#0f766e",
-        axisColor: $("axisColor").value || "#111827",
-        gridColor: $("gridColor").value || "#e5e7eb",
+        expColor: $("expColor").value || "#2f6db2",
+        peakColor: $("peakColor").value || "#c84b45",
+        theoryColor: $("theoryColor").value || "#167b72",
+        axisColor: $("axisColor").value || "#334155",
+        gridColor: $("gridColor").value || "#e5ebf1",
         curveWidth: Math.max(0.5, Number($("curveWidth").value) || 1.4)
       };
       localStorage.setItem("xmatcher-plot-settings", JSON.stringify(state.plotSettings));
@@ -2933,9 +3701,10 @@
         height: Math.max(300, Math.round(num("pdfPlotHeight")) || 520),
         axisLabelSize: Math.max(8, Math.round(num("pdfAxisLabelSize")) || 16),
         tickLabelSize: Math.max(8, Math.round(num("pdfTickLabelSize")) || 13),
-        expColor: $("pdfExpColor").value || "#1d4ed8",
-        mixtureColor: $("pdfMixtureColor").value || "#0f172a",
-        gridColor: $("pdfGridColor").value || "#e5e7eb",
+        expColor: $("pdfExpColor").value || "#2f6db2",
+        mixtureColor: $("pdfMixtureColor").value || "#263d52",
+        axisColor: $("pdfAxisColor").value || "#334155",
+        gridColor: $("pdfGridColor").value || "#e5ebf1",
         curveWidth: Math.max(0.5, Number($("pdfCurveWidth").value) || 1.4)
       };
       localStorage.setItem("xmatcher-pdf-settings", JSON.stringify(state.pdfSettings));
@@ -2954,12 +3723,51 @@
       $("pdfTickLabelSize").value = s.tickLabelSize;
       $("pdfExpColor").value = s.expColor;
       $("pdfMixtureColor").value = s.mixtureColor;
+      $("pdfAxisColor").value = s.axisColor;
       $("pdfGridColor").value = s.gridColor;
       $("pdfCurveWidth").value = s.curveWidth;
-      ["pdfPlotWidth", "pdfPlotHeight", "pdfAxisLabelSize", "pdfTickLabelSize", "pdfExpColor", "pdfMixtureColor", "pdfGridColor", "pdfCurveWidth"].forEach((id) => {
+      ["pdfPlotWidth", "pdfPlotHeight", "pdfAxisLabelSize", "pdfTickLabelSize", "pdfExpColor", "pdfMixtureColor", "pdfAxisColor", "pdfGridColor", "pdfCurveWidth"].forEach((id) => {
         $(id).addEventListener("input", readPdfSettings);
       });
       ["pdfRangeMin", "pdfRangeMax"].forEach((id) => $(id).addEventListener("input", readPdfSettings));
+    }
+
+    function setupColorControls() {
+      document.querySelectorAll(".plot-control-grid input[type='color'], .pdf-settings-grid input[type='color']").forEach((input) => {
+        const cell = input.parentElement;
+        if (!cell || cell.classList.contains("color-control")) return;
+        cell.classList.add("color-control");
+        input.classList.add("color-native");
+        const swatch = document.createElement("label");
+        swatch.className = "color-swatch";
+        swatch.htmlFor = input.id;
+        swatch.setAttribute("aria-hidden", "true");
+        swatch.innerHTML = '<span class="color-swatch-dot"></span><span class="color-swatch-line"></span><span class="color-swatch-value"></span>';
+        cell.append(swatch);
+        const update = () => {
+          const value = input.value.toUpperCase();
+          swatch.style.setProperty("--tone", value);
+          swatch.querySelector(".color-swatch-value").textContent = value;
+        };
+        input.addEventListener("input", update);
+        input.addEventListener("change", update);
+        update();
+      });
+    }
+
+    function applyPaletteRefresh() {
+      const key = "xmatcher-plot-palette-v2";
+      if (localStorage.getItem(key) === "applied") return;
+      const palette = {
+        expColor: "#2f6db2", peakColor: "#c84b45", theoryColor: "#167b72", axisColor: "#334155", gridColor: "#e5ebf1",
+        multiExpColor: "#2f6db2", multiResidualColor: "#c84b45", multiAxisColor: "#334155", multiGridColor: "#e5ebf1",
+        pdfExpColor: "#2f6db2", pdfMixtureColor: "#263d52", pdfAxisColor: "#334155", pdfGridColor: "#e5ebf1"
+      };
+      Object.entries(palette).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
+      readPlotSettings();
+      readPdfSettings();
+      readMultiPlotSettings();
+      localStorage.setItem(key, "applied");
     }
 
     function updatePdfToggleButton() {
@@ -2993,7 +3801,7 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = "#1d4ed8";
+      ctx.fillStyle = settings.expColor;
       ctx.beginPath();
       ctx.arc(px, py, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -3205,7 +4013,7 @@
         ctx.lineTo(w - margin.right, yy);
       }
       ctx.stroke();
-      ctx.strokeStyle = "#111827";
+      ctx.strokeStyle = settings.axisColor;
       ctx.beginPath();
       ctx.moveTo(margin.left, margin.top);
       ctx.lineTo(margin.left, h - margin.bottom);
@@ -3510,7 +4318,7 @@
         const yy = margin.top + i * plotH / 8;
         parts.push(`<line x1="${margin.left}" y1="${yy}" x2="${w - margin.right}" y2="${yy}" stroke="${s.gridColor}" stroke-width="1"/>`);
       }
-      parts.push(`<path d="M ${margin.left} ${margin.top} L ${margin.left} ${h - margin.bottom} L ${w - margin.right} ${h - margin.bottom}" fill="none" stroke="#111827" stroke-width="1"/>`);
+      parts.push(`<path d="M ${margin.left} ${margin.top} L ${margin.left} ${h - margin.bottom} L ${w - margin.right} ${h - margin.bottom}" fill="none" stroke="${s.axisColor}" stroke-width="1"/>`);
       if (exp) {
         const y = normalize(exp.intensity);
         const points = exp.two_theta.map((value, index) => `${sx(value).toFixed(2)},${sy(y[index]).toFixed(2)}`).join(" ");
@@ -3546,6 +4354,42 @@
       }
       parts.push(`</svg>`);
       download(`${pdfResultStem("xmatcher_pdf_comparison")}.svg`, parts.join("\n"), "image/svg+xml");
+    }
+
+    async function exportPdfPeakTableExcel(phaseIndex, button) {
+      const phase = state.pdf.result?.phases?.[phaseIndex];
+      if (!phase) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(t("pdfNoPeakExport"))}</span>`;
+        return;
+      }
+      button.disabled = true;
+      try {
+        const res = await fetch(`${getApiUrl()}/api/pdf-peaks-xlsx`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({phases: [phase]})
+        });
+        if (!res.ok) {
+          let detail = `HTTP ${res.status}`;
+          try {
+            const data = await res.json();
+            detail = data.error || detail;
+          } catch (_) { /* keep HTTP status when a non-JSON response is returned */ }
+          throw new Error(detail);
+        }
+        const url = URL.createObjectURL(await res.blob());
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${safeFileStem(`xmatcher_pdf_peak_table_${phase.name || phase.formula || phaseIndex + 1}`, "xmatcher_pdf_peak_table")}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        $("pdfLog").innerHTML = `<span class="error">${escapeHtml(t("pdfExcelExportFailed", {error: err.message}))}</span>`;
+      } finally {
+        button.disabled = false;
+      }
     }
 
     async function copyText(text, button, labelKey) {
@@ -3613,7 +4457,36 @@
       download("xmatcher_results.csv", csv, "text/csv");
     }
 
+    function downloadMultiJson() {
+      if (!state.multiphase?.results?.length) return;
+      download("xmatcher_automix_results.json", JSON.stringify({fileName: state.fileName, params: getParams(), elements: getElements(), automix: state.multiphase}, null, 2), "application/json");
+    }
+
+    function downloadMultiCsv() {
+      const results = state.multiphase?.results || [];
+      if (!results.length) return;
+      const header = ["rank", "score", "explained_intensity_percent", "formula", "relative_contribution", "estimated_shift", "single_phase_score"];
+      const rows = results.flatMap((result, rank) => result.phases.map((phase) => [rank + 1, result.score, result.explained_intensity_percent, phase.formula, phase.relative_contribution, phase.estimated_shift, phase.single_phase_score]));
+      download("xmatcher_automix_results.csv", [header, ...rows].map((row) => row.map((value) => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n"), "text/csv");
+    }
+
+    function exportMultiPng() {
+      if (!state.multiphase?.results?.length) return;
+      drawMultiPhasePlot();
+      $("multiPlot").toBlob((blob) => { if (!blob) return; const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = "xmatcher_automix.png"; a.click(); URL.revokeObjectURL(url); }, "image/png");
+    }
+
+    function exportMultiSvg() {
+      if (!state.multiphase?.results?.length) return;
+      drawMultiPhasePlot();
+      const canvas = $("multiPlot"), svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}" viewBox="0 0 ${canvas.width} ${canvas.height}"><image width="${canvas.width}" height="${canvas.height}" href="${canvas.toDataURL("image/png")}"/></svg>`;
+      download("xmatcher_automix.svg", svg, "image/svg+xml");
+    }
+
     $("checkServer").addEventListener("click", checkServer);
+    // Keep the complete single-phase visualization with its identification
+    // controls: collapsing the module now also hides its chart and settings.
+    $("singlePhaseBody").prepend($("singlePhaseChart"));
     $("fileInput").addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -3655,6 +4528,10 @@
       state.processed = null;
       state.detectedPeaks = [];
       state.results = [];
+      state.multiphase = null;
+      state.selectedMultiPhaseIndex = 0;
+      state.multiHover = null;
+      state.multiPlotZoom = null;
       state.selectedIndex = 0;
       state.hover = null;
       state.plotZoom = null;
@@ -3673,14 +4550,24 @@
       $("mBest").textContent = "-";
       $("mPhase").textContent = "-";
       renderResults();
+      renderMultiPhaseResults();
       renderMatches();
       renderPdfSummary();
       updatePdfToggleButton();
       drawPlot();
+      drawMultiPhasePlot();
       drawPdfPlot();
       log(t("cleared"));
     });
     $("runMatch").addEventListener("click", runMatch);
+    $("runMultiPhase").addEventListener("click", runMultiPhase);
+    $("resetMultiPlotZoom").addEventListener("click", resetMultiPlotZoom);
+    ["multiPlotWidth", "multiPlotHeight", "multiAxisLabelSize", "multiTickLabelSize", "multiXAxisLabel", "multiYAxisLabel", "multiExpColor", "multiResidualColor", "multiAxisColor", "multiGridColor", "multiCurveWidth"].forEach((id) => $(id).addEventListener("input", readMultiPlotSettings));
+    ["multiRangeMin", "multiRangeMax"].forEach((id) => $(id).addEventListener("input", readMultiPlotSettings));
+    $("exportMultiPng").addEventListener("click", exportMultiPng);
+    $("exportMultiSvg").addEventListener("click", exportMultiSvg);
+    $("downloadMultiJson").addEventListener("click", downloadMultiJson);
+    $("downloadMultiCsv").addEventListener("click", downloadMultiCsv);
     $("pdfNormalizeWeights").addEventListener("click", normalizePdfWeights);
     $("pdfCalculate").addEventListener("click", calculatePdfComparison);
     $("pdfToggleResult").addEventListener("click", togglePdfResult);
@@ -3705,7 +4592,11 @@
     setupSidebarResize();
     setupPlotSettings();
     setupPdfSettings();
+    applyPaletteRefresh();
+    readMultiPlotSettings();
+    setupColorControls();
     setupPlotHover();
+    setupMultiPhaseHover();
     setupPdfHover();
     setupZoomBox("plot", "plotZoomBox", () => state.plot, (zoom) => {
       state.plotZoom = zoom;
@@ -3713,13 +4604,19 @@
       $("plotRangeMax").value = fmt(zoom.xMax, 2);
       state.hover = null;
     }, drawPlot);
+    setupZoomBox("multiPlot", "multiPlotZoomBox", () => state.multiPlot, (zoom) => {
+      state.multiPlotZoom = zoom;
+      $("multiRangeMin").value = fmt(zoom.xMin, 2);
+      $("multiRangeMax").value = fmt(zoom.xMax, 2);
+      state.multiHover = null;
+    }, drawMultiPhasePlot);
     setupZoomBox("pdfPlot", "pdfZoomBox", () => state.pdfPlot, (zoom) => {
       state.pdfZoom = zoom;
       $("pdfRangeMin").value = fmt(zoom.xMin, 2);
       $("pdfRangeMax").value = fmt(zoom.xMax, 2);
       state.pdfHover = null;
     }, drawPdfPlot);
-    window.addEventListener("resize", drawPlot);
+    window.addEventListener("resize", () => { drawPlot(); drawMultiPhasePlot(); });
 
     applyLanguage(currentLang);
     checkServer();

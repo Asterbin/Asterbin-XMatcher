@@ -671,7 +671,7 @@
       <h1>XMatcher 正式使用手册</h1>
       <p>面向粉末 XRD 物相识别的完整软件文档。手册分为三个模块：代码与应用、App 使用、常见问题。点击对应模块即可展开阅读，避免内容混在一起。</p>
       <div class="hero-meta">
-        <span>Official Release V1.0.0</span>
+        <span>Official Release V1.1.0</span>
         <span>Author: Dr. Bin Cao</span>
         <span>XRD Phase Identification</span>
       </div>
@@ -680,7 +680,7 @@
       <h1>XMatcher Official User Guide</h1>
       <p>A complete software manual for powder XRD phase identification. The guide is split into three modules: Code & Application, App Usage, and FAQ. Click a module to expand only the part you need.</p>
       <div class="hero-meta">
-        <span>Official Release V1.0.0</span>
+        <span>Official Release V1.1.0</span>
         <span>Author: Dr. Bin Cao</span>
         <span>XRD Phase Identification</span>
       </div>
@@ -1122,6 +1122,7 @@ print(best["peak_matches"][:3])</code></pre>
               <tr><td>顶部指标条</td><td>显示输入点数、检测到的实验峰、扫描候选数、最佳分数和当前物相。</td><td>用于快速判断计算是否真的运行，以及是否返回了候选结果。</td></tr>
               <tr><td>实验谱与理论峰对比</td><td>显示去背底后的实验谱、检测峰和当前候选的理论峰。</td><td>鼠标悬停查看数值；框选局部区域可放大；点击恢复全图重置视图。</td></tr>
               <tr><td>候选物相</td><td>列出候选公式、MP ID、分数、覆盖率、匹配峰数、平移量和空间群。</td><td>点击不同行，图中理论峰会同步切换。MP ID 可跳转到 Materials Project。</td></tr>
+              <tr><td>AutoMix 自动多相识别</td><td>从单相候选中搜索最多三个相的组合，并以非负拟合估计相对衍射贡献、峰归属和残峰。</td><td>单相无法解释主要峰时使用；点击不同组合比较全理论峰，最终仍用 PDF 模块确认。</td></tr>
               <tr><td>PDF 全峰对比</td><td>上传实验 XRD 和最多五个 CIF，计算完整理论峰和多相加权混合谱。</td><td>自动识别后，用这个模块做最终确认。它比候选图中的部分峰标记更完整。</td></tr>
               <tr><td>引用与页脚</td><td>提供论文引用、BibTeX、一键复制、软件下载和问题反馈链接。</td><td>论文或报告中使用软件结果时，复制引用信息即可。</td></tr>
             </tbody>
@@ -1181,7 +1182,20 @@ print(best["peak_matches"][:3])</code></pre>
             </tbody>
           </table>
 
-          <h3>1.7 PDF 全峰对比模块</h3>
+          <h3>1.7 AutoMix 自动多相识别</h3>
+          <p>AutoMix 用于处理单一物相无法解释主要实验峰的情况。它先取得前列单相候选，再搜索最多三个相的组合，并使用非负拟合计算各相对实验衍射信号的相对贡献。该贡献仅用于解释拟合信号，<strong>不等同于质量分数或重量百分比</strong>。</p>
+          <ol class="step-list">
+            <li><strong>先运行单相自动识别</strong>：它为 AutoMix 提供合理的候选基础；元素范围不确定时可以留空。</li>
+            <li><strong>设置最多相数</strong>：通常从 2 开始；最多支持 3 相。相数越多不一定更可靠，应优先选择能解释主要峰的简单组合。</li>
+            <li><strong>设置候选池</strong>：候选池是用于组成 AutoMix 组合的前列单相候选数。保持适中；设得过大会让组合数快速增长、计算变慢，并增加近似重复或噪声结果。</li>
+            <li><strong>点击不同组合</strong>：结果表会切换到所选组合。主图显示实验谱、按贡献缩放的理论峰和未解释残峰；每个相的完整理论峰位与相对强度在图谱下方独立轨道标识。</li>
+            <li><strong>检查与确认</strong>：可在图中框选局部范围放大，查看检测峰归属表；最后将候选 CIF 放入 PDF 全峰对比模块，检查完整理论峰是否合理对应实验谱。</li>
+          </ol>
+          <div class="callout info">
+            <strong>为什么结果不会重复：</strong> 如果某个候选相在非负拟合中的贡献为零，AutoMix 会按最终实际参与拟合的数据库物相去重，只保留分数最高的有效组合。
+          </div>
+
+          <h3>1.8 PDF 全峰对比模块</h3>
           <p>PDF 模块是相对独立的验证模块，默认折叠显示。点击模块标题后展开完整内容。它用于把实验 XRD 与 CIF 计算得到的全部理论峰进行比较，特别适合确认自动识别结果、检查多相混合和发现遗漏峰。</p>
           <ol class="step-list">
             <li><strong>上传实验 XRD</strong> 可选。如果不上传，模块会使用当前主界面已加载的实验谱；显示时使用去背底后的实验曲线。</li>
@@ -1196,7 +1210,7 @@ print(best["peak_matches"][:3])</code></pre>
             <strong>为什么 PDF 峰画在图谱下方：</strong> 不同物相的完整理论峰可能非常密集。软件把不同 CIF 的峰放在不同高度的底部轨道，避免多相标记互相遮挡。
           </div>
 
-          <h3>1.8 常见操作建议</h3>
+          <h3>1.9 常见操作建议</h3>
           <ul>
             <li>如果没有匹配结果，先减小“峰数量”，例如从 20 改为 10 或 8；软件也会给出具体推荐值。</li>
             <li>如果噪声峰很多，增大“最小峰高”和“最小显著性”。</li>
@@ -1227,6 +1241,7 @@ print(best["peak_matches"][:3])</code></pre>
               <tr><td>Metric bar</td><td>Input points, detected peaks, scanned candidates, best score, and selected phase.</td><td>Use it to confirm that calculation ran and returned candidates.</td></tr>
               <tr><td>XRD comparison plot</td><td>Shows background-removed experiment, detected peaks, and theoretical peaks for the selected candidate.</td><td>Hover for values, drag to zoom, reset to full range when needed.</td></tr>
               <tr><td>Candidate phases</td><td>Lists formula, MP ID, score, coverage, matched peaks, shift, and space group.</td><td>Click rows to update the theoretical overlay. MP IDs link to Materials Project.</td></tr>
+              <tr><td>AutoMix multi-phase identification</td><td>Searches combinations of up to three single-phase candidates and fits relative diffraction contributions, peak attribution, and residual peaks.</td><td>Use when one phase cannot explain the main peaks; compare combinations, then confirm with PDF full-peak comparison.</td></tr>
               <tr><td>PDF full-peak comparison</td><td>Uploads experimental XRD and up to five CIF files, calculates full theoretical peaks and weighted mixtures.</td><td>Use it as final confirmation after automatic identification.</td></tr>
               <tr><td>Citation/footer</td><td>Provides citation, BibTeX, copy buttons, download, and issue links.</td><td>Copy the citation when using software results in reports or papers.</td></tr>
             </tbody>
@@ -1286,7 +1301,20 @@ print(best["peak_matches"][:3])</code></pre>
             </tbody>
           </table>
 
-          <h3>1.7 PDF Full-Peak Comparison Module</h3>
+          <h3>1.7 AutoMix Multi-phase Identification</h3>
+          <p>Use AutoMix when a single candidate cannot explain the main experimental peaks. It starts from leading single-phase candidates, searches combinations of up to three phases, and uses non-negative fitting to estimate each retained phase's relative diffraction contribution. This contribution explains the fitted diffraction signal; it is <strong>not a mass or weight fraction</strong>.</p>
+          <ol class="step-list">
+            <li><strong>Run single-phase identification first.</strong> It supplies the plausible candidate basis for AutoMix; leave element filtering blank when the chemistry is uncertain.</li>
+            <li><strong>Set maximum phases.</strong> Start with 2 in most cases; at most 3 phases are supported. More phases are not automatically more reliable.</li>
+            <li><strong>Set candidate pool.</strong> This is the number of leading single-phase candidates used to form combinations. Keep it moderate: a large pool makes combinations grow quickly, slows the search, and can add near-duplicate or noisy alternatives.</li>
+            <li><strong>Click a ranked combination.</strong> The display switches to that result. The plot shows the experiment, contribution-scaled theoretical peaks, and unexplained residual peaks. Each phase's complete theoretical peak positions and relative intensities appear in a separate bottom lane.</li>
+            <li><strong>Inspect and confirm.</strong> Drag to zoom a local region, inspect the detected-peak attribution table, then use the PDF full-peak module with candidate CIF files for final confirmation.</li>
+          </ol>
+          <div class="callout info">
+            <strong>Why repeated results are removed:</strong> if an extra candidate has zero non-negative-fit contribution, AutoMix deduplicates by the final retained database phases and keeps only the highest-ranked effective combination.
+          </div>
+
+          <h3>1.8 PDF Full-Peak Comparison Module</h3>
           <p>The PDF module is a relatively independent validation module and is collapsed by default. Click its title to open the full controls. It compares experimental XRD with all theoretical peaks calculated from CIF files, making it useful for confirming automatic identification, checking multiphase mixtures, and finding missing peaks.</p>
           <ol class="step-list">
             <li><strong>Upload experimental XRD</strong> Optional. If omitted, the module uses the current main experimental pattern and displays a background-removed curve.</li>
@@ -1301,7 +1329,7 @@ print(best["peak_matches"][:3])</code></pre>
             <strong>Why markers are below the plot:</strong> Full theoretical peaks from multiple phases can be dense. Separate bottom lanes keep phase markers visible without overlap.
           </div>
 
-          <h3>1.8 Practical Advice</h3>
+          <h3>1.9 Practical Advice</h3>
           <ul>
             <li>If no match is found, reduce Peak count first, for example from 20 to 10 or 8. The UI also gives a recommended value.</li>
             <li>If noise creates many false peaks, increase Min height and Min prominence.</li>
@@ -1434,8 +1462,8 @@ print(best["peak_matches"][:3])</code></pre>
 
   <footer>
     <div class="footer-inner">
-      <div class="lang lang-zh">XMatcher Official User Guide · Release V1.0.0 · Author: Dr. Bin Cao (曹斌)<br>XMatcher 目前没有单独论文；作为 XQueryer 相关研究的一部分，使用时建议引用 XQueryer 论文。</div>
-      <div class="lang lang-en">XMatcher Official User Guide · Release V1.0.0 · Author: Dr. Bin Cao<br>XMatcher currently has no separate publication; as part of the related XQueryer research work, please cite the XQueryer paper when using it.</div>
+      <div class="lang lang-zh">XMatcher Official User Guide · Release V1.1.0 · Author: Dr. Bin Cao (曹斌)<br>XMatcher 目前没有单独论文；作为 XQueryer 相关研究的一部分，使用时建议引用 XQueryer 论文。</div>
+      <div class="lang lang-en">XMatcher Official User Guide · Release V1.1.0 · Author: Dr. Bin Cao<br>XMatcher currently has no separate publication; as part of the related XQueryer research work, please cite the XQueryer paper when using it.</div>
       <div>
         <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener">Download</a>
         · <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener">Manual</a>

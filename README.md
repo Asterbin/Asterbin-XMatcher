@@ -4,6 +4,8 @@
 
 **Local XRD Phase Identification Toolkit & App**
 
+**Current release: V1.1.0**
+
 [![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
 [![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
@@ -57,6 +59,32 @@ X-ray diffraction. *National Science Review* 12(12), nwaf421 (2025).
 - Matches peaks with an optimal assignment algorithm instead of greedy nearest-neighbor pairing.
 - Estimates a global 2θ shift from both a regular scan grid and peak-pair shift candidates.
 - Returns explainable results, including matched peak pairs, position errors, FOM, precision, recall and estimated shift.
+- Includes AutoMix multi-phase identification: combines leading single-phase candidates, fits non-negative relative diffraction contributions, and reports peak attribution and residual peaks.
+
+## AutoMix Multi-phase Identification (V1.1.0)
+
+Use AutoMix when a single candidate cannot explain the main experimental peaks.
+It searches combinations of up to three leading single-phase candidates, then uses
+non-negative fitting to estimate each retained phase's relative diffraction
+contribution. These contributions describe the fitted diffraction signal; they
+are **not** quantitative mass or weight fractions.
+
+1. Run normal single-phase identification first, then open **AutoMix
+   multi-phase identification**.
+2. Choose the maximum number of phases and a moderate candidate pool. The pool
+   is the number of leading single-phase candidates used to build combinations;
+   a large value makes the number of combinations grow quickly, slows the
+   search, and can introduce near-duplicate alternatives.
+3. Run AutoMix and click a ranked combination. The plot shows the experimental
+   pattern, contribution-scaled theoretical sticks, unexplained residual peaks,
+   and separate bottom lanes containing the full theoretical peak list for each
+   selected phase.
+4. Drag on the AutoMix plot to zoom. Inspect the peak-attribution table and
+   use the PDF full-peak module with CIF files for final confirmation.
+
+AutoMix removes combinations that collapse to the same effective retained
+database phases, so zero-contribution candidates do not appear as repeated
+results.
 
 ## Project Files
 

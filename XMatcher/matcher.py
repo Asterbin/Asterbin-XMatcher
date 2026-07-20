@@ -240,11 +240,24 @@ class XRDMatcher:
         if np.all(np.isinf(cost)):
             return self._empty_metrics(shift=shift)
 
+        # ``linear_sum_assignment`` rejects a matrix as infeasible when even
+        # one experimental peak has no theoretical peak inside tolerance. In
+        # phase identification that is normal: unmatched experimental peaks
+        # are residual evidence, not a reason to discard every valid pair.
+        # Restrict the assignment to rows and columns with at least one finite
+        # edge, then retain only finite assignments below.
+        eligible_rows = np.flatnonzero(np.any(np.isfinite(cost), axis=1))
+        eligible_cols = np.flatnonzero(np.any(np.isfinite(cost), axis=0))
+        if not eligible_rows.size or not eligible_cols.size:
+            return self._empty_metrics(shift=shift)
+        feasible_cost = cost[np.ix_(eligible_rows, eligible_cols)]
         try:
-            row_ind, col_ind = linear_sum_assignment(cost)
+            row_sub, col_sub = linear_sum_assignment(feasible_cost)
         except ValueError:
             return self._empty_metrics(shift=shift)
 
+        row_ind = eligible_rows[row_sub]
+        col_ind = eligible_cols[col_sub]
         valid = np.isfinite(cost[row_ind, col_ind])
         row_ind = row_ind[valid]
         col_ind = col_ind[valid]

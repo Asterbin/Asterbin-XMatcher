@@ -11,6 +11,7 @@ import numpy as np
 
 from .database import normalize_database_package
 from .matcher import XRDMatcher
+from .multiphase_matcher import MultiPhaseMatcher
 from .peak_detector import PeakDetector
 from .xrd_reader import XRDReader
 
@@ -114,6 +115,17 @@ class XRDRetriever:
             elements=elements,
             top_n=top_n,
             element_filter_mode=element_filter_mode,
+        )
+
+    def retrieve_multiple_phases_from_peaks(
+        self, peak_positions: Sequence[float], peak_intensities: Sequence[float],
+        elements: Optional[Sequence[str]] = None, top_n: int = 10,
+        element_filter_mode: str = "contains", max_phases: int = 3, candidate_pool: int = 12,
+    ) -> Dict:
+        return MultiPhaseMatcher(self.matcher).match_pattern(
+            peak_positions, peak_intensities, self.database, elements=elements,
+            element_filter_mode=element_filter_mode, max_phases=max_phases,
+            candidate_pool=candidate_pool, top_n=top_n,
         )
 
     def get_entry_details(self, entry_id: int) -> Optional[Dict]:

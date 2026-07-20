@@ -11,11 +11,12 @@ The public API is intentionally small:
 
 from .database import DatabaseBuilder, DatabaseProcessor, XRDCalculator
 from .matcher import XRDMatcher
+from .multiphase_matcher import MultiPhaseMatcher
 from .peak_detector import PeakDetector
 from .retriever import XRDRetriever
 from .xrd_reader import XRDReader
 
-__version__ = "0.2.0"
+__version__ = "1.1.0"
 __author__ = "Bin Cao"
 __email__ = "bcao686@connect.hkust-gz.edu.cn"
 __github__ = "https://github.com/Bin-Cao/XMatcher"
@@ -27,5 +28,6 @@ __all__ = [
     "XRDRetriever",
     "XRDCalculator",
     "XRDMatcher",
+    "MultiPhaseMatcher",
     "XRDReader",
 ]
