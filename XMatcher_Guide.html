@@ -23,6 +23,8 @@
       --blue-bg: #eff6ff;
       --blue-line: #60a5fa;
       --ink-panel: #111827;
+      --violet: #6366f1;
+      --glow: rgba(20, 184, 166, 0.22);
     }
 
     * {
@@ -31,10 +33,28 @@
 
     body {
       margin: 0;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 88% 4%, rgba(99, 102, 241, 0.12), transparent 27rem),
+        radial-gradient(circle at 6% 20%, rgba(20, 184, 166, 0.1), transparent 26rem),
+        var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
       line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    .reading-progress {
+      position: fixed;
+      z-index: 100;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2dd4bf, #6366f1);
+      box-shadow: 0 0 14px var(--glow);
+      transition: width 100ms linear;
     }
 
     a {
@@ -81,6 +101,8 @@
       background: #ffffff;
       color: var(--accent-dark);
       font-weight: 850;
+      box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08), 0 8px 18px rgba(0, 0, 0, 0.24);
+      animation: brand-breathe 4s ease-in-out infinite;
     }
 
     .toplinks {
@@ -132,7 +154,9 @@
     .hero {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 56px 20px 22px;
+      padding: 72px 20px 36px;
+      position: relative;
+      isolation: isolate;
     }
 
     .hero h1 {
@@ -141,6 +165,10 @@
       font-size: clamp(34px, 6vw, 64px);
       line-height: 1.03;
       letter-spacing: 0;
+      background: linear-gradient(112deg, #0f172a 5%, #115e59 52%, #4f46e5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .hero p {
@@ -165,7 +193,36 @@
       color: #334155;
       font-size: 13px;
       font-weight: 700;
+      box-shadow: 0 5px 16px rgba(15, 23, 42, 0.05);
+      transition: transform 180ms ease, border-color 180ms ease;
     }
+
+    .hero-meta span:hover { transform: translateY(-2px); border-color: #5eead4; }
+
+    .hero-orbit {
+      position: absolute;
+      z-index: -1;
+      right: 3%;
+      top: 22px;
+      width: 220px;
+      aspect-ratio: 1;
+      border: 1px solid rgba(20, 184, 166, 0.28);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0 13%, transparent 14%),
+        radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.3), transparent 10%);
+      animation: orbit-drift 12s ease-in-out infinite;
+    }
+
+    .hero-orbit::before, .hero-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: #14b8a6;
+      box-shadow: 0 0 0 8px rgba(20, 184, 166, 0.12);
+    }
+
+    .hero-orbit::before { width: 11px; height: 11px; top: 12%; left: 18%; }
+    .hero-orbit::after { width: 8px; height: 8px; right: 7%; bottom: 25%; background: #818cf8; box-shadow: 0 0 0 7px rgba(129, 140, 248, 0.12); }
 
     .resource-hub {
       max-width: 1120px;
@@ -179,6 +236,7 @@
       background: #ffffff;
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
       overflow: hidden;
+      position: relative;
     }
 
     .resource-head {
@@ -210,7 +268,10 @@
       min-width: 0;
       background: #ffffff;
       padding: 16px;
+      transition: background 180ms ease, transform 180ms ease;
     }
+
+    .resource-grid .resource-item:hover { background: #f8fffe; transform: translateY(-2px); }
 
     .resource-item strong {
       display: block;
@@ -287,6 +348,12 @@
       color: var(--accent-dark);
     }
 
+    nav a.active {
+      background: linear-gradient(90deg, #e6fffb, #eef2ff);
+      color: var(--accent-dark);
+      font-weight: 750;
+    }
+
     main {
       min-width: 0;
     }
@@ -298,7 +365,10 @@
       background: #ffffff;
       box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
       overflow: hidden;
+      transition: transform 220ms ease, box-shadow 220ms ease;
     }
+
+    .manual-module:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1); }
 
     .manual-module > summary {
       display: flex;
@@ -332,6 +402,9 @@
 
     .manual-module[open] > summary::after {
       content: "-";
+      background: var(--ink-panel);
+      color: #fff;
+      border-color: var(--ink-panel);
     }
 
     .module-title {
@@ -372,7 +445,10 @@
       border-radius: 8px;
       background: var(--panel);
       padding: 26px;
+      transition: transform 220ms ease, box-shadow 220ms ease;
     }
+
+    section:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07); }
 
     section.featured {
       border-color: #b6d8f8;
@@ -587,6 +663,30 @@
       background: #ffffff;
       padding: 12px;
       min-height: 92px;
+      transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    }
+
+    .workflow-strip div:hover { transform: translateY(-4px); border-color: #5eead4; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08); }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes brand-breathe {
+      50% { transform: translateY(-2px); box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.06), 0 12px 22px rgba(0, 0, 0, 0.25); }
+    }
+
+    @keyframes orbit-drift {
+      50% { transform: translate(-12px, 12px) rotate(14deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
     }
 
     .workflow-strip strong {
@@ -647,10 +747,14 @@
       .manual-module > summary {
         align-items: flex-start;
       }
+
+      .hero { padding-top: 48px; }
+      .hero-orbit { opacity: 0.45; right: -70px; top: 6px; }
     }
   </style>
 </head>
 <body data-lang="zh">
+  <div class="reading-progress" aria-hidden="true"></div>
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand"><span class="brand-mark">XM</span><span>XMatcher User Guide</span></div>
@@ -667,6 +771,7 @@
   </div>
 
   <header class="hero">
+    <div class="hero-orbit" aria-hidden="true"></div>
     <div class="lang lang-zh">
       <h1>XMatcher 正式使用手册</h1>
       <p>面向粉末 XRD 物相识别的完整软件文档。手册分为三个模块：代码与应用、App 使用、常见问题。点击对应模块即可展开阅读，避免内容混在一起。</p>
@@ -1500,6 +1605,39 @@ print(best["peak_matches"][:3])</code></pre>
     if (saved === "zh" || saved === "en") {
       setLanguage(saved);
     }
+
+    const progress = document.querySelector(".reading-progress");
+    const updateProgress = () => {
+      const range = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = `${range > 0 ? (window.scrollY / range) * 100 : 0}%`;
+    };
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+
+    const revealTargets = document.querySelectorAll(".resource-panel, .manual-module, .manual-module section, footer");
+    revealTargets.forEach((target) => target.classList.add("reveal"));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealTargets.forEach((target) => revealObserver.observe(target));
+
+    const navLinks = [...document.querySelectorAll('nav a[href^="#"]')];
+    const navTargets = navLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const navObserver = new IntersectionObserver((entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting);
+      if (!visible) return;
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    }, { rootMargin: "-20% 0px -68% 0px", threshold: 0 });
+    navTargets.forEach((target) => navObserver.observe(target));
   </script>
 </body>
 </html>
