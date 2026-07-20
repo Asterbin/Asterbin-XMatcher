@@ -91,7 +91,7 @@ retriever.print_results(results)
 
 ## 引用说明
 
-XMatcher 并非 XQueryer 本身，而是作为 XQueryer 相关研究工作的一部分开发和整理的本地 XRD 物相识别软件。目前 XMatcher 没有单独发表论文。如果本软件支持了您的研究，建议引用 XQueryer 论文：
+如果本软件支持了您的研究，请引用以下论文：
 
 Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. *National Science Review* 12(12), nwaf421 (2025).
 

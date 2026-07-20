@@ -42,10 +42,7 @@ Then open [`XMatcher_Local_UI.html`](XMatcher_Local_UI.html).
 
 ## Citation Note
 
-XMatcher is not XQueryer itself. It is a local XRD phase-identification software
-developed and organized as part of the related XQueryer research work. XMatcher
-currently does not have a separate publication. If this software supports your
-research, please cite the XQueryer paper:
+If this software supports your research, please cite the following paper:
 
 Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and
 Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder

@@ -71,7 +71,7 @@ retriever.print_results(results)
 
 ## 인용 안내
 
-XMatcher는 XQueryer 자체가 아닙니다. XQueryer 관련 연구의 일부로 개발 및 정리된 로컬 XRD 상 식별 소프트웨어입니다. 현재 XMatcher 단독 논문은 없습니다. 이 소프트웨어가 연구에 도움이 되었다면 XQueryer 논문을 인용하는 것을 권장합니다.
+이 소프트웨어가 연구에 도움이 되었다면 다음 논문을 인용해 주세요.
 
 Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. *National Science Review* 12(12), nwaf421 (2025).
 
