@@ -1365,10 +1365,11 @@
       <div class="panel resource-panel">
         <button class="panel-title" type="button" data-i18n="projectResources">Project resources</button>
         <div class="panel-body">
-          <p class="section-note" data-i18n="projectNote">Get the software package, report problems, and cite the related XQueryer publication.</p>
+          <p class="section-note" data-i18n="projectNote">Get the software package, report problems, and cite the XMatcher and XQueryer papers.</p>
           <div class="link-list">
             <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener"><span data-i18n="softwareDownload">Software download</span><span>DOI</span></a>
             <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener"><span data-i18n="manualLink">Manual</span><span>Guide</span></a>
+            <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener"><span data-i18n="paperLink">XMatcher paper</span><span>arXiv</span></a>
             <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener"><span data-i18n="reportIssue">Report a problem</span><span>GitHub</span></a>
             <a href="https://bin-cao.github.io" target="_blank" rel="noopener"><span data-i18n="authorInfo">Author: Dr. Bin Cao</span><span>Profile</span></a>
           </div>
@@ -1831,18 +1832,29 @@
         <div class="panel-heading">
           <div>
             <h2 data-i18n="citationTitle">Citation</h2>
-            <p data-i18n="citationNote">Please cite the related XQueryer article when this software supports your work.</p>
+            <p data-i18n="citationNote">Please cite both the XMatcher article and the related XQueryer article when this software supports your work.</p>
           </div>
         </div>
         <div class="citation-grid">
           <div class="citation-block">
-            <p id="citationPlain" class="citation-text">Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. National Science Review 12(12), nwaf421 (2025).</p>
+            <p id="citationPlain" class="citation-text">Cao B. XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification. arXiv:2607.17162 (2026). https://arxiv.org/abs/2607.17162</p>
             <div class="citation-actions">
               <button id="copyCitationText" class="copy-btn" type="button" data-i18n="copyCitation">Copy citation</button>
             </div>
           </div>
           <div class="citation-block">
-            <pre><code id="citationBibtex">@article{cao2025xqueryer,
+            <pre><code id="citationBibtex">@misc{cao2026xmatcheropensourceframeworkxray,
+      title={XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification},
+      author={Bin Cao},
+      year={2026},
+      eprint={2607.17162},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.mtrl-sci},
+      url={https://arxiv.org/abs/2607.17162},
+}</code></pre>
+            <p class="section-note">Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. National Science Review 12(12), nwaf421 (2025).</p>
+            <pre><code id="citationBibtexXQueryer">
+@article{cao2025xqueryer,
   title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
   author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
   journal={National Science Review},
@@ -1951,7 +1963,8 @@
         issueLink: "GitHub issues",
         checkingApi: "Checking local API...",
         projectResources: "Project resources",
-        projectNote: "Get the software package, report problems, and cite the related XQueryer publication.",
+        projectNote: "Get the software package, report problems, and cite the XMatcher and XQueryer papers.",
+        paperLink: "XMatcher paper",
         softwareDownload: "Software download",
         reportIssue: "Report a problem",
         authorInfo: "Author: Dr. Bin Cao",
@@ -2149,7 +2162,7 @@
         dbIntensity: "DB intensity",
         waitingData: "Waiting for XRD data.",
         citationTitle: "Citation",
-        citationNote: "Please cite the related XQueryer article when this software supports your work.",
+        citationNote: "Please cite both the XMatcher article and the related XQueryer article when this software supports your work.",
         copyCitation: "Copy citation",
         copyBibtex: "Copy BibTeX",
         copied: "Copied",
@@ -2196,7 +2209,8 @@
         issueLink: "GitHub 问题反馈",
         checkingApi: "正在检查本地 API...",
         projectResources: "项目资源",
-        projectNote: "下载软件、反馈问题，并引用相关的 XQueryer 论文。",
+        projectNote: "下载软件、反馈问题，并同时引用 XMatcher 和 XQueryer 论文。",
+        paperLink: "XMatcher 论文",
         softwareDownload: "软件下载地址",
         reportIssue: "提交问题",
         authorInfo: "作者：Dr. Bin Cao（曹斌）",
@@ -2394,7 +2408,7 @@
         dbIntensity: "理论强度",
         waitingData: "等待上传 XRD 文件。",
         citationTitle: "引用",
-        citationNote: "如果本软件支持了您的研究，请引用相关 XQueryer 论文。",
+        citationNote: "如果本软件支持了您的研究，请同时引用 XMatcher 论文和相关的 XQueryer 论文。",
         copyCitation: "复制引用",
         copyBibtex: "复制 BibTeX",
         copied: "已复制",
@@ -2437,7 +2451,7 @@
       releaseVersion: "正式リリース V1.1.0",
       appSubtitle: "実験 XRD データを読み込み、条件を調整し、ローカルで照合して実験ピークと理論反射を比較します。",
       downloadLink: "ソフトウェアをダウンロード", manualLink: "マニュアル", issueLink: "GitHub Issues", checkingApi: "ローカル API を確認中...",
-      projectResources: "プロジェクト情報", projectNote: "ソフトウェアの入手、問題報告、関連 XQueryer 論文の引用はこちらです。",
+      projectResources: "プロジェクト情報", projectNote: "ソフトウェアの入手、問題報告、XMatcher と XQueryer 論文の引用はこちらです。", paperLink: "XMatcher 論文",
       softwareDownload: "ソフトウェアのダウンロード", reportIssue: "問題を報告", authorInfo: "著者: Dr. Bin Cao",
       localApiTitle: "1. ローカル API", localApiNote: "ページをローカルの XMatcher バックエンドに接続します。", appAutoConnectNote: "配布用アプリではローカルサービスへ自動接続されるため、手動起動は不要です。", apiUrl: "API URL",
       runFirst: "先にプロジェクトルートで実行:", checkConnection: "接続確認", uploadTitle: "2. XRD を読み込み",
@@ -2489,7 +2503,7 @@
       formula: "組成式", elementsShort: "元素", score: "スコア", expCoverage: "実験カバー率", matched: "一致ピーク", shift: "シフト", spacegroup: "空間群",
       peakMatches: "ピーク対応", expTwoTheta: "実験 2theta", dbShifted: "DB 2theta シフト後", dbRaw: "DB 2theta 元値", delta: "差分",
       expIntensity: "実験強度", dbIntensity: "理論強度", waitingData: "XRD データ待機中。",
-      citationTitle: "引用", citationNote: "本ソフトウェアを研究に利用した場合は、関連する XQueryer 論文を引用してください。", copyCitation: "引用をコピー", copyBibtex: "BibTeX をコピー", copied: "コピー済み",
+      citationTitle: "引用", citationNote: "本ソフトウェアを研究に利用した場合は、XMatcher 論文と関連する XQueryer 論文の両方を引用してください。", copyCitation: "引用をコピー", copyBibtex: "BibTeX をコピー", copied: "コピー済み",
       footerProduct: "粉末 XRD 相同定用 XMatcher ローカル UI。", footerDownload: "ダウンロード", footerManual: "マニュアル", footerIssues: "Issues", footerAuthor: "著者",
       apiConnected: "API 接続済み: {count} 件", apiConnectedLog: "ローカル API に接続しました。データベース: {count} 件。",
       apiNotConnected: "API 未接続", apiConnectFailed: "ローカル API に接続できません。先に python xmatcher_local_api.py --database MP500_xrd_database.pkl を実行してください。エラー: {error}",
@@ -2509,7 +2523,7 @@
       releaseVersion: "공식 릴리스 V1.1.0",
       appSubtitle: "실험 XRD 데이터를 불러오고 매개변수를 조정한 뒤 로컬에서 매칭하여 실험 피크와 이론 반사를 비교합니다.",
       downloadLink: "소프트웨어 다운로드", manualLink: "매뉴얼", issueLink: "GitHub 이슈", checkingApi: "로컬 API 확인 중...",
-      projectResources: "프로젝트 리소스", projectNote: "소프트웨어를 받고 문제를 보고하며 관련 XQueryer 논문을 인용할 수 있습니다.",
+      projectResources: "프로젝트 리소스", projectNote: "소프트웨어를 받고 문제를 보고하며 XMatcher 및 XQueryer 논문을 인용할 수 있습니다.", paperLink: "XMatcher 논문",
       softwareDownload: "소프트웨어 다운로드", reportIssue: "문제 보고", authorInfo: "저자: Dr. Bin Cao",
       localApiTitle: "1. 로컬 API", localApiNote: "페이지를 로컬 XMatcher 백엔드에 연결합니다.", appAutoConnectNote: "배포용 앱에서는 로컬 서비스가 자동으로 연결되므로 사용자가 직접 시작할 필요가 없습니다.", apiUrl: "API URL",
       runFirst: "먼저 프로젝트 루트에서 실행:", checkConnection: "연결 확인", uploadTitle: "2. XRD 업로드",
@@ -2561,7 +2575,7 @@
       formula: "화학식", elementsShort: "원소", score: "점수", expCoverage: "실험 커버리지", matched: "매칭 피크", shift: "시프트", spacegroup: "공간군",
       peakMatches: "피크 매칭", expTwoTheta: "실험 2theta", dbShifted: "DB 2theta 시프트 후", dbRaw: "DB 2theta 원본", delta: "편차",
       expIntensity: "실험 강도", dbIntensity: "이론 강도", waitingData: "XRD 데이터를 기다리는 중입니다.",
-      citationTitle: "인용", citationNote: "이 소프트웨어가 연구에 사용되었다면 관련 XQueryer 논문을 인용해 주세요.", copyCitation: "인용 복사", copyBibtex: "BibTeX 복사", copied: "복사됨",
+      citationTitle: "인용", citationNote: "이 소프트웨어가 연구에 사용되었다면 XMatcher 논문과 관련 XQueryer 논문을 모두 인용해 주세요.", copyCitation: "인용 복사", copyBibtex: "BibTeX 복사", copied: "복사됨",
       footerProduct: "분말 XRD 상 식별용 XMatcher 로컬 UI.", footerDownload: "다운로드", footerManual: "매뉴얼", footerIssues: "이슈", footerAuthor: "저자",
       apiConnected: "API 연결됨: {count} 항목", apiConnectedLog: "로컬 API가 연결되었습니다. 데이터베이스 {count} 항목.",
       apiNotConnected: "API 연결 안 됨", apiConnectFailed: "로컬 API에 연결할 수 없습니다. 먼저 python xmatcher_local_api.py --database MP500_xrd_database.pkl 를 실행하세요. 오류: {error}",
@@ -4581,7 +4595,7 @@
       copyText($("citationPlain").textContent.trim(), $("copyCitationText"), "copyCitation");
     });
     $("copyBibtex").addEventListener("click", () => {
-      copyText($("citationBibtex").textContent.trim(), $("copyBibtex"), "copyBibtex");
+      copyText(`${$("citationBibtex").textContent.trim()}\n\n${$("citationBibtexXQueryer").textContent.trim()}`, $("copyBibtex"), "copyBibtex");
     });
     $("exportPng").addEventListener("click", exportPng);
     $("exportSvg").addEventListener("click", exportSvg);

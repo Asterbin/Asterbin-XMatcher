@@ -10,6 +10,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
 [![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
 [![Download](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
+[![Paper](https://img.shields.io/badge/arXiv-2607.17162-b31b1b.svg)](https://arxiv.org/abs/2607.17162)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Language / 语言 / 言語 / 언어**  
@@ -42,11 +43,36 @@ Then open [`XMatcher_Local_UI.html`](XMatcher_Local_UI.html).
 
 ## Citation Note
 
-If this software supports your research, please cite the following paper:
+If this software supports your research, please cite both the XMatcher paper and the related XQueryer paper:
 
-Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and
-Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder
-X-ray diffraction. *National Science Review* 12(12), nwaf421 (2025).
+Cao B. *XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification.* arXiv:2607.17162 (2026). https://arxiv.org/abs/2607.17162
+
+```bibtex
+@misc{cao2026xmatcheropensourceframeworkxray,
+      title={XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification},
+      author={Bin Cao},
+      year={2026},
+      eprint={2607.17162},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.mtrl-sci},
+      url={https://arxiv.org/abs/2607.17162},
+}
+```
+
+Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. *XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction.* *National Science Review* 12(12), nwaf421 (2025).
+
+```bibtex
+@article{cao2025xqueryer,
+  title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
+  author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
+  journal={National Science Review},
+  volume={12},
+  number={12},
+  pages={nwaf421},
+  year={2025},
+  publisher={Oxford University Press}
+}
+```
 
 ## What It Does
 

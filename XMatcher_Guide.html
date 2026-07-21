@@ -259,7 +259,7 @@
 
     .resource-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 1px;
       background: var(--line);
     }
@@ -821,6 +821,11 @@
           <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener">asterbin.github.io/Asterbin-XMatcher</a>
         </div>
         <div class="resource-item">
+          <strong><span class="inline-zh">XMatcher 论文</span><span class="inline-en">XMatcher paper</span></strong>
+          <p><span class="inline-zh">arXiv 预印本与正式引用信息。</span><span class="inline-en">arXiv preprint and citation information.</span></p>
+          <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener">arXiv:2607.17162</a>
+        </div>
+        <div class="resource-item">
           <strong><span class="inline-zh">问题反馈</span><span class="inline-en">Issues</span></strong>
           <p><span class="inline-zh">报告 bug、使用问题或功能建议。</span><span class="inline-en">Report bugs, usage questions, or feature requests.</span></p>
           <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener">GitHub Issues</a>
@@ -830,14 +835,25 @@
         <strong><span class="inline-zh">引用方式</span><span class="inline-en">Citation</span></strong>
         <div class="callout info">
           <div class="lang lang-zh">
-            <strong>引用说明：</strong> 如果本软件支持了您的研究，请引用以下论文。
+            <strong>引用说明：</strong> 如果本软件支持了您的研究，请同时引用以下 XMatcher 论文和相关的 XQueryer 论文。
           </div>
           <div class="lang lang-en">
-            <strong>Citation note:</strong> If this software supports your research, please cite the paper below.
+            <strong>Citation note:</strong> If this software supports your research, please cite both the XMatcher paper and the related XQueryer paper below.
           </div>
         </div>
-        <p>Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction. <em>National Science Review</em> 12(12), nwaf421 (2025).</p>
-        <pre><code>@article{cao2025xqueryer,
+        <p>Cao B. <em>XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification.</em> arXiv:2607.17162 (2026). <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener">https://arxiv.org/abs/2607.17162</a></p>
+        <pre><code>@misc{cao2026xmatcheropensourceframeworkxray,
+      title={XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification},
+      author={Bin Cao},
+      year={2026},
+      eprint={2607.17162},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.mtrl-sci},
+      url={https://arxiv.org/abs/2607.17162},
+}</code></pre>
+        <p><span class="inline-zh">相关论文：</span><span class="inline-en">Related paper:</span> Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. <em>XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction.</em> <em>National Science Review</em> 12(12), nwaf421 (2025).</p>
+        <pre><code>
+@article{cao2025xqueryer,
   title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
   author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
   journal={National Science Review},
