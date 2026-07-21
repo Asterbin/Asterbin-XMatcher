@@ -293,6 +293,26 @@
       font-weight: 700;
     }
 
+    .citation-copy-row {
+      display: flex;
+      justify-content: flex-end;
+      margin: -2px 0 14px;
+    }
+
+    .citation-copy-btn {
+      border: 1px solid #bfdbfe;
+      border-radius: 7px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 10px;
+    }
+
+    .citation-copy-btn:hover { background: #dbeafe; }
+
     footer {
       max-width: 1120px;
       margin: 0 auto;
@@ -841,8 +861,9 @@
             <strong>Citation note:</strong> If this software supports your research, please cite both the XMatcher paper and the related XQueryer paper below.
           </div>
         </div>
-        <p>Cao B. <em>XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification.</em> arXiv:2607.17162 (2026). <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener">https://arxiv.org/abs/2607.17162</a></p>
-        <pre><code>@misc{cao2026xmatcheropensourceframeworkxray,
+        <p id="citation-xmatcher-text">Cao B. <em>XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification.</em> arXiv:2607.17162 (2026). <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener">https://arxiv.org/abs/2607.17162</a></p>
+        <div class="citation-copy-row"><button class="citation-copy-btn" type="button" data-copy-target="citation-xmatcher-text"><span class="inline-zh">复制引用</span><span class="inline-en">Copy citation</span></button></div>
+        <pre><code id="citation-xmatcher-bibtex">@misc{cao2026xmatcheropensourceframeworkxray,
       title={XMatcher: An Open-Source Framework for X-Ray Diffraction Phase Identification},
       author={Bin Cao},
       year={2026},
@@ -851,8 +872,10 @@
       primaryClass={cond-mat.mtrl-sci},
       url={https://arxiv.org/abs/2607.17162},
 }</code></pre>
-        <p><span class="inline-zh">相关论文：</span><span class="inline-en">Related paper:</span> Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. <em>XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction.</em> <em>National Science Review</em> 12(12), nwaf421 (2025).</p>
-        <pre><code>
+        <div class="citation-copy-row"><button class="citation-copy-btn" type="button" data-copy-target="citation-xmatcher-bibtex"><span class="inline-zh">复制 BibTeX</span><span class="inline-en">Copy BibTeX</span></button></div>
+        <p id="citation-xqueryer-text"><span class="inline-zh">相关论文：</span><span class="inline-en">Related paper:</span> Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li J., Li H., and Zhang T.-Y. <em>XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction.</em> <em>National Science Review</em> 12(12), nwaf421 (2025).</p>
+        <div class="citation-copy-row"><button class="citation-copy-btn" type="button" data-copy-target="citation-xqueryer-text"><span class="inline-zh">复制引用</span><span class="inline-en">Copy citation</span></button></div>
+        <pre><code id="citation-xqueryer-bibtex">
 @article{cao2025xqueryer,
   title={XQueryer: an intelligent crystal structure identifier for powder X-ray diffraction},
   author={Cao, Bin and Zheng, Zinan and Liu, Yang and Zhang, Longhan and Wong, Lawrence WY and Weng, Lu-Tao and Li, Jia and Li, Haoxiang and Zhang, Tong-Yi},
@@ -863,6 +886,7 @@
   year={2025},
   publisher={Oxford University Press}
 }</code></pre>
+        <div class="citation-copy-row"><button class="citation-copy-btn" type="button" data-copy-target="citation-xqueryer-bibtex"><span class="inline-zh">复制 BibTeX</span><span class="inline-en">Copy BibTeX</span></button></div>
       </div>
     </div>
   </section>
@@ -1654,6 +1678,39 @@ print(best["peak_matches"][:3])</code></pre>
       });
     }, { rootMargin: "-20% 0px -68% 0px", threshold: 0 });
     navTargets.forEach((target) => navObserver.observe(target));
+
+    async function copyCitationText(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+
+    document.querySelectorAll("[data-copy-target]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        if (!target) return;
+        const originalLabel = button.innerHTML;
+        const copyNode = target.cloneNode(true);
+        copyNode.querySelectorAll(".inline-zh, .inline-en").forEach((label) => label.remove());
+        try {
+          await copyCitationText(copyNode.textContent.trim());
+          button.textContent = document.body.dataset.lang === "zh" ? "已复制" : "Copied";
+          setTimeout(() => { button.innerHTML = originalLabel; }, 1500);
+        } catch {
+          button.textContent = document.body.dataset.lang === "zh" ? "复制失败" : "Copy failed";
+          setTimeout(() => { button.innerHTML = originalLabel; }, 1500);
+        }
+      });
+    });
   </script>
 </body>
 </html>
