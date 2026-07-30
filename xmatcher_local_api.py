@@ -20,6 +20,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
+from XMatcher.calibration import calibrate_two_theta
 from XMatcher.database import DatabaseBuilder, normalize_database_package
 from XMatcher.matcher import XRDMatcher
 from XMatcher.multiphase_matcher import MultiPhaseMatcher
@@ -204,6 +205,9 @@ def _match(payload: Dict) -> Dict:
     database = _get_database()
     params = payload.get("params", {})
     two_theta, intensity = _prepare_arrays(payload.get("two_theta", []), payload.get("intensity", []))
+    zero_shift = float(params.get("fixed_zero_shift", 0.0))
+    specimen_displacement = float(params.get("specimen_displacement", 0.0))
+    calibrated_two_theta = calibrate_two_theta(two_theta, zero_shift, specimen_displacement)
 
     detector = PeakDetector(
         min_peak_height=float(params.get("min_peak_height", 3.0)),
@@ -213,7 +217,7 @@ def _match(payload: Dict) -> Dict:
         baseline_window_fraction=float(params.get("baseline_window_fraction", 0.05)),
     )
     n_peaks = int(params.get("n_peaks", 4))
-    peaks = detector.get_top_peaks(two_theta, intensity, n_peaks=n_peaks, preprocess=True)
+    peaks = detector.get_top_peaks(calibrated_two_theta, intensity, n_peaks=n_peaks, preprocess=True)
     exp_positions, exp_intensities = detector.extract_peak_positions_and_intensities(peaks)
 
     matcher = XRDMatcher(
@@ -242,6 +246,7 @@ def _match(payload: Dict) -> Dict:
         elements=elements,
         top_n=top_n,
         element_filter_mode=element_filter_mode,
+        two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
     )
 
     enriched = []
@@ -260,7 +265,7 @@ def _match(payload: Dict) -> Dict:
             }
         )
 
-    processed_x, processed_y = detector.preprocess_spectrum(two_theta, intensity)
+    processed_x, processed_y = detector.preprocess_spectrum(calibrated_two_theta, intensity)
     return {
         "status": "ok",
         "input_points": int(two_theta.size),
@@ -274,6 +279,7 @@ def _match(payload: Dict) -> Dict:
         "params": params,
         "elements": elements,
         "element_filter_mode": element_filter_mode,
+        "calibration": {"fixed_zero_shift": zero_shift, "specimen_displacement": specimen_displacement},
     }
 
 
@@ -282,6 +288,9 @@ def _multiphase_match(payload: Dict) -> Dict:
     database = _get_database()
     params = payload.get("params", {})
     two_theta, intensity = _prepare_arrays(payload.get("two_theta", []), payload.get("intensity", []))
+    zero_shift = float(params.get("fixed_zero_shift", 0.0))
+    specimen_displacement = float(params.get("specimen_displacement", 0.0))
+    calibrated_two_theta = calibrate_two_theta(two_theta, zero_shift, specimen_displacement)
     detector = PeakDetector(
         min_peak_height=float(params.get("min_peak_height", 3.0)),
         min_peak_prominence=float(params.get("min_peak_prominence", 2.0)),
@@ -294,7 +303,7 @@ def _multiphase_match(payload: Dict) -> Dict:
     # bound, but fit AutoMix with at least twelve detected peaks.
     n_peaks = int(params.get("multiphase_n_peaks", max(12, int(params.get("n_peaks", 4)))))
     n_peaks = max(1, min(n_peaks, 80))
-    peaks = detector.get_top_peaks(two_theta, intensity, n_peaks=n_peaks, preprocess=True)
+    peaks = detector.get_top_peaks(calibrated_two_theta, intensity, n_peaks=n_peaks, preprocess=True)
     exp_positions, exp_intensities = detector.extract_peak_positions_and_intensities(peaks)
     matcher = XRDMatcher(
         position_tolerance=float(params.get("position_tolerance", 0.2)),
@@ -325,6 +334,7 @@ def _multiphase_match(payload: Dict) -> Dict:
         required_entry_ids=known_phase_constraints["mpid_entry_ids"],
         required_element_sets=known_element_sets,
         minimum_required_contribution_percent=3.0,
+        two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
     )
     single_results = []
     # MultiPhaseMatcher already evaluates its one-phase baseline. Only perform
@@ -334,6 +344,7 @@ def _multiphase_match(payload: Dict) -> Dict:
         single_results = matcher.match_pattern(
             exp_positions, exp_intensities, database, elements=elements or None,
             element_filter_mode=element_filter_mode, top_n=1,
+            two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
         )
     if not result.get("results") and single_results:
         candidate = single_results[0]
@@ -379,10 +390,11 @@ def _multiphase_match(payload: Dict) -> Dict:
             }
     result["single_phase_fallback_available"] = bool(single_results)
     result["known_phase_constraints"] = known_phase_constraints
-    processed_x, processed_y = detector.preprocess_spectrum(two_theta, intensity)
+    processed_x, processed_y = detector.preprocess_spectrum(calibrated_two_theta, intensity)
     return {
         "status": "ok", "detected_peaks": peaks,
         "processed_spectrum": {"two_theta": processed_x.tolist(), "intensity": processed_y.tolist()},
+        "calibration": {"fixed_zero_shift": zero_shift, "specimen_displacement": specimen_displacement},
         **result,
     }
 
@@ -640,7 +652,7 @@ def _pdf_peaks_xlsx(payload: Dict) -> bytes:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "XMatcherLocalAPI/1.1.0"
+    server_version = "XMatcherLocalAPI/1.2.0"
 
     def do_OPTIONS(self) -> None:
         _json_response(self, 200, {"status": "ok"})

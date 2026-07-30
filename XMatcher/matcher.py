@@ -25,6 +25,9 @@ class MatchConfig:
     shift_step: float = 0.02
     scoring_method: str = "hybrid"
     shift_candidate_limit: int = 4000
+    strong_peak_threshold: float = 5.0
+    unmatched_experimental_penalty: float = 18.0
+    unmatched_theoretical_penalty: float = 10.0
 
 
 class XRDMatcher:
@@ -42,6 +45,9 @@ class XRDMatcher:
         scoring_method: str = "hybrid",
         max_shift: float = 0.5,
         shift_step: float = 0.02,
+        strong_peak_threshold: float = 5.0,
+        unmatched_experimental_penalty: float = 18.0,
+        unmatched_theoretical_penalty: float = 10.0,
     ):
         if scoring_method not in self.valid_scoring_methods:
             raise ValueError(f"scoring_method must be one of {sorted(self.valid_scoring_methods)}")
@@ -49,6 +55,10 @@ class XRDMatcher:
             raise ValueError("position_tolerance must be positive")
         if min_matched_peaks < 1:
             raise ValueError("min_matched_peaks must be at least 1")
+        if strong_peak_threshold < 0:
+            raise ValueError("strong_peak_threshold must be non-negative")
+        if unmatched_experimental_penalty < 0 or unmatched_theoretical_penalty < 0:
+            raise ValueError("unmatched peak penalties must be non-negative")
 
         total_weight = intensity_weight + position_weight
         if total_weight <= 0:
@@ -62,6 +72,9 @@ class XRDMatcher:
             scoring_method=scoring_method,
             max_shift=max_shift,
             shift_step=shift_step,
+            strong_peak_threshold=strong_peak_threshold,
+            unmatched_experimental_penalty=unmatched_experimental_penalty,
+            unmatched_theoretical_penalty=unmatched_theoretical_penalty,
         )
 
     @property
@@ -113,6 +126,7 @@ class XRDMatcher:
         top_n: int = 10,
         element_filter_mode: str = "contains",
         include_zero_scores: bool = False,
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> List[Dict]:
         database = normalize_database_package(database)
         xrd_db = database["xrd_database"]
@@ -123,7 +137,9 @@ class XRDMatcher:
         results = []
         for entry_id in candidate_ids:
             entry = xrd_db[entry_id]
-            metrics = self.match_single_entry(exp_positions_arr, exp_intensities_arr, entry)
+            metrics = self.match_single_entry(
+                exp_positions_arr, exp_intensities_arr, entry, two_theta_range=two_theta_range
+            )
             if include_zero_scores or metrics["score"] > 0:
                 results.append(
                     {
@@ -155,10 +171,13 @@ class XRDMatcher:
         exp_positions: np.ndarray,
         exp_intensities: np.ndarray,
         entry: Dict,
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> Dict:
         db_positions = np.asarray(entry.get("peaks", {}).get("positions", []), dtype=float)
         db_intensities = np.asarray(entry.get("peaks", {}).get("intensities", []), dtype=float)
-        return self.calculate_match_metrics(exp_positions, exp_intensities, db_positions, db_intensities)
+        return self.calculate_match_metrics(
+            exp_positions, exp_intensities, db_positions, db_intensities, two_theta_range=two_theta_range
+        )
 
     def calculate_peak_match_score(
         self,
@@ -185,6 +204,7 @@ class XRDMatcher:
         exp_intensities: np.ndarray,
         db_positions: np.ndarray,
         db_intensities: np.ndarray,
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> Dict:
         exp_positions, exp_intensities = _prepare_peak_arrays(exp_positions, exp_intensities)
         db_positions, db_intensities = _prepare_peak_arrays(db_positions, db_intensities)
@@ -194,7 +214,9 @@ class XRDMatcher:
 
         best = self._empty_metrics()
         for shift in self._candidate_shifts(exp_positions, db_positions):
-            metrics = self._score_at_shift(exp_positions, exp_intensities, db_positions + shift, db_intensities, shift)
+            metrics = self._score_at_shift(
+                exp_positions, exp_intensities, db_positions + shift, db_intensities, shift, two_theta_range
+            )
             if self._is_better_match(metrics, best):
                 best = metrics
         return best
@@ -226,9 +248,21 @@ class XRDMatcher:
         shifted_db_positions: np.ndarray,
         db_intensities: np.ndarray,
         shift: float,
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> Dict:
         exp_norm = _normalize_max(exp_intensities)
         db_norm = _normalize_max(db_intensities)
+        exp_relative = _relative_intensity(exp_intensities)
+        db_relative = _relative_intensity(db_intensities)
+        if two_theta_range is not None:
+            scan_min, scan_max = (float(two_theta_range[0]), float(two_theta_range[1]))
+            if not np.isfinite(scan_min) or not np.isfinite(scan_max) or scan_max < scan_min:
+                raise ValueError("two_theta_range must contain finite values in ascending order")
+            observable_db = (shifted_db_positions >= scan_min) & (shifted_db_positions <= scan_max)
+        else:
+            observable_db = np.ones(shifted_db_positions.size, dtype=bool)
+        if not np.any(observable_db):
+            return self._empty_metrics(shift=shift)
         position_dist = cdist(exp_positions.reshape(-1, 1), shifted_db_positions.reshape(-1, 1))
         intensity_diff = np.abs(exp_norm.reshape(-1, 1) - db_norm.reshape(1, -1)) / 100.0
 
@@ -237,6 +271,7 @@ class XRDMatcher:
             + self.config.intensity_weight * intensity_diff
         )
         cost[position_dist > self.position_tolerance] = np.inf
+        cost[:, ~observable_db] = np.inf
         if np.all(np.isinf(cost)):
             return self._empty_metrics(shift=shift)
 
@@ -267,12 +302,12 @@ class XRDMatcher:
 
         matched_costs = cost[row_ind, col_ind]
         matched_errors = np.abs(exp_positions[row_ind] - shifted_db_positions[col_ind])
-        db_total_intensity = float(np.sum(db_norm))
+        db_total_intensity = float(np.sum(db_norm[observable_db]))
         exp_total_intensity = float(np.sum(exp_norm))
         matched_db_intensity = float(np.sum(db_norm[col_ind]))
         matched_exp_intensity = float(np.sum(exp_norm[row_ind]))
 
-        recall = n_matched / len(shifted_db_positions)
+        recall = n_matched / int(np.count_nonzero(observable_db))
         precision = n_matched / len(exp_positions)
         fom = 100.0 * matched_db_intensity / db_total_intensity if db_total_intensity > 0 else 0.0
         exp_coverage = 100.0 * matched_exp_intensity / exp_total_intensity if exp_total_intensity > 0 else 0.0
@@ -285,12 +320,26 @@ class XRDMatcher:
             + 0.15 * exp_coverage
             + 0.10 * 100.0 * min(recall, precision)
         )
-        score = {
+        matched_exp = np.zeros(exp_positions.size, dtype=bool)
+        matched_db = np.zeros(shifted_db_positions.size, dtype=bool)
+        matched_exp[row_ind] = True
+        matched_db[col_ind] = True
+        strong_exp = exp_relative >= self.config.strong_peak_threshold
+        strong_db = observable_db & (db_relative >= self.config.strong_peak_threshold)
+        unmatched_exp = strong_exp & ~matched_exp
+        unmatched_db = strong_db & ~matched_db
+        unmatched_exp_fraction = _weighted_fraction(exp_norm, unmatched_exp, strong_exp)
+        unmatched_db_fraction = _weighted_fraction(db_norm, unmatched_db, strong_db)
+        unmatched_exp_penalty = self.config.unmatched_experimental_penalty * unmatched_exp_fraction
+        unmatched_db_penalty = self.config.unmatched_theoretical_penalty * unmatched_db_fraction
+        strong_peak_penalty = unmatched_exp_penalty + unmatched_db_penalty
+        base_score = {
             "weighted": weighted_score,
             "fom": fom,
             "combined": hybrid_score,
             "hybrid": hybrid_score,
         }[self.scoring_method]
+        score = max(0.0, base_score - strong_peak_penalty)
 
         peak_matches = []
         for exp_idx, db_idx, err, pair_cost in zip(row_ind, col_ind, matched_errors, matched_costs):
@@ -307,10 +356,24 @@ class XRDMatcher:
                     "cost": float(pair_cost),
                 }
             )
+        residual_diagnostics = _residual_diagnostics(peak_matches)
 
         return {
             "score": float(score),
             "weighted_score": float(weighted_score),
+            "base_hybrid_score": float(hybrid_score),
+            "base_score": float(base_score),
+            "strong_peak_penalty": float(strong_peak_penalty),
+            "unmatched_experimental_penalty": float(unmatched_exp_penalty),
+            "unmatched_theoretical_penalty": float(unmatched_db_penalty),
+            "unmatched_experimental_strong_fraction": float(unmatched_exp_fraction),
+            "unmatched_theoretical_strong_fraction": float(unmatched_db_fraction),
+            "unmatched_experimental_strong_peaks": _unmatched_peak_payload(
+                exp_positions, exp_relative, unmatched_exp
+            ),
+            "unmatched_theoretical_strong_peaks": _unmatched_peak_payload(
+                shifted_db_positions, db_relative, unmatched_db, shift=shift
+            ),
             "fom": float(fom),
             "experimental_coverage": float(exp_coverage),
             "precision": float(precision),
@@ -320,6 +383,7 @@ class XRDMatcher:
             "max_abs_error": float(np.max(matched_errors)),
             "estimated_shift": float(shift),
             "peak_matches": peak_matches,
+            "residual_diagnostics": residual_diagnostics,
         }
 
     def _candidate_shifts(self, exp_positions: np.ndarray, db_positions: np.ndarray) -> np.ndarray:
@@ -374,6 +438,15 @@ class XRDMatcher:
         return {
             "score": 0.0,
             "weighted_score": 0.0,
+            "base_hybrid_score": 0.0,
+            "base_score": 0.0,
+            "strong_peak_penalty": 0.0,
+            "unmatched_experimental_penalty": 0.0,
+            "unmatched_theoretical_penalty": 0.0,
+            "unmatched_experimental_strong_fraction": 0.0,
+            "unmatched_theoretical_strong_fraction": 0.0,
+            "unmatched_experimental_strong_peaks": [],
+            "unmatched_theoretical_strong_peaks": [],
             "fom": 0.0,
             "experimental_coverage": 0.0,
             "precision": 0.0,
@@ -383,6 +456,7 @@ class XRDMatcher:
             "max_abs_error": None,
             "estimated_shift": float(shift),
             "peak_matches": [],
+            "residual_diagnostics": {"positions": [], "deltas": [], "slope_per_degree": None},
         }
 
 
@@ -395,6 +469,45 @@ def _normalize_max(values: np.ndarray) -> np.ndarray:
     values = np.sqrt(values)
     max_value = np.max(values)
     return 100.0 * values / max_value if max_value > 0 else values
+
+
+def _relative_intensity(values: np.ndarray) -> np.ndarray:
+    values = np.asarray(values, dtype=float)
+    values = np.nan_to_num(values, nan=0.0, posinf=0.0, neginf=0.0)
+    values[values < 0] = 0.0
+    maximum = float(np.max(values)) if values.size else 0.0
+    return 100.0 * values / maximum if maximum > 0 else values
+
+
+def _weighted_fraction(values: np.ndarray, numerator_mask: np.ndarray, denominator_mask: np.ndarray) -> float:
+    denominator = float(np.sum(values[denominator_mask]))
+    return float(np.sum(values[numerator_mask]) / denominator) if denominator > 0 else 0.0
+
+
+def _unmatched_peak_payload(
+    positions: np.ndarray, relative_intensities: np.ndarray, mask: np.ndarray, shift: Optional[float] = None
+) -> List[Dict]:
+    peaks = []
+    for index in np.flatnonzero(mask):
+        peak = {
+            "index": int(index),
+            "two_theta": float(positions[index]),
+            "relative_intensity": float(relative_intensities[index]),
+        }
+        if shift is not None:
+            peak["two_theta_unshifted"] = float(positions[index] - shift)
+        peaks.append(peak)
+    return peaks
+
+
+def _residual_diagnostics(peak_matches: List[Dict]) -> Dict:
+    """Summarize post-alignment peak errors for an error-versus-2theta plot."""
+    positions = np.asarray([match["exp_two_theta"] for match in peak_matches], dtype=float)
+    deltas = np.asarray([match["delta"] for match in peak_matches], dtype=float)
+    slope = None
+    if positions.size >= 2 and not np.allclose(positions, positions[0]):
+        slope = float(np.polyfit(positions, deltas, deg=1)[0])
+    return {"positions": positions.tolist(), "deltas": deltas.tolist(), "slope_per_degree": slope}
 
 
 def _prepare_peak_arrays(positions: Sequence[float], intensities: Sequence[float]) -> Tuple[np.ndarray, np.ndarray]:

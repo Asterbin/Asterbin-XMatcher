@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -74,6 +74,7 @@ class XRDRetriever:
             elements=elements,
             top_n=top_n,
             element_filter_mode=element_filter_mode,
+            two_theta_range=(float(xrd_data["two_theta"][0]), float(xrd_data["two_theta"][-1])),
         )
 
     def detect_peaks(self, two_theta: Sequence[float], intensity: Sequence[float]) -> List[Dict]:
@@ -90,6 +91,7 @@ class XRDRetriever:
         elements: Optional[Sequence[str]] = None,
         top_n: int = 10,
         element_filter_mode: str = "contains",
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> List[Dict]:
         positions, intensities = self.peak_detector.extract_peak_positions_and_intensities(peaks)
         return self.retrieve_from_peaks(
@@ -98,6 +100,7 @@ class XRDRetriever:
             elements=elements,
             top_n=top_n,
             element_filter_mode=element_filter_mode,
+            two_theta_range=two_theta_range,
         )
 
     def retrieve_from_peaks(
@@ -107,6 +110,7 @@ class XRDRetriever:
         elements: Optional[Sequence[str]] = None,
         top_n: int = 10,
         element_filter_mode: str = "contains",
+        two_theta_range: Optional[Tuple[float, float]] = None,
     ) -> List[Dict]:
         return self.matcher.match_pattern(
             peak_positions,
@@ -115,6 +119,7 @@ class XRDRetriever:
             elements=elements,
             top_n=top_n,
             element_filter_mode=element_filter_mode,
+            two_theta_range=two_theta_range,
         )
 
     def retrieve_multiple_phases_from_peaks(

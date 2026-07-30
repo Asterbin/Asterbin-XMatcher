@@ -1332,12 +1332,13 @@
           </svg>
         </div>
         <div>
-          <h1><span data-i18n="appTitle">XMatcher Local XRD Identification</span><span class="version-badge" data-i18n="releaseVersion">Release V1.1.0</span></h1>
+          <h1><span data-i18n="appTitle">XMatcher Local XRD Identification</span><span class="version-badge" data-i18n="releaseVersion">Release V1.2.0</span></h1>
           <p class="subtitle" data-i18n="appSubtitle">Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.</p>
         </div>
       </div>
       <div class="toolbar">
         <div class="quick-links">
+          <a href="https://xmatcher.caobin.asia/" target="_blank" rel="noopener" data-i18n="homepageLink">Product home</a>
           <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener" data-i18n="downloadLink">Download software</a>
           <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener" data-i18n="manualLink">Manual</a>
           <a href="https://github.com/Asterbin/Asterbin-XMatcher/issues" target="_blank" rel="noopener" data-i18n="issueLink">GitHub issues</a>
@@ -1367,6 +1368,7 @@
         <div class="panel-body">
           <p class="section-note" data-i18n="projectNote">Get the software package, report problems, and cite the XMatcher and XQueryer papers.</p>
           <div class="link-list">
+            <a href="https://xmatcher.caobin.asia/" target="_blank" rel="noopener"><span data-i18n="homepageLink">Product home</span><span>Web</span></a>
             <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener"><span data-i18n="softwareDownload">Software download</span><span>DOI</span></a>
             <a href="https://asterbin.github.io/Asterbin-XMatcher" target="_blank" rel="noopener"><span data-i18n="manualLink">Manual</span><span>Guide</span></a>
             <a href="https://arxiv.org/abs/2607.17162" target="_blank" rel="noopener"><span data-i18n="paperLink">XMatcher paper</span><span>arXiv</span></a>
@@ -1393,9 +1395,9 @@
       <div class="panel">
         <button class="panel-title" type="button" data-i18n="uploadTitle">2. Upload XRD</button>
         <div class="panel-body">
-          <input id="fileInput" type="file" accept=".csv,.txt,.xy,.dat,.xrdml,.xml,.json">
+          <input id="fileInput" type="file" accept=".csv,.txt,.xy,.xys,.xye,.chi,.asc,.dat,.uxd,.xrdml,.xml,.json">
           <p id="fileStatus" class="upload-status"></p>
-          <p class="hint" data-i18n="uploadHint">Supports CSV/TXT/XY/DAT, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2theta and intensity.</p>
+          <p class="hint" data-i18n="uploadHint">Supports CSV/TXT/XY/XYS/XYE/CHI/ASC/DAT/UXD, simple JSON, and common XRDML/XML. The first two numeric columns are read as 2theta and intensity.</p>
           <label for="manualData" data-i18n="pasteData">Paste two-column data</label>
           <textarea id="manualData" placeholder="two_theta,intensity&#10;20.12,100&#10;27.45,320"></textarea>
           <div class="actions">
@@ -1492,6 +1494,16 @@
               <label for="shiftStep" data-i18n="shiftStep">Shift step</label>
               <input id="shiftStep" type="number" value="0.02" step="0.01">
               <p class="field-help" data-i18n="shiftStepHelp">Smaller is finer but slower.</p>
+            </div>
+            <div>
+              <label for="fixedZeroShift" data-i18n="fixedZeroCorrection">Fixed zero correction (°)</label>
+              <input id="fixedZeroShift" type="number" value="0" step="0.001">
+              <p class="field-help" data-i18n="fixedZeroCorrectionHelp">Added to measured 2theta before peak detection; derive from a standard sample.</p>
+            </div>
+            <div>
+              <label for="specimenDisplacement" data-i18n="geometryCorrection">Geometry correction at 2theta = 0 (°)</label>
+              <input id="specimenDisplacement" type="number" value="0" step="0.001">
+              <p class="field-help" data-i18n="geometryCorrectionHelp">Uses a cos(theta) Bragg-Brentano correction. Set only from standard-sample calibration.</p>
             </div>
             <div>
               <label for="positionWeight" data-i18n="positionWeight">Position weight</label>
@@ -1667,6 +1679,11 @@
               <tbody id="matchesBody"></tbody>
             </table>
           </div>
+        </details>
+        <details open>
+          <summary data-i18n="residualErrorPlot">Residual error vs 2theta</summary>
+          <p id="residualSummary" class="field-help"></p>
+          <canvas id="residualPlot" width="900" height="260" style="width:100%; max-width:900px; height:auto;"></canvas>
         </details>
         <div id="log" class="log" data-i18n="waitingData">Waiting for XRD data.</div>
         </div>
@@ -1877,7 +1894,9 @@
     <div class="footer-inner">
       <span data-i18n="footerProduct">XMatcher Local UI for powder XRD phase identification.</span>
       <span>
-        <span data-i18n="releaseVersion">Release V1.1.0</span>
+        <span data-i18n="releaseVersion">Release V1.2.0</span>
+        ·
+        <a href="https://xmatcher.caobin.asia/" target="_blank" rel="noopener" data-i18n="homepageLink">Product home</a>
         ·
         <a href="https://doi.org/10.6084/m9.figshare.32812985" target="_blank" rel="noopener" data-i18n="footerDownload">Download</a>
         ·
@@ -1956,9 +1975,10 @@
         collapseSidebar: "Collapse sidebar",
         expandSidebar: "Expand sidebar",
         appTitle: "XMatcher Local XRD Identification",
-        releaseVersion: "Official Release V1.1.0",
+        releaseVersion: "Official Release V1.2.0",
         appSubtitle: "Upload experimental XRD data, tune parameters, run local matching, and compare experimental peaks with theoretical reflections.",
         downloadLink: "Download software",
+        homepageLink: "Product home",
         manualLink: "Manual",
         issueLink: "GitHub issues",
         checkingApi: "Checking local API...",
@@ -2186,6 +2206,16 @@
         resultRiskLowEvidence: "Low evidence: only {matched} peak(s) matched. Confirm this phase with full-peak comparison in the PDF module.",
         resultRiskLargeShift: "Large 2theta shift ({shift}). Check sample displacement/calibration and confirm with the PDF module.",
         resultRiskLowCoverage: "Low experimental coverage ({coverage}). Treat this identification as tentative and compare all peaks in the PDF module.",
+        resultRiskUnexplainedStrong: "{count} strong experimental peak(s) are unexplained; score penalty {penalty}.",
+        resultRiskMissingStrong: "{count} strong theoretical peak(s) are missing from the experiment; score penalty {penalty}.",
+        fixedZeroCorrection: "Fixed zero correction (°)",
+        fixedZeroCorrectionHelp: "Added to measured 2theta before peak detection; derive from a standard sample.",
+        geometryCorrection: "Geometry correction at 2theta = 0 (°)",
+        geometryCorrectionHelp: "Uses a cos(theta) Bragg-Brentano correction. Set only from standard-sample calibration.",
+        residualErrorPlot: "Residual error vs 2theta",
+        residualNoMatches: "Select a candidate with matched peaks to inspect residual errors.",
+        residualSlope: "Matched peaks: {count}; residual slope: {slope} degree/degree.",
+        residualSlopeUnavailable: "Matched peaks: {count}; at least two distinct peaks are needed for a residual slope.",
         matchFailed: "Match failed: {error}",
         emptyPlot: "Upload XRD data to show the pattern",
         noDownload: "No identification results to download.",
@@ -2201,10 +2231,11 @@
         controlPanel: "控制面板",
         collapseSidebar: "折叠左侧面板",
         expandSidebar: "展开左侧面板",
-        appTitle: "XMatcher 本地 XRD 物相识别",
-        releaseVersion: "正式发行版本 V1.1.0",
+        appTitle: "XMatcher XRD 物相识别",
+        releaseVersion: "正式发行版本 V1.2.0",
         appSubtitle: "上传实验 XRD 数据，调整参数，在本机完成匹配，并对比实验峰与理论衍射峰。",
         downloadLink: "软件下载",
+        homepageLink: "产品主页",
         manualLink: "说明手册",
         issueLink: "GitHub 问题反馈",
         checkingApi: "正在检查本地 API...",
@@ -2432,6 +2463,16 @@
         resultRiskLowEvidence: "证据偏弱：仅匹配到 {matched} 个峰。建议在 PDF 模块中进行全峰对比确认。",
         resultRiskLargeShift: "2theta 平移较大（{shift}）。请检查样品位移/仪器校准，并在 PDF 模块中确认。",
         resultRiskLowCoverage: "实验峰覆盖率偏低（{coverage}）。该识别结果建议视为待确认，并在 PDF 模块中对比全部峰。",
+        resultRiskUnexplainedStrong: "有 {count} 个强实验峰未被解释；已扣分 {penalty}。",
+        resultRiskMissingStrong: "有 {count} 个强理论峰未在实验中观察到；已扣分 {penalty}。",
+        fixedZeroCorrection: "固定零点校正（°）",
+        fixedZeroCorrectionHelp: "在峰检测前加到测得的 2theta；应由标准样品测定。",
+        geometryCorrection: "2theta = 0 时的几何校正（°）",
+        geometryCorrectionHelp: "使用 cos(theta) 的 Bragg-Brentano 校正；仅应由标准样品校准后设置。",
+        residualErrorPlot: "残余误差–2theta",
+        residualNoMatches: "请选择具有匹配峰的候选以查看残余误差。",
+        residualSlope: "匹配峰：{count}；残余误差斜率：{slope} 度/度。",
+        residualSlopeUnavailable: "匹配峰：{count}；至少需要两个不同位置的峰才能计算残余误差斜率。",
         matchFailed: "识别失败：{error}",
         emptyPlot: "上传 XRD 文件后显示图谱",
         noDownload: "没有可下载的识别结果。",
@@ -2448,7 +2489,7 @@
     i18n.ja = {...i18n.en,
       controlPanel: "制御パネル", collapseSidebar: "左パネルを折りたたむ", expandSidebar: "左パネルを展開",
       appTitle: "XMatcher ローカル XRD 相同定",
-      releaseVersion: "正式リリース V1.1.0",
+      releaseVersion: "正式リリース V1.2.0",
       appSubtitle: "実験 XRD データを読み込み、条件を調整し、ローカルで照合して実験ピークと理論反射を比較します。",
       downloadLink: "ソフトウェアをダウンロード", manualLink: "マニュアル", issueLink: "GitHub Issues", checkingApi: "ローカル API を確認中...",
       projectResources: "プロジェクト情報", projectNote: "ソフトウェアの入手、問題報告、XMatcher と XQueryer 論文の引用はこちらです。", paperLink: "XMatcher 論文",
@@ -2520,7 +2561,7 @@
     i18n.ko = {...i18n.en,
       controlPanel: "제어 패널", collapseSidebar: "왼쪽 패널 접기", expandSidebar: "왼쪽 패널 펼치기",
       appTitle: "XMatcher 로컬 XRD 상 식별",
-      releaseVersion: "공식 릴리스 V1.1.0",
+      releaseVersion: "공식 릴리스 V1.2.0",
       appSubtitle: "실험 XRD 데이터를 불러오고 매개변수를 조정한 뒤 로컬에서 매칭하여 실험 피크와 이론 반사를 비교합니다.",
       downloadLink: "소프트웨어 다운로드", manualLink: "매뉴얼", issueLink: "GitHub 이슈", checkingApi: "로컬 API 확인 중...",
       projectResources: "프로젝트 리소스", projectNote: "소프트웨어를 받고 문제를 보고하며 XMatcher 및 XQueryer 논문을 인용할 수 있습니다.", paperLink: "XMatcher 논문",
@@ -2749,6 +2790,10 @@
       if (matched <= Math.max(2, minMatched)) messages.push(t("resultRiskLowEvidence", {matched}));
       if (shift >= 0.35) messages.push(t("resultRiskLargeShift", {shift: fmt(shift, 3)}));
       if (Number.isFinite(coverage) && coverage > 0 && coverage < 0.45) messages.push(t("resultRiskLowCoverage", {coverage: fmt(coverage, 2)}));
+      const unexplainedStrong = selected.unmatched_experimental_strong_peaks || [];
+      const missingStrong = selected.unmatched_theoretical_strong_peaks || [];
+      if (unexplainedStrong.length) messages.push(t("resultRiskUnexplainedStrong", {count: unexplainedStrong.length, penalty: fmt(selected.unmatched_experimental_penalty, 2)}));
+      if (missingStrong.length) messages.push(t("resultRiskMissingStrong", {count: missingStrong.length, penalty: fmt(selected.unmatched_theoretical_penalty, 2)}));
       return messages;
     }
 
@@ -2826,16 +2871,21 @@
 
     function parseXml(text) {
       const doc = new DOMParser().parseFromString(text, "application/xml");
+      if (doc.querySelector("parsererror")) throw new Error(t("xmlParseError"));
       const parseNumbers = (value) => String(value || "").trim().split(/[\s,;]+/).map(Number).filter(Number.isFinite);
-      const intensityNode = doc.querySelector("intensities, counts, intensity");
-      const positionNode = doc.querySelector("positions, twoTheta, twotheta");
-      if (intensityNode && positionNode) {
+      const nodes = [...doc.getElementsByTagName("*")];
+      const named = (names) => nodes.filter((node) => names.includes(node.localName.toLowerCase()));
+      const intensityNode = named(["intensities", "counts", "intensity"]).find((node) => parseNumbers(node.textContent).length > 2);
+      const positionNodes = named(["positions", "position", "twotheta", "2theta"]);
+      if (intensityNode) {
         const y = parseNumbers(intensityNode.textContent);
-        const x = parseNumbers(positionNode.textContent);
-        if (x.length === y.length && x.length > 2) return x.map((value, index) => [value, y[index]]);
+        for (const positionNode of positionNodes) {
+          const x = parseNumbers(positionNode.textContent);
+          if (x.length === y.length) return x.map((value, index) => [value, y[index]]);
+        }
       }
-      const startNode = doc.querySelector("startPosition");
-      const endNode = doc.querySelector("endPosition");
+      const startNode = named(["startposition", "start"])[0];
+      const endNode = named(["endposition", "end"])[0];
       if (intensityNode && startNode && endNode) {
         const y = parseNumbers(intensityNode.textContent);
         const start = Number(startNode.textContent);
@@ -2916,6 +2966,8 @@
         min_matched_peaks: Math.round(num("minMatchedPeaks")),
         max_shift: num("maxShift"),
         shift_step: num("shiftStep"),
+        fixed_zero_shift: num("fixedZeroShift"),
+        specimen_displacement: num("specimenDisplacement"),
         scoring_method: $("scoringMethod").value
       };
     }
@@ -3251,6 +3303,37 @@
         `;
         body.appendChild(tr);
       }
+      drawResidualPlot(selected?.residual_diagnostics);
+    }
+
+    function drawResidualPlot(diagnostics) {
+      const canvas = $("residualPlot"), summary = $("residualSummary");
+      if (!canvas || !summary) return;
+      const positions = diagnostics?.positions || [], deltas = diagnostics?.deltas || [];
+      const ctx = canvas.getContext("2d"), w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+      if (!positions.length) {
+        summary.textContent = t("residualNoMatches");
+        return;
+      }
+      const margin = {left: 64, right: 24, top: 20, bottom: 44};
+      const xMin = Math.min(...positions), xMax = Math.max(...positions);
+      const extent = Math.max(...deltas.map((value) => Math.abs(value)), 0.01) * 1.2;
+      const sx = (x) => margin.left + (x - xMin) * (w - margin.left - margin.right) / (xMax - xMin || 1);
+      const sy = (y) => margin.top + (extent - y) * (h - margin.top - margin.bottom) / (2 * extent);
+      ctx.strokeStyle = "#d7dee8"; ctx.lineWidth = 1; ctx.beginPath();
+      ctx.moveTo(margin.left, sy(0)); ctx.lineTo(w - margin.right, sy(0)); ctx.stroke();
+      ctx.strokeStyle = "#25364a"; ctx.beginPath(); ctx.moveTo(margin.left, margin.top); ctx.lineTo(margin.left, h - margin.bottom); ctx.lineTo(w - margin.right, h - margin.bottom); ctx.stroke();
+      ctx.fillStyle = "#167b72";
+      positions.forEach((position, index) => { ctx.beginPath(); ctx.arc(sx(position), sy(deltas[index]), 4, 0, 2 * Math.PI); ctx.fill(); });
+      ctx.fillStyle = "#25364a"; ctx.font = "13px ui-sans-serif, system-ui";
+      ctx.fillText("2theta (degree)", w / 2 - 42, h - 12);
+      ctx.save(); ctx.translate(16, h / 2 + 34); ctx.rotate(-Math.PI / 2); ctx.fillText("residual (degree)", 0, 0); ctx.restore();
+      const slope = diagnostics?.slope_per_degree;
+      summary.textContent = Number.isFinite(Number(slope))
+        ? t("residualSlope", {count: positions.length, slope: fmt(slope, 5)})
+        : t("residualSlopeUnavailable", {count: positions.length});
     }
 
     function formatPdfHkl(hklRecords) {
@@ -4462,9 +4545,9 @@
         log(t("noDownload"), "error");
         return;
       }
-      const header = ["rank","entry_id","mpid","formula","elements","score","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
+      const header = ["rank","entry_id","mpid","formula","elements","score","base_hybrid_score","strong_peak_penalty","unmatched_experimental_strong_fraction","unmatched_theoretical_strong_fraction","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
       const rows = state.results.map((r, i) => [
-        i + 1, r.entry_id, r.mpid, r.formula, (r.elements || []).join("|"), r.score, r.weighted_score, r.fom,
+        i + 1, r.entry_id, r.mpid, r.formula, (r.elements || []).join("|"), r.score, r.base_hybrid_score, r.strong_peak_penalty, r.unmatched_experimental_strong_fraction, r.unmatched_theoretical_strong_fraction, r.weighted_score, r.fom,
         r.experimental_coverage, r.precision, r.recall, r.n_matched_peaks, r.mean_abs_error, r.estimated_shift, r.spacegroup_symbol
       ]);
       const csv = [header, ...rows].map((row) => row.map((value) => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");

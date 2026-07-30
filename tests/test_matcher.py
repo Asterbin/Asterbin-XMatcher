@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import pytest
 
 from XMatcher.matcher import XRDMatcher
@@ -74,6 +75,72 @@ def test_intensity_mismatch_does_not_overwhelm_position_match():
 
     assert metrics["n_matched_peaks"] == 3
     assert metrics["score"] > 50.0
+
+
+def test_scan_range_excludes_unobserved_theoretical_peaks_from_fom_and_recall():
+    matcher = XRDMatcher(position_tolerance=0.1, min_matched_peaks=2, max_shift=0)
+
+    metrics = matcher.calculate_match_metrics(
+        exp_positions=[20.0, 30.0],
+        exp_intensities=[100.0, 50.0],
+        db_positions=[20.0, 30.0, 80.0],
+        db_intensities=[100.0, 50.0, 100.0],
+        two_theta_range=(10.0, 40.0),
+    )
+
+    assert metrics["recall"] == pytest.approx(1.0)
+    assert metrics["fom"] == pytest.approx(100.0)
+
+
+def test_unmatched_strong_experimental_peak_reduces_hybrid_score():
+    matcher = XRDMatcher(position_tolerance=0.1, min_matched_peaks=2, max_shift=0)
+    matching = matcher.calculate_match_metrics(
+        exp_positions=[20.0, 30.0],
+        exp_intensities=[100.0, 50.0],
+        db_positions=[20.0, 30.0],
+        db_intensities=[100.0, 50.0],
+    )
+    with_strong_residual = matcher.calculate_match_metrics(
+        exp_positions=[20.0, 30.0, 45.0],
+        exp_intensities=[100.0, 50.0, 80.0],
+        db_positions=[20.0, 30.0],
+        db_intensities=[100.0, 50.0],
+    )
+
+    assert with_strong_residual["strong_peak_penalty"] > 0
+    assert with_strong_residual["score"] < matching["score"]
+    assert with_strong_residual["unmatched_experimental_strong_peaks"] == [
+        {"index": 2, "two_theta": 45.0, "relative_intensity": 80.0}
+    ]
+
+
+def test_unmatched_strong_theoretical_peak_reduces_hybrid_score():
+    matcher = XRDMatcher(position_tolerance=0.1, min_matched_peaks=2, max_shift=0)
+
+    metrics = matcher.calculate_match_metrics(
+        exp_positions=[20.0, 30.0],
+        exp_intensities=[100.0, 50.0],
+        db_positions=[20.0, 30.0, 45.0],
+        db_intensities=[100.0, 50.0, 80.0],
+    )
+
+    assert metrics["strong_peak_penalty"] > 0
+    assert metrics["unmatched_theoretical_strong_peaks"] == [
+        {"index": 2, "two_theta": 45.0, "relative_intensity": 80.0, "two_theta_unshifted": 45.0}
+    ]
+
+
+def test_match_metrics_returns_residual_error_diagnostics():
+    matcher = XRDMatcher(position_tolerance=0.2, min_matched_peaks=2, max_shift=0)
+
+    metrics = matcher.calculate_match_metrics(
+        exp_positions=[20.02, 30.04], exp_intensities=[100.0, 50.0],
+        db_positions=[20.0, 30.0], db_intensities=[100.0, 50.0],
+    )
+
+    np.testing.assert_allclose(metrics["residual_diagnostics"]["positions"], [20.02, 30.04])
+    np.testing.assert_allclose(metrics["residual_diagnostics"]["deltas"], [0.02, 0.04])
+    assert metrics["residual_diagnostics"]["slope_per_degree"] is not None
 
 
 def test_retrieve_ranks_true_candidate_first_with_extra_experimental_peak():

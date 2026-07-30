@@ -4,7 +4,7 @@
 
 **本地 XRD 物相识别工具包与 App**
 
-**当前版本：V1.1.0**
+**当前版本：V1.2.0**
 
 [![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
@@ -46,7 +46,15 @@ python xmatcher_local_api.py --database MP500_xrd_database.pkl
 - PDF 全峰对比模块支持最多五个 CIF 的多相加权混合对比。
 - AutoMix 自动多相识别会从单相候选中搜索最多三个相的组合，以非负拟合给出相对衍射贡献、峰归属和未解释残峰；贡献值不等同于质量分数。
 
-## AutoMix 自动多相识别（V1.1.0）
+## V1.2.0 更新内容
+
+- 新增扫描范围感知评分与未匹配强峰惩罚，降低误识别风险。
+- 新增固定零点、Bragg-Brentano 几何校正及残余误差–2θ 诊断。
+- 扩展 ASCII、JSON 与 XRDML/XML 实验数据导入兼容性。
+
+完整记录见 [CHANGELOG.md](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md)。
+
+## AutoMix 自动多相识别
 
 当单相候选无法解释主要实验峰时，可使用 AutoMix。它从前列单相候选中搜索最多三个相的组合，并通过非负拟合估计各保留相的相对衍射贡献。该贡献值描述拟合到的衍射信号，**不等同于质量分数或重量百分比**。
 

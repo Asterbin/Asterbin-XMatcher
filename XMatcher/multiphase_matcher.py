@@ -35,6 +35,7 @@ class MultiPhaseMatcher:
         required_entry_ids: Optional[Sequence[int]] = None,
         required_element_sets: Optional[Sequence[Sequence[str]]] = None,
         minimum_required_contribution_percent: float = 3.0,
+        two_theta_range: Optional[Sequence[float]] = None,
     ) -> Dict:
         """Return ranked phase combinations and peak-level attribution.
 
@@ -62,10 +63,10 @@ class MultiPhaseMatcher:
         # contain them. Searching the unconstrained ~100k-entry library again
         # would both defeat that purpose and introduce irrelevant phases.
         candidates = [] if known_entry_ids else self._single_phase_candidates(
-            x, y, database, elements, element_filter_mode, candidate_pool
+            x, y, database, elements, element_filter_mode, candidate_pool, two_theta_range
         )
         known_candidates = self._known_entry_candidates(
-            x, y, database, known_entry_ids, candidate_pool, required_element_sets, required_entry_ids
+            x, y, database, known_entry_ids, candidate_pool, required_element_sets, required_entry_ids, two_theta_range
         )
         # Known-phase candidates are prepended so an explicitly supplied MPID
         # or exact-element constraint cannot be displaced by the unconstrained
@@ -192,6 +193,7 @@ class MultiPhaseMatcher:
         candidate_pool: int,
         required_element_sets: Optional[Sequence[Sequence[str]]] = None,
         required_entry_ids: Optional[Sequence[int]] = None,
+        two_theta_range: Optional[Sequence[float]] = None,
     ) -> List[Dict]:
         """Score user-constrained entries and preserve them in the pool.
 
@@ -215,7 +217,7 @@ class MultiPhaseMatcher:
                 continue
             seen.add(entry_id)
             entry = entries[entry_id]
-            metrics = self.matcher.match_single_entry(x, y, entry)
+            metrics = self.matcher.match_single_entry(x, y, entry, two_theta_range=two_theta_range)
             candidates.append({
                 "entry_id": entry_id, "mpid": entry.get("mpid"),
                 "formula": entry.get("formula"), "elements": entry.get("elements", []),
@@ -261,6 +263,7 @@ class MultiPhaseMatcher:
     def _single_phase_candidates(
         self, x: np.ndarray, y: np.ndarray, database: Dict,
         elements: Optional[Sequence[str]], element_filter_mode: str, candidate_pool: int,
+        two_theta_range: Optional[Sequence[float]] = None,
     ) -> List[Dict]:
         """Retrieve candidates with a multi-phase-aware element scope.
 
@@ -270,7 +273,7 @@ class MultiPhaseMatcher:
         of the supplied element scope instead.
         """
         if not elements:
-            return self.matcher.match_pattern(x, y, database, top_n=candidate_pool)
+            return self.matcher.match_pattern(x, y, database, top_n=candidate_pool, two_theta_range=two_theta_range)
         database = normalize_database_package(database)
         allowed = {str(element).strip().capitalize() for element in elements if str(element).strip()}
         entries = database["xrd_database"]
@@ -279,7 +282,7 @@ class MultiPhaseMatcher:
             phase_elements = set(entry.get("elements", []))
             if not phase_elements or not phase_elements.issubset(allowed):
                 continue
-            metrics = self.matcher.match_single_entry(x, y, entry)
+            metrics = self.matcher.match_single_entry(x, y, entry, two_theta_range=two_theta_range)
             if metrics["score"] <= 0:
                 continue
             results.append({

@@ -9,6 +9,7 @@ The public API is intentionally small:
     - DatabaseBuilder: offline database builder
 """
 
+from .calibration import calibrate_two_theta
 from .database import DatabaseBuilder, DatabaseProcessor, XRDCalculator
 from .matcher import XRDMatcher
 from .multiphase_matcher import MultiPhaseMatcher
@@ -16,7 +17,7 @@ from .peak_detector import PeakDetector
 from .retriever import XRDRetriever
 from .xrd_reader import XRDReader
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Bin Cao"
 __email__ = "bcao686@connect.hkust-gz.edu.cn"
 __github__ = "https://github.com/Bin-Cao/XMatcher"
@@ -24,6 +25,7 @@ __github__ = "https://github.com/Bin-Cao/XMatcher"
 __all__ = [
     "DatabaseBuilder",
     "DatabaseProcessor",
+    "calibrate_two_theta",
     "PeakDetector",
     "XRDRetriever",
     "XRDCalculator",

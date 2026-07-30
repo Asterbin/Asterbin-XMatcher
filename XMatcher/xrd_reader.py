@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import logging
+import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
 
@@ -52,16 +55,106 @@ class XRDReader:
         return self._clean(two_theta, intensity, file_path)
 
     def read_auto(self, file_path: Union[str, Path]) -> Dict[str, np.ndarray]:
+        file_path = Path(file_path)
+        suffix = file_path.suffix.lower()
+        if suffix == ".json":
+            return self._read_json(file_path)
+        if suffix in {".xml", ".xrdml"}:
+            return self._read_xml(file_path)
+
         errors = []
         for delimiter in [",", "\t", r"\s+", ";"]:
-            for header in ["infer", None]:
+            # Trying ``header="infer"`` first makes pandas treat a numeric
+            # first row as column names, silently dropping that measurement.
+            # A genuine textual header fails this no-header attempt and is
+            # handled by the following inferred-header attempt.
+            for header in [None, "infer"]:
                 try:
                     data = self.read_csv(file_path, delimiter=delimiter, header=header)
                     if len(data["two_theta"]) >= 2:
                         return data
                 except Exception as exc:
                     errors.append(f"{delimiter!r}/{header!r}: {exc}")
+        try:
+            return self._read_numeric_text(file_path)
+        except Exception as exc:
+            errors.append(f"numeric-text fallback: {exc}")
         raise ValueError(f"Could not read XRD file {file_path}. Tried common delimiters. {errors[-1]}")
+
+    def _read_numeric_text(self, file_path: Path) -> Dict[str, np.ndarray]:
+        """Read vendor-style ASCII files with metadata before two/three-column data."""
+        rows = []
+        for line in file_path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith(("#", "//", ";", "_")):
+                continue
+            values = re.split(r"[,;\t\s]+", stripped)
+            if len(values) < 2:
+                continue
+            try:
+                rows.append((float(values[0]), float(values[1])))
+            except ValueError:
+                continue
+        if len(rows) < 2:
+            raise ValueError("no two-column numeric rows found")
+        return self._clean(
+            np.asarray([row[0] for row in rows]), np.asarray([row[1] for row in rows]), file_path
+        )
+
+    def _read_json(self, file_path: Path) -> Dict[str, np.ndarray]:
+        """Read common two-column JSON layouts used by local instruments and APIs."""
+        data = json.loads(file_path.read_text(encoding="utf-8-sig"))
+        if isinstance(data, dict):
+            positions = data.get("two_theta", data.get("angle", data.get("x")))
+            intensities = data.get("intensity", data.get("counts", data.get("y")))
+            if positions is not None and intensities is not None:
+                return self._clean(np.asarray(positions, dtype=float), np.asarray(intensities, dtype=float), file_path)
+        if isinstance(data, list):
+            rows = []
+            for item in data:
+                if isinstance(item, dict):
+                    x = item.get("two_theta", item.get("angle", item.get("x")))
+                    y = item.get("intensity", item.get("counts", item.get("y")))
+                elif isinstance(item, (list, tuple)) and len(item) >= 2:
+                    x, y = item[:2]
+                else:
+                    continue
+                rows.append((float(x), float(y)))
+            if rows:
+                return self._clean(
+                    np.asarray([row[0] for row in rows]), np.asarray([row[1] for row in rows]), file_path
+                )
+        raise ValueError("JSON must contain two_theta/intensity arrays or two-column rows")
+
+    def _read_xml(self, file_path: Path) -> Dict[str, np.ndarray]:
+        """Read simple XML and XRDML scans, including documents with XML namespaces."""
+        root = ET.parse(file_path).getroot()
+
+        def local_name(node) -> str:
+            return node.tag.rsplit("}", 1)[-1].lower()
+
+        def numbers(text) -> np.ndarray:
+            return np.asarray(
+                [float(value) for value in re.split(r"[,;\s]+", (text or "").strip()) if value], dtype=float
+            )
+
+        nodes = list(root.iter())
+        intensity_nodes = [node for node in nodes if local_name(node) in {"intensities", "intensity", "counts"}]
+        position_nodes = [node for node in nodes if local_name(node) in {"positions", "position", "twotheta", "2theta"}]
+        intensity_values = next((numbers(node.text) for node in intensity_nodes if numbers(node.text).size >= 2), None)
+        if intensity_values is None:
+            raise ValueError("no intensity values found in XML/XRDML")
+        for node in position_nodes:
+            position_values = numbers(node.text)
+            if position_values.size == intensity_values.size:
+                return self._clean(position_values, intensity_values, file_path)
+
+        starts = [numbers(node.text) for node in nodes if local_name(node) in {"startposition", "start"}]
+        ends = [numbers(node.text) for node in nodes if local_name(node) in {"endposition", "end"}]
+        if starts and ends and starts[0].size and ends[0].size:
+            positions = np.linspace(float(starts[0][0]), float(ends[0][0]), intensity_values.size)
+            return self._clean(positions, intensity_values, file_path)
+        raise ValueError("XML/XRDML needs matching positions or start/end positions")
 
     def normalize_intensity(self, intensity: np.ndarray, method: str = "max") -> np.ndarray:
         intensity = np.asarray(intensity, dtype=float)

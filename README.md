@@ -4,7 +4,7 @@
 
 **Local XRD Phase Identification Toolkit & App**
 
-**Current release: V1.1.0**
+**Current release: V1.2.0**
 
 [![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
@@ -76,7 +76,7 @@ Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li
 
 ## What It Does
 
-- Reads common two-column XRD text formats, including CSV, tab-separated and whitespace-separated files.
+- Reads common two/three-column XRD text formats, including CSV, tab-separated, whitespace-separated, XY/XYS/XYE, CHI, ASC, DAT and UXD files; also supports simple JSON and common XRDML/XML scans. Binary vendor formats should be exported as text or XRDML first.
 - Detects experimental peaks with baseline correction, smoothing, prominence filtering and sub-point peak refinement.
 - Searches a precomputed theoretical XRD database by element constraints before peak-level ranking.
 - Matches peaks with an optimal assignment algorithm instead of greedy nearest-neighbor pairing.
@@ -84,7 +84,15 @@ Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li
 - Returns explainable results, including matched peak pairs, position errors, FOM, precision, recall and estimated shift.
 - Includes AutoMix multi-phase identification: combines leading single-phase candidates, fits non-negative relative diffraction contributions, and reports peak attribution and residual peaks.
 
-## AutoMix Multi-phase Identification (V1.1.0)
+## What's New in V1.2.0
+
+- Adds scan-range-aware scoring and strong unmatched-peak penalties to reduce false-positive phase rankings.
+- Adds fixed zero and Bragg-Brentano geometry corrections, plus residual-error-versus-2θ diagnostics.
+- Expands experimental-data import for common ASCII, JSON and XRDML/XML formats.
+
+See the [full release record](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md).
+
+## AutoMix Multi-phase Identification
 
 Use AutoMix when a single candidate cannot explain the main experimental peaks.
 It searches combinations of up to three leading single-phase candidates, then uses
