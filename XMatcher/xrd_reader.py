@@ -84,6 +84,7 @@ class XRDReader:
     def _read_numeric_text(self, file_path: Path) -> Dict[str, np.ndarray]:
         """Read vendor-style ASCII files with metadata before two/three-column data."""
         rows = []
+        two_theta_col, intensity_col = 0, 1
         for line in file_path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
             stripped = line.strip()
             if not stripped or stripped.startswith(("#", "//", ";", "_")):
@@ -91,9 +92,23 @@ class XRDReader:
             values = re.split(r"[,;\t\s]+", stripped)
             if len(values) < 2:
                 continue
+
+            # Some vendor CSV exports put a metadata block before a named data
+            # table, e.g. ``Angle, TimePerStep, Intensity, ESD``.  In that
+            # layout the second numeric column is acquisition time, not the
+            # measured intensity.
+            normalized_columns = [re.sub(r"[^a-z0-9]", "", value.lower()) for value in values]
+            position_names = {"angle", "twotheta", "2theta", "position", "x"}
+            intensity_names = {"intensity", "intensities", "counts", "count", "y"}
+            position_matches = [i for i, name in enumerate(normalized_columns) if name in position_names]
+            intensity_matches = [i for i, name in enumerate(normalized_columns) if name in intensity_names]
+            if position_matches and intensity_matches:
+                two_theta_col, intensity_col = position_matches[0], intensity_matches[0]
+                continue
+
             try:
-                rows.append((float(values[0]), float(values[1])))
-            except ValueError:
+                rows.append((float(values[two_theta_col]), float(values[intensity_col])))
+            except (IndexError, ValueError):
                 continue
         if len(rows) < 2:
             raise ValueError("no two-column numeric rows found")

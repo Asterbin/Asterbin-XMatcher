@@ -33,6 +33,26 @@ def test_reader_auto_reads_vendor_ascii_with_metadata_and_third_column(tmp_path)
     assert data["intensity"].tolist() == [1.0, 2.0, 3.0]
 
 
+def test_reader_auto_uses_named_intensity_column_after_vendor_metadata(tmp_path):
+    path = tmp_path / "scan.csv"
+    path.write_text(
+        """[Measurement conditions]
+Scan range,5,80
+[Scan points]
+Angle, TimePerStep, Intensity, ESD
+5.0, 22.440, 221.0, 14.8661
+5.1, 22.440, 230.0, 15.1658
+5.2, 22.440, 203.0, 14.2478
+""",
+        encoding="utf-8",
+    )
+
+    data = XRDReader().read_auto(path)
+
+    assert data["two_theta"].tolist() == [5.0, 5.1, 5.2]
+    assert data["intensity"].tolist() == [221.0, 230.0, 203.0]
+
+
 def test_reader_auto_reads_json_arrays(tmp_path):
     path = tmp_path / "scan.json"
     path.write_text('{"two_theta": [10, 20, 30], "counts": [1, 2, 3]}', encoding="utf-8")
