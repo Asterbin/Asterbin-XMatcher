@@ -7,6 +7,7 @@ HTML interface in a native desktop window via pywebview.
 
 from __future__ import annotations
 
+import base64
 import logging
 import socket
 import sys
@@ -22,6 +23,40 @@ from XMatcher.database import DatabaseBuilder, normalize_database_package
 
 APP_NAME = "XMatcher"
 DEFAULT_PORT = 8765
+
+
+class DesktopAPI:
+    """Native operations exposed to the bundled web interface."""
+
+    def __init__(self) -> None:
+        self.window = None
+
+    def save_excel(self, workbook_base64: str, filename: str) -> dict:
+        """Save an XLSX payload through the OS dialog used by the desktop app."""
+        if self.window is None:
+            raise RuntimeError("Desktop window is not ready")
+
+        safe_filename = Path(str(filename or "xmatcher_peak_table.xlsx")).name
+        if not safe_filename.lower().endswith(".xlsx"):
+            safe_filename += ".xlsx"
+        destination = self.window.create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename=safe_filename,
+            file_types=("Excel Workbook (*.xlsx)",),
+        )
+        if not destination:
+            return {"saved": False}
+        if isinstance(destination, (list, tuple)):
+            destination = destination[0]
+
+        try:
+            workbook = base64.b64decode(workbook_base64, validate=True)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Invalid Excel data") from exc
+        if not workbook:
+            raise ValueError("Excel data is empty")
+        Path(destination).write_bytes(workbook)
+        return {"saved": True, "path": str(destination)}
 
 
 def resource_path(name: str) -> Path:
@@ -71,6 +106,7 @@ def main() -> int:
     server = start_api_server(database_path, port)
     api_url = f"http://127.0.0.1:{port}"
 
+    desktop_api = DesktopAPI()
     window = webview.create_window(
         APP_NAME,
         html_path.as_uri(),
@@ -78,7 +114,9 @@ def main() -> int:
         height=940,
         min_size=(1100, 720),
         text_select=True,
+        js_api=desktop_api,
     )
+    desktop_api.window = window
 
     def configure_ui() -> None:
         escaped_api_url = api_url.replace("\\", "\\\\").replace("'", "\\'")

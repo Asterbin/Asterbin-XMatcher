@@ -4474,10 +4474,25 @@
           } catch (_) { /* keep HTTP status when a non-JSON response is returned */ }
           throw new Error(detail);
         }
-        const url = URL.createObjectURL(await res.blob());
+        const blob = await res.blob();
+        const filename = `${safeFileStem(`xmatcher_pdf_peak_table_${phase.name || phase.formula || phaseIndex + 1}`, "xmatcher_pdf_peak_table")}.xlsx`;
+        // pywebview does not consistently honor an anchor's Blob download.
+        // Use its native save dialog in the packaged desktop app, while
+        // retaining the standard browser download for the standalone UI.
+        if (window.pywebview?.api?.save_excel) {
+          const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error("Could not prepare Excel file"));
+            reader.onload = () => resolve(String(reader.result).split(",", 2)[1]);
+            reader.readAsDataURL(blob);
+          });
+          await window.pywebview.api.save_excel(base64, filename);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${safeFileStem(`xmatcher_pdf_peak_table_${phase.name || phase.formula || phaseIndex + 1}`, "xmatcher_pdf_peak_table")}.xlsx`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         a.remove();
