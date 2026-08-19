@@ -48,6 +48,27 @@ def test_element_filter_is_case_tolerant():
     assert matcher.filter_by_elements(database, ["b", "tc"], mode="contains") == [1, 3]
 
 
+def test_match_result_preserves_local_cryst_id_without_mpid():
+    database = {
+        "xrd_database": {
+            7: {
+                "mpid": None,
+                "cryst_id": "RRUFF:R060227-9",
+                "formula": "Quartz",
+                "elements": ["Si", "O"],
+                "peaks": {"positions": [20.0, 30.0], "intensities": [100.0, 50.0]},
+            }
+        }
+    }
+
+    result = XRDMatcher(position_tolerance=0.1, min_matched_peaks=2).match_pattern(
+        [20.0, 30.0], [100.0, 50.0], database, top_n=1
+    )
+
+    assert result[0]["mpid"] is None
+    assert result[0]["cryst_id"] == "RRUFF:R060227-9"
+
+
 def test_shift_estimate_prefers_low_error_candidate():
     matcher = XRDMatcher(position_tolerance=0.2, max_shift=0.5, shift_step=0.05, min_matched_peaks=2)
 

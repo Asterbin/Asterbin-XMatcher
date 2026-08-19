@@ -219,7 +219,7 @@ class MultiPhaseMatcher:
             entry = entries[entry_id]
             metrics = self.matcher.match_single_entry(x, y, entry, two_theta_range=two_theta_range)
             candidates.append({
-                "entry_id": entry_id, "mpid": entry.get("mpid"),
+                "entry_id": entry_id, "mpid": entry.get("mpid"), "cryst_id": entry.get("cryst_id"),
                 "formula": entry.get("formula"), "elements": entry.get("elements", []),
                 "spacegroup": entry.get("spacegroup_number"),
                 "spacegroup_symbol": entry.get("spacegroup_symbol"),
@@ -286,7 +286,7 @@ class MultiPhaseMatcher:
             if metrics["score"] <= 0:
                 continue
             results.append({
-                "entry_id": entry_id, "mpid": entry.get("mpid"),
+                "entry_id": entry_id, "mpid": entry.get("mpid"), "cryst_id": entry.get("cryst_id"),
                 "formula": entry.get("formula"), "elements": entry.get("elements", []),
                 "spacegroup": entry.get("spacegroup_number"),
                 "spacegroup_symbol": entry.get("spacegroup_symbol"), **metrics,
@@ -322,7 +322,7 @@ class MultiPhaseMatcher:
             if (coefficient <= 1e-10 or contribution <= 1e-10) and candidate["entry_id"] not in force_keep:
                 continue
             phases.append({
-                "entry_id": candidate["entry_id"], "mpid": candidate.get("mpid"),
+                "entry_id": candidate["entry_id"], "mpid": candidate.get("mpid"), "cryst_id": candidate.get("cryst_id"),
                 "formula": candidate.get("formula"), "elements": candidate.get("elements", []),
                 "spacegroup": candidate.get("spacegroup"),
                 "spacegroup_symbol": candidate.get("spacegroup_symbol"),

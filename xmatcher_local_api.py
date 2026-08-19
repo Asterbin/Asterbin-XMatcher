@@ -365,7 +365,7 @@ def _multiphase_match(payload: Dict) -> Dict:
             "explained_intensity_percent": float(candidate.get("experimental_coverage", 0.0)),
             "n_phases": 1,
             "phases": [{
-                "entry_id": candidate["entry_id"], "mpid": candidate.get("mpid"),
+                "entry_id": candidate["entry_id"], "mpid": candidate.get("mpid"), "cryst_id": candidate.get("cryst_id"),
                 "formula": candidate.get("formula"), "elements": candidate.get("elements", []),
                 "spacegroup": candidate.get("spacegroup"), "spacegroup_symbol": candidate.get("spacegroup_symbol"),
                 "estimated_shift": candidate.get("estimated_shift", 0.0),

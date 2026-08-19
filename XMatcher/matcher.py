@@ -145,6 +145,7 @@ class XRDMatcher:
                     {
                         "entry_id": entry_id,
                         "mpid": entry.get("mpid"),
+                        "cryst_id": entry.get("cryst_id"),
                         "formula": entry.get("formula"),
                         "elements": entry.get("elements", []),
                         "spacegroup": entry.get("spacegroup_number"),

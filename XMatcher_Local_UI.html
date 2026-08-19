@@ -1646,7 +1646,7 @@
               <tr>
                 <th>#</th>
                 <th data-i18n="formula">Formula</th>
-                <th>MP ID</th>
+                <th>CrystID</th>
                 <th data-i18n="elementsShort">Elements</th>
                 <th data-i18n="score">Score</th>
                 <th>Weighted</th>
@@ -3256,11 +3256,13 @@
         const tr = document.createElement("tr");
         if (index === state.selectedIndex) tr.classList.add("selected");
         const mpid = materialProjectId(r.mpid);
+        const crystId = String(r.cryst_id ?? "").trim();
         const mpLink = materialProjectLink(r.mpid);
+        const structureId = mpid || crystId;
         tr.innerHTML = `
           <td>${index + 1}</td>
           <td><strong>${escapeHtml(r.formula)}</strong></td>
-          <td>${mpLink ? `<a href="${escapeHtml(mpLink)}" target="_blank" rel="noopener">${escapeHtml(mpid)}</a>` : ""}</td>
+          <td>${mpLink ? `<a href="${escapeHtml(mpLink)}" target="_blank" rel="noopener">${escapeHtml(structureId)}</a>` : escapeHtml(structureId)}</td>
           <td>${(r.elements || []).map((e) => `<span class="pill">${escapeHtml(e)}</span>`).join(" ")}</td>
           <td>${fmt(r.score, 2)}</td>
           <td>${fmt(r.weighted_score, 2)}</td>
@@ -4560,9 +4562,9 @@
         log(t("noDownload"), "error");
         return;
       }
-      const header = ["rank","entry_id","mpid","formula","elements","score","base_hybrid_score","strong_peak_penalty","unmatched_experimental_strong_fraction","unmatched_theoretical_strong_fraction","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
+      const header = ["rank","entry_id","cryst_id","mpid","formula","elements","score","base_hybrid_score","strong_peak_penalty","unmatched_experimental_strong_fraction","unmatched_theoretical_strong_fraction","weighted_score","fom","experimental_coverage","precision","recall","n_matched_peaks","mean_abs_error","estimated_shift","spacegroup_symbol"];
       const rows = state.results.map((r, i) => [
-        i + 1, r.entry_id, r.mpid, r.formula, (r.elements || []).join("|"), r.score, r.base_hybrid_score, r.strong_peak_penalty, r.unmatched_experimental_strong_fraction, r.unmatched_theoretical_strong_fraction, r.weighted_score, r.fom,
+        i + 1, r.entry_id, r.cryst_id, r.mpid, r.formula, (r.elements || []).join("|"), r.score, r.base_hybrid_score, r.strong_peak_penalty, r.unmatched_experimental_strong_fraction, r.unmatched_theoretical_strong_fraction, r.weighted_score, r.fom,
         r.experimental_coverage, r.precision, r.recall, r.n_matched_peaks, r.mean_abs_error, r.estimated_shift, r.spacegroup_symbol
       ]);
       const csv = [header, ...rows].map((row) => row.map((value) => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");

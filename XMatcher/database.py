@@ -44,10 +44,15 @@ class DatabaseProcessor:
             elements = sorted(set(symbols))
             spacegroup_number, spacegroup_symbol = _get_spacegroup_info(atoms)
 
-            mpid = row.get("mpid", None) or row.get("material_id", None) or row.get("id", None)
+            # ASE's ``row.id`` is its internal SQLite row number, not a
+            # Materials Project identifier.  Keep external MP IDs and local
+            # crystal IDs separate so databases such as RRUFF remain local.
+            mpid = row.get("mpid", None) or row.get("material_id", None)
+            cryst_id = row.get("cryst_id", None)
             return {
                 "entry_id": entry_id,
                 "mpid": mpid,
+                "cryst_id": cryst_id,
                 "formula": atoms.get_chemical_formula(),
                 "elements": elements,
                 "n_atoms": len(atoms),
@@ -165,6 +170,7 @@ def _make_entry_record(entry_id: int, info: Dict, peak_data: Dict) -> Dict:
     return {
         "entry_id": entry_id,
         "mpid": info["mpid"],
+        "cryst_id": info.get("cryst_id"),
         "formula": info["formula"],
         "elements": info["elements"],
         "n_atoms": info["n_atoms"],
