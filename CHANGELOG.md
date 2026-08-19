@@ -1,5 +1,16 @@
 # Changelog
 
+## V1.3.0 — 2026-08-19
+
+### Fixed
+
+- Fixes the App data-export bug.
+
+### Expanded crystal-structure database
+
+- Adds 2,007 RRUFF crystal structures to the searchable XRD database.
+- Displays local RRUFF `CrystID` values without an external link, while Materials Project IDs remain linked.
+
 ## V1.2.0 — 2026-07-30
 
 ### Improved identification reliability

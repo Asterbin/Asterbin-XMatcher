@@ -4,7 +4,7 @@
 
 **本地 XRD 物相识别工具包与 App**
 
-**当前版本：V1.2.0**
+**当前版本：V1.3.0**
 
 [![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
@@ -46,11 +46,11 @@ python xmatcher_local_api.py --database MP500_xrd_database.pkl
 - PDF 全峰对比模块支持最多五个 CIF 的多相加权混合对比。
 - AutoMix 自动多相识别会从单相候选中搜索最多三个相的组合，以非负拟合给出相对衍射贡献、峰归属和未解释残峰；贡献值不等同于质量分数。
 
-## V1.2.0 更新内容
+## V1.3.0 更新内容
 
-- 新增扫描范围感知评分与未匹配强峰惩罚，降低误识别风险。
-- 新增固定零点、Bragg-Brentano 几何校正及残余误差–2θ 诊断。
-- 扩展 ASCII、JSON 与 XRDML/XML 实验数据导入兼容性。
+- 修复 App 中的数据导出 bug。
+- 新增 2,007 个 RRUFF 晶体结构，扩展可检索的晶体结构数据库。
+- RRUFF 结构显示不带外部链接的 CrystID；Materials Project 结构仍保留 MPID 超链接。
 
 完整记录见 [CHANGELOG.md](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md)。
 

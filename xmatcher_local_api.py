@@ -652,7 +652,7 @@ def _pdf_peaks_xlsx(payload: Dict) -> bytes:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "XMatcherLocalAPI/1.2.0"
+    server_version = "XMatcherLocalAPI/1.3.0"
 
     def do_OPTIONS(self) -> None:
         _json_response(self, 200, {"status": "ok"})

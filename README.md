@@ -4,7 +4,7 @@
 
 **Local XRD Phase Identification Toolkit & App**
 
-**Current release: V1.2.0**
+**Current release: V1.3.0**
 
 [![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
@@ -84,11 +84,11 @@ Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li
 - Returns explainable results, including matched peak pairs, position errors, FOM, precision, recall and estimated shift.
 - Includes AutoMix multi-phase identification: combines leading single-phase candidates, fits non-negative relative diffraction contributions, and reports peak attribution and residual peaks.
 
-## What's New in V1.2.0
+## What's New in V1.3.0
 
-- Adds scan-range-aware scoring and strong unmatched-peak penalties to reduce false-positive phase rankings.
-- Adds fixed zero and Bragg-Brentano geometry corrections, plus residual-error-versus-2θ diagnostics.
-- Expands experimental-data import for common ASCII, JSON and XRDML/XML formats.
+- Fixes the App data-export bug.
+- Expands the searchable crystal-structure database with 2,007 RRUFF structures.
+- Shows local RRUFF CrystIDs without external links; Materials Project IDs remain linked to their structure pages.
 
 See the [full release record](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md).
 

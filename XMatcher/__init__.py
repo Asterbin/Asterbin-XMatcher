@@ -17,7 +17,7 @@ from .peak_detector import PeakDetector
 from .retriever import XRDRetriever
 from .xrd_reader import XRDReader
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "Bin Cao"
 __email__ = "bcao686@connect.hkust-gz.edu.cn"
 __github__ = "https://github.com/Bin-Cao/XMatcher"
