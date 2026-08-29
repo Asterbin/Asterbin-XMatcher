@@ -103,6 +103,24 @@ def _prepare_arrays(two_theta: Sequence, intensity: Sequence) -> Tuple[np.ndarra
     return x[order], y[order]
 
 
+def _calibration_adjustment(raw_score: float, estimated_shift: float, max_shift: float,
+                            warning_fraction: float = 0.60,
+                            max_penalty_fraction: float = 0.20) -> Dict:
+    """Return a continuous, bounded calibration penalty for ranking candidates."""
+    limit = abs(float(max_shift))
+    fraction = abs(float(estimated_shift)) / limit if limit else 0.0
+    excess = max(0.0, fraction - warning_fraction)
+    span = max(1e-12, 1.0 - warning_fraction)
+    severity = min(1.0, excess / span)
+    penalty = max(0.0, float(raw_score)) * max(0.0, float(max_penalty_fraction)) * severity
+    return {
+        "shift_fraction_of_limit": fraction,
+        "shift_calibration_warning": fraction >= warning_fraction,
+        "calibration_penalty": penalty,
+        "calibration_adjusted_score": float(raw_score) - penalty,
+    }
+
+
 def _get_database() -> Dict:
     if DATABASE is None:
         raise RuntimeError("Database is not loaded")
@@ -217,7 +235,16 @@ def _match(payload: Dict) -> Dict:
         baseline_window_fraction=float(params.get("baseline_window_fraction", 0.05)),
     )
     n_peaks = int(params.get("n_peaks", 4))
-    peaks = detector.get_top_peaks(calibrated_two_theta, intensity, n_peaks=n_peaks, preprocess=True)
+    # Keep the full detector count separate from the selected matching peaks.
+    # ``len(detected_peaks)`` is otherwise capped by n_peaks and cannot be used
+    # to decide whether a pattern is peak-rich.
+    all_detected_peaks = detector.detect_peaks(calibrated_two_theta, intensity, preprocess=True)
+    peaks = [dict(peak) for peak in all_detected_peaks[:n_peaks]]
+    if peaks:
+        selected_max_intensity = max(peak["intensity"] for peak in peaks)
+        if selected_max_intensity > 0:
+            for peak in peaks:
+                peak["intensity"] = 100.0 * peak["intensity"] / selected_max_intensity
     exp_positions, exp_intensities = detector.extract_peak_positions_and_intensities(peaks)
 
     matcher = XRDMatcher(
@@ -249,13 +276,21 @@ def _match(payload: Dict) -> Dict:
         two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
     )
 
+    warning_fraction = float(params.get("shift_warning_fraction", 0.60))
+    max_penalty_fraction = float(params.get("shift_penalty_max_fraction", 0.20))
     enriched = []
     for result in results:
         entry = database["xrd_database"].get(result["entry_id"], {})
         peaks_data = entry.get("peaks", {})
+        estimated_shift = float(result.get("estimated_shift", 0.0))
+        adjustment = _calibration_adjustment(
+            float(result.get("score", 0.0)), estimated_shift,
+            float(params.get("max_shift", 0.5)), warning_fraction, max_penalty_fraction,
+        )
         enriched.append(
             {
                 **result,
+                **adjustment,
                 "theoretical_peaks": {
                     "positions": peaks_data.get("positions", []),
                     "intensities": peaks_data.get("intensities", []),
@@ -264,12 +299,14 @@ def _match(payload: Dict) -> Dict:
                 },
             }
         )
+    enriched.sort(key=lambda candidate: candidate["calibration_adjusted_score"], reverse=True)
 
     processed_x, processed_y = detector.preprocess_spectrum(calibrated_two_theta, intensity)
     return {
         "status": "ok",
         "input_points": int(two_theta.size),
         "candidate_count": len(candidate_ids),
+        "detected_peak_count": len(all_detected_peaks),
         "detected_peaks": peaks,
         "processed_spectrum": {
             "two_theta": processed_x.tolist(),
@@ -277,8 +314,69 @@ def _match(payload: Dict) -> Dict:
         },
         "results": enriched,
         "params": params,
+        "ranking": {
+            "primary": "calibration_adjusted_score",
+            "raw_score_field": "score",
+            "shift_warning_fraction": warning_fraction,
+            "max_penalty_fraction": max_penalty_fraction,
+        },
         "elements": elements,
         "element_filter_mode": element_filter_mode,
+        "calibration": {"fixed_zero_shift": zero_shift, "specimen_displacement": specimen_displacement},
+    }
+
+
+def _detect_peaks(payload: Dict) -> Dict:
+    """Detect all experimental peaks before any matching-peak cap is applied."""
+    params = payload.get("params", {})
+    two_theta, intensity = _prepare_arrays(payload.get("two_theta", []), payload.get("intensity", []))
+    zero_shift = float(params.get("fixed_zero_shift", 0.0))
+    specimen_displacement = float(params.get("specimen_displacement", 0.0))
+    calibrated_two_theta = calibrate_two_theta(two_theta, zero_shift, specimen_displacement)
+    detector = PeakDetector(
+        min_peak_height=float(params.get("min_peak_height", 3.0)),
+        min_peak_prominence=float(params.get("min_peak_prominence", 2.0)),
+        min_peak_distance=float(params.get("min_peak_distance", 0.1)),
+        smooth_window=int(params.get("smooth_window", 7)),
+        baseline_window_fraction=float(params.get("baseline_window_fraction", 0.05)),
+    )
+    peaks = detector.detect_peaks(calibrated_two_theta, intensity, preprocess=True)
+    processed_x, processed_y = detector.preprocess_spectrum(calibrated_two_theta, intensity)
+    step = float(np.median(np.diff(processed_x))) if len(processed_x) > 1 else 0.0
+    differences = np.diff(processed_y)
+    noise_sigma = float(1.4826 * np.median(np.abs(differences - np.median(differences))) / math.sqrt(2)) if differences.size else 0.0
+    max_peak_intensity = max((float(peak["intensity"]) for peak in peaks), default=0.0)
+    min_width = max(2.0 * step, 0.0)
+    min_prominence = max(float(params.get("min_peak_prominence", 2.0)), 5.0 * noise_sigma)
+    reliable_peaks = []
+    for peak in peaks:
+        annotated = dict(peak)
+        annotated["relative_intensity_percent"] = 100.0 * float(peak["intensity"]) / max_peak_intensity if max_peak_intensity else 0.0
+        annotated["reliable"] = bool(
+            float(peak["prominence"]) >= min_prominence
+            and float(peak["width"]) >= min_width
+            and annotated["relative_intensity_percent"] >= 1.0
+        )
+        reliable_peaks.append(annotated)
+    reliable = [peak for peak in reliable_peaks if peak["reliable"]]
+    return {
+        "status": "ok",
+        "input_points": int(two_theta.size),
+        "detected_peak_count": len(peaks),
+        "detected_peaks": reliable_peaks,
+        "reliable_detected_peak_count": len(reliable),
+        "reliable_detected_peaks": reliable,
+        "reliability_criteria": {
+            "minimum_prominence": min_prominence,
+            "minimum_width_deg": min_width,
+            "minimum_relative_intensity_percent": 1.0,
+            "estimated_noise_sigma": noise_sigma,
+        },
+        "processed_spectrum": {
+            "two_theta": processed_x.tolist(),
+            "intensity": processed_y.tolist(),
+        },
+        "params": params,
         "calibration": {"fixed_zero_shift": zero_shift, "specimen_displacement": specimen_displacement},
     }
 
@@ -665,6 +763,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         try:
+            if self.path.rstrip("/") == "/api/detect-peaks":
+                payload = _read_json(self)
+                _json_response(self, 200, _detect_peaks(payload))
+                return
             if self.path.rstrip("/") == "/api/match":
                 payload = _read_json(self)
                 _json_response(self, 200, _match(payload))

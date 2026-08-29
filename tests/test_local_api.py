@@ -1,9 +1,10 @@
 import io
 import zipfile
 
+import numpy as np
 import pytest
 
-from xmatcher_local_api import _calculate_cif_xrd, _parse_known_element_sets, _parse_known_mpids, _pdf_peaks_xlsx, _resolve_known_phase_entries
+from xmatcher_local_api import _calibration_adjustment, _calculate_cif_xrd, _detect_peaks, _parse_known_element_sets, _parse_known_mpids, _pdf_peaks_xlsx, _resolve_known_phase_entries
 
 
 NACL_CIF = """data_NaCl
@@ -26,6 +27,37 @@ loop_
   Na1 Na 0.00000 0.00000 0.00000 1
   Cl1 Cl 0.50000 0.50000 0.50000 1
 """
+
+
+def test_detect_peaks_returns_uncapped_peak_count():
+    two_theta = np.linspace(10.0, 40.0, 601)
+    intensity = (
+        2.0
+        + 100.0 * np.exp(-0.5 * ((two_theta - 15.0) / 0.12) ** 2)
+        + 80.0 * np.exp(-0.5 * ((two_theta - 25.0) / 0.12) ** 2)
+        + 60.0 * np.exp(-0.5 * ((two_theta - 35.0) / 0.12) ** 2)
+    )
+    result = _detect_peaks({
+        "two_theta": two_theta.tolist(),
+        "intensity": intensity.tolist(),
+        "params": {"min_peak_height": 3, "min_peak_prominence": 2, "smooth_window": 7},
+    })
+
+    assert result["status"] == "ok"
+    assert result["detected_peak_count"] == 3
+    assert len(result["detected_peaks"]) == 3
+    assert result["reliable_detected_peak_count"] == 3
+    assert len(result["reliable_detected_peaks"]) == 3
+
+
+def test_calibration_penalty_scales_with_shift_excess():
+    no_penalty = _calibration_adjustment(50, 0.30, 0.50)
+    severe_penalty = _calibration_adjustment(50, 0.50, 0.50)
+
+    assert no_penalty["calibration_penalty"] == 0
+    assert no_penalty["calibration_adjusted_score"] == 50
+    assert severe_penalty["calibration_penalty"] == 10
+    assert severe_penalty["calibration_adjusted_score"] == 40
 
 
 def test_calculate_cif_xrd_parses_cif_from_string():
