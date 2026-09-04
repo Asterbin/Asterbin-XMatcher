@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-from scipy.spatial.distance import cdist
 
 from .database import normalize_database_package
 
@@ -213,10 +212,27 @@ class XRDMatcher:
         if exp_positions.size == 0 or db_positions.size == 0:
             return self._empty_metrics()
 
+        # These values only depend on the pattern, not on the trial global
+        # shift.  A typical database search evaluates tens or hundreds of
+        # shifts per entry, so calculating them inside ``_score_at_shift`` was
+        # a substantial and entirely redundant part of the hot path.
+        exp_norm = _normalize_max(exp_intensities)
+        db_norm = _normalize_max(db_intensities)
+        exp_relative = _relative_intensity(exp_intensities)
+        db_relative = _relative_intensity(db_intensities)
         best = self._empty_metrics()
         for shift in self._candidate_shifts(exp_positions, db_positions):
             metrics = self._score_at_shift(
-                exp_positions, exp_intensities, db_positions + shift, db_intensities, shift, two_theta_range
+                exp_positions,
+                exp_intensities,
+                db_positions + shift,
+                db_intensities,
+                shift,
+                two_theta_range,
+                exp_norm=exp_norm,
+                db_norm=db_norm,
+                exp_relative=exp_relative,
+                db_relative=db_relative,
             )
             if self._is_better_match(metrics, best):
                 best = metrics
@@ -250,11 +266,19 @@ class XRDMatcher:
         db_intensities: np.ndarray,
         shift: float,
         two_theta_range: Optional[Tuple[float, float]] = None,
+        *,
+        exp_norm: Optional[np.ndarray] = None,
+        db_norm: Optional[np.ndarray] = None,
+        exp_relative: Optional[np.ndarray] = None,
+        db_relative: Optional[np.ndarray] = None,
     ) -> Dict:
-        exp_norm = _normalize_max(exp_intensities)
-        db_norm = _normalize_max(db_intensities)
-        exp_relative = _relative_intensity(exp_intensities)
-        db_relative = _relative_intensity(db_intensities)
+        # Optional arguments retain this method's usefulness for direct
+        # callers while allowing ``calculate_match_metrics`` to reuse the
+        # shift-invariant quantities above.
+        exp_norm = _normalize_max(exp_intensities) if exp_norm is None else exp_norm
+        db_norm = _normalize_max(db_intensities) if db_norm is None else db_norm
+        exp_relative = _relative_intensity(exp_intensities) if exp_relative is None else exp_relative
+        db_relative = _relative_intensity(db_intensities) if db_relative is None else db_relative
         if two_theta_range is not None:
             scan_min, scan_max = (float(two_theta_range[0]), float(two_theta_range[1]))
             if not np.isfinite(scan_min) or not np.isfinite(scan_max) or scan_max < scan_min:
@@ -264,15 +288,28 @@ class XRDMatcher:
             observable_db = np.ones(shifted_db_positions.size, dtype=bool)
         if not np.any(observable_db):
             return self._empty_metrics(shift=shift)
-        position_dist = cdist(exp_positions.reshape(-1, 1), shifted_db_positions.reshape(-1, 1))
+        # For 1-D peak positions, direct broadcasting avoids the general
+        # purpose scipy.cdist dispatch.  More importantly, identify infeasible
+        # shifts before allocating intensity/cost matrices or running the
+        # Hungarian solver.
+        position_dist = np.abs(exp_positions[:, None] - shifted_db_positions[None, :])
+        feasible_positions = position_dist <= self.position_tolerance
+        feasible_positions[:, ~observable_db] = False
+        eligible_rows = np.flatnonzero(np.any(feasible_positions, axis=1))
+        eligible_cols = np.flatnonzero(np.any(feasible_positions, axis=0))
+        if (
+            eligible_rows.size < self.config.min_matched_peaks
+            or eligible_cols.size < self.config.min_matched_peaks
+        ):
+            return self._empty_metrics(shift=shift)
+
         intensity_diff = np.abs(exp_norm.reshape(-1, 1) - db_norm.reshape(1, -1)) / 100.0
 
         cost = (
             self.config.position_weight * (position_dist / self.position_tolerance)
             + self.config.intensity_weight * intensity_diff
         )
-        cost[position_dist > self.position_tolerance] = np.inf
-        cost[:, ~observable_db] = np.inf
+        cost[~feasible_positions] = np.inf
         if np.all(np.isinf(cost)):
             return self._empty_metrics(shift=shift)
 
@@ -282,10 +319,6 @@ class XRDMatcher:
         # are residual evidence, not a reason to discard every valid pair.
         # Restrict the assignment to rows and columns with at least one finite
         # edge, then retain only finite assignments below.
-        eligible_rows = np.flatnonzero(np.any(np.isfinite(cost), axis=1))
-        eligible_cols = np.flatnonzero(np.any(np.isfinite(cost), axis=0))
-        if not eligible_rows.size or not eligible_cols.size:
-            return self._empty_metrics(shift=shift)
         feasible_cost = cost[np.ix_(eligible_rows, eligible_cols)]
         try:
             row_sub, col_sub = linear_sum_assignment(feasible_cost)
