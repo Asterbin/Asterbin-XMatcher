@@ -221,7 +221,12 @@ class XRDMatcher:
         exp_relative = _relative_intensity(exp_intensities)
         db_relative = _relative_intensity(db_intensities)
         best = self._empty_metrics()
-        for shift in self._candidate_shifts(exp_positions, db_positions):
+        # A shift with fewer feasible peak-pair edges than the requested
+        # minimum can never produce a valid assignment.  Pruning it here is
+        # exact (rather than heuristic) and avoids invoking the Hungarian
+        # solver for the overwhelming majority of grid shifts in a database
+        # search.
+        for shift in self._feasible_candidate_shifts(exp_positions, db_positions):
             metrics = self._score_at_shift(
                 exp_positions,
                 exp_intensities,
@@ -233,9 +238,27 @@ class XRDMatcher:
                 db_norm=db_norm,
                 exp_relative=exp_relative,
                 db_relative=db_relative,
+                include_details=False,
             )
             if self._is_better_match(metrics, best):
                 best = metrics
+        # Peak payloads, residual regression, and unmatched-peak lists are
+        # useful in the response but are pure overhead for losing shifts.
+        # Materialize them once, for the winning alignment only.
+        if best["n_matched_peaks"]:
+            best = self._score_at_shift(
+                exp_positions,
+                exp_intensities,
+                db_positions + best["estimated_shift"],
+                db_intensities,
+                best["estimated_shift"],
+                two_theta_range,
+                exp_norm=exp_norm,
+                db_norm=db_norm,
+                exp_relative=exp_relative,
+                db_relative=db_relative,
+                include_details=True,
+            )
         return best
 
     def calculate_figure_of_merit(
@@ -271,6 +294,7 @@ class XRDMatcher:
         db_norm: Optional[np.ndarray] = None,
         exp_relative: Optional[np.ndarray] = None,
         db_relative: Optional[np.ndarray] = None,
+        include_details: bool = True,
     ) -> Dict:
         # Optional arguments retain this method's usefulness for direct
         # callers while allowing ``calculate_match_metrics`` to reuse the
@@ -375,22 +399,32 @@ class XRDMatcher:
         }[self.scoring_method]
         score = max(0.0, base_score - strong_peak_penalty)
 
-        peak_matches = []
-        for exp_idx, db_idx, err, pair_cost in zip(row_ind, col_ind, matched_errors, matched_costs):
-            peak_matches.append(
-                {
-                    "exp_index": int(exp_idx),
-                    "db_index": int(db_idx),
-                    "exp_two_theta": float(exp_positions[exp_idx]),
-                    "db_two_theta": float(shifted_db_positions[db_idx]),
-                    "db_two_theta_unshifted": float(shifted_db_positions[db_idx] - shift),
-                    "delta": float(exp_positions[exp_idx] - shifted_db_positions[db_idx]),
-                    "exp_intensity": float(exp_norm[exp_idx]),
-                    "db_intensity": float(db_norm[db_idx]),
-                    "cost": float(pair_cost),
-                }
+        if include_details:
+            peak_matches = []
+            for exp_idx, db_idx, err, pair_cost in zip(row_ind, col_ind, matched_errors, matched_costs):
+                peak_matches.append(
+                    {
+                        "exp_index": int(exp_idx),
+                        "db_index": int(db_idx),
+                        "exp_two_theta": float(exp_positions[exp_idx]),
+                        "db_two_theta": float(shifted_db_positions[db_idx]),
+                        "db_two_theta_unshifted": float(shifted_db_positions[db_idx] - shift),
+                        "delta": float(exp_positions[exp_idx] - shifted_db_positions[db_idx]),
+                        "exp_intensity": float(exp_norm[exp_idx]),
+                        "db_intensity": float(db_norm[db_idx]),
+                        "cost": float(pair_cost),
+                    }
+                )
+            residual_diagnostics = _residual_diagnostics(peak_matches)
+            unmatched_exp_payload = _unmatched_peak_payload(exp_positions, exp_relative, unmatched_exp)
+            unmatched_db_payload = _unmatched_peak_payload(
+                shifted_db_positions, db_relative, unmatched_db, shift=shift
             )
-        residual_diagnostics = _residual_diagnostics(peak_matches)
+        else:
+            peak_matches = []
+            residual_diagnostics = {"positions": [], "deltas": [], "slope_per_degree": None}
+            unmatched_exp_payload = []
+            unmatched_db_payload = []
 
         return {
             "score": float(score),
@@ -402,12 +436,8 @@ class XRDMatcher:
             "unmatched_theoretical_penalty": float(unmatched_db_penalty),
             "unmatched_experimental_strong_fraction": float(unmatched_exp_fraction),
             "unmatched_theoretical_strong_fraction": float(unmatched_db_fraction),
-            "unmatched_experimental_strong_peaks": _unmatched_peak_payload(
-                exp_positions, exp_relative, unmatched_exp
-            ),
-            "unmatched_theoretical_strong_peaks": _unmatched_peak_payload(
-                shifted_db_positions, db_relative, unmatched_db, shift=shift
-            ),
+            "unmatched_experimental_strong_peaks": unmatched_exp_payload,
+            "unmatched_theoretical_strong_peaks": unmatched_db_payload,
             "fom": float(fom),
             "experimental_coverage": float(exp_coverage),
             "precision": float(precision),
@@ -431,6 +461,31 @@ class XRDMatcher:
                 sample_indices = np.linspace(0, pair_diffs.size - 1, self.config.shift_candidate_limit, dtype=int)
                 shifts.extend(pair_diffs[sample_indices].tolist())
         return np.unique(np.round(np.asarray(shifts, dtype=float), 10))
+
+    def _feasible_candidate_shifts(self, exp_positions: np.ndarray, db_positions: np.ndarray) -> np.ndarray:
+        """Return only trial shifts that could meet ``min_matched_peaks``.
+
+        This is a conservative pre-check: it counts feasible *edges*, while
+        the later assignment requires distinct peaks.  Therefore it can leave
+        some losing shifts in place, but it can never remove a valid match.
+        Work in bounded chunks so unusually peak-rich database entries do not
+        create a large three-dimensional temporary array.
+        """
+        shifts = self._candidate_shifts(exp_positions, db_positions)
+        if shifts.size == 0:
+            return shifts
+        pair_differences = exp_positions[:, None] - db_positions[None, :]
+        valid = np.zeros(shifts.size, dtype=bool)
+        chunk_size = 256
+        for start in range(0, shifts.size, chunk_size):
+            stop = min(start + chunk_size, shifts.size)
+            edge_count = np.count_nonzero(
+                np.abs(pair_differences[None, :, :] - shifts[start:stop, None, None])
+                <= self.position_tolerance,
+                axis=(1, 2),
+            )
+            valid[start:stop] = edge_count >= self.config.min_matched_peaks
+        return shifts[valid]
 
     def _shift_grid(self) -> np.ndarray:
         if self.config.max_shift <= 0 or self.config.shift_step <= 0:

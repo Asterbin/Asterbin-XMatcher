@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from XMatcher.matcher import XRDMatcher
+from XMatcher.matcher import XRDMatcher, _normalize_max, _prepare_peak_arrays, _relative_intensity
 
 
 def _database():
@@ -82,6 +82,26 @@ def test_shift_estimate_prefers_low_error_candidate():
     assert metrics["n_matched_peaks"] == 3
     assert math.isclose(metrics["estimated_shift"], 0.13, abs_tol=1e-9)
     assert metrics["mean_abs_error"] == pytest.approx(0.0, abs=1e-9)
+
+
+def test_exact_shift_pruning_preserves_the_exhaustive_best_match():
+    matcher = XRDMatcher(position_tolerance=0.2, max_shift=0.5, shift_step=0.02, min_matched_peaks=2)
+    exp_x, exp_y = _prepare_peak_arrays([20.13, 30.08, 45.17, 60.11], [100, 60, 40, 20])
+    db_x, db_y = _prepare_peak_arrays([20.0, 30.0, 45.0, 60.0, 74.0], [100, 55, 45, 20, 10])
+    exp_norm, db_norm = _normalize_max(exp_y), _normalize_max(db_y)
+    exp_relative, db_relative = _relative_intensity(exp_y), _relative_intensity(db_y)
+    exhaustive_best = matcher._empty_metrics()
+    for shift in matcher._candidate_shifts(exp_x, db_x):
+        candidate = matcher._score_at_shift(
+            exp_x, exp_y, db_x + shift, db_y, shift,
+            exp_norm=exp_norm, db_norm=db_norm,
+            exp_relative=exp_relative, db_relative=db_relative,
+        )
+        if matcher._is_better_match(candidate, exhaustive_best):
+            exhaustive_best = candidate
+
+    pruned_best = matcher.calculate_match_metrics(exp_x, exp_y, db_x, db_y)
+    assert pruned_best == exhaustive_best
 
 
 def test_intensity_mismatch_does_not_overwhelm_position_match():
