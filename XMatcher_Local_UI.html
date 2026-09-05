@@ -1453,7 +1453,7 @@
             </div>
             <div>
               <label for="nPeaks" data-i18n="peakCount">Peak count</label>
-              <input id="nPeaks" type="number" value="4" min="1" max="80" step="1">
+              <input id="nPeaks" type="number" value="8" min="1" max="80" step="1">
               <p class="field-help" data-i18n="peakCountHelp">Top experimental peaks used for matching.</p>
             </div>
             <div>
@@ -1482,7 +1482,7 @@
             </div>
             <div>
               <label for="minMatchedPeaks" data-i18n="minMatchedPeaks">Min matched peaks</label>
-              <input id="minMatchedPeaks" type="number" value="2" min="1" step="1">
+              <input id="minMatchedPeaks" type="number" value="4" min="1" step="1">
               <p class="field-help" data-i18n="minMatchedPeaksHelp">Reject phases with fewer matched peaks.</p>
             </div>
             <div>
@@ -3035,7 +3035,14 @@
       }
       state.selectedMultiPhaseIndex = Math.max(0, Math.min(state.selectedMultiPhaseIndex, results.length - 1));
       const rows = results.map((result, index) => {
-        const phases = result.phases.map((phase) => `${escapeHtml(phase.formula || "-")} <span class="pill">${fmt(phase.relative_contribution, 1)}%</span>`).join(" + ");
+        const phases = result.phases.map((phase) => {
+          const mpid = materialProjectId(phase.mpid);
+          const mpLink = materialProjectLink(phase.mpid);
+          const mpidDisplay = mpid
+            ? ` · MPID: ${mpLink ? `<a href="${escapeHtml(mpLink)}" target="_blank" rel="noopener">${escapeHtml(mpid)}</a>` : escapeHtml(mpid)}`
+            : "";
+          return `${escapeHtml(phase.formula || "-")}${mpidDisplay} <span class="pill">${fmt(phase.relative_contribution, 1)}%</span>`;
+        }).join(" + ");
         const unexplained = (result.peak_attribution || []).filter((peak) => !peak.assigned_formula).length;
         return `<tr class="${index === state.selectedMultiPhaseIndex ? "selected" : ""}" data-multiphase-result="${index}" tabindex="0" role="button" aria-label="${escapeHtml(t("multiPhaseBest"))} ${index + 1}"><td>${index + 1}</td><td>${phases}</td><td>${fmt(result.score, 2)}</td><td>${fmt(result.explained_intensity_percent, 1)}%</td><td>${unexplained}</td></tr>`;
       }).join("");
