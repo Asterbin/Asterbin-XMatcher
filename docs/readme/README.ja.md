@@ -4,9 +4,9 @@
 
 **ローカル XRD 相同定ツールキット & App**
 
-[![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
-[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
+[![GitHub stars](https://img.shields.io/github/stars/DeltaGanjiang/XMatcher?style=social)](https://github.com/DeltaGanjiang/XMatcher/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/DeltaGanjiang/XMatcher)](https://github.com/DeltaGanjiang/XMatcher/issues)
+[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://deltaganjiang.github.io/XMatcher)
 [![Download](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
 [![Paper](https://img.shields.io/badge/arXiv-2607.17162-b31b1b.svg)](https://arxiv.org/abs/2607.17162)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
@@ -23,8 +23,8 @@ XMatcher は、実験粉末 X 線回折（XRD）パターンを理論ピーク�
 通常の利用では、パッケージ化された XMatcher App を推奨します。App 版はローカルサービスへ自動接続するため、ユーザーが `xmatcher_local_api.py` を手動で起動する必要はありません。
 
 - App、データベース、リリースファイル：https://doi.org/10.6084/m9.figshare.32812985
-- オンラインマニュアル：https://asterbin.github.io/Asterbin-XMatcher
-- Issues：https://github.com/Asterbin/Asterbin-XMatcher/issues
+- オンラインマニュアル：https://deltaganjiang.github.io/XMatcher
+- Issues：https://github.com/DeltaGanjiang/XMatcher/issues
 
 ソースコードまたは HTML 版を直接使う場合のみ、先にローカル API を起動します。
 

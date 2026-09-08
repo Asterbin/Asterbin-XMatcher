@@ -27,8 +27,8 @@ viz = ["matplotlib>=3.4.0"]
 dev = ["pytest>=7.0", "ruff>=0.5"]
 
 [project.urls]
-Homepage = "https://github.com/Bin-Cao/XMatcher"
-Repository = "https://github.com/Bin-Cao/XMatcher"
+Homepage = "https://github.com/DeltaGanjiang/XMatcher"
+Repository = "https://github.com/DeltaGanjiang/XMatcher"
 
 [tool.setuptools]
 packages = ["XMatcher"]

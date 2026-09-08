@@ -4,9 +4,9 @@
 
 **로컬 XRD 상 식별 툴킷 & App**
 
-[![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
-[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
+[![GitHub stars](https://img.shields.io/github/stars/DeltaGanjiang/XMatcher?style=social)](https://github.com/DeltaGanjiang/XMatcher/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/DeltaGanjiang/XMatcher)](https://github.com/DeltaGanjiang/XMatcher/issues)
+[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://deltaganjiang.github.io/XMatcher)
 [![Download](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
 [![Paper](https://img.shields.io/badge/arXiv-2607.17162-b31b1b.svg)](https://arxiv.org/abs/2607.17162)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
@@ -23,8 +23,8 @@ XMatcher는 실험 분말 X선 회절(XRD) 패턴을 이론 피크 데이터베�
 일반 사용자는 패키징된 XMatcher App 사용을 권장합니다. App 버전은 로컬 서비스에 자동으로 연결되므로 사용자가 `xmatcher_local_api.py`를 직접 실행할 필요가 없습니다.
 
 - App, 데이터베이스, 릴리스 파일: https://doi.org/10.6084/m9.figshare.32812985
-- 온라인 매뉴얼: https://asterbin.github.io/Asterbin-XMatcher
-- Issues: https://github.com/Asterbin/Asterbin-XMatcher/issues
+- 온라인 매뉴얼: https://deltaganjiang.github.io/XMatcher
+- Issues: https://github.com/DeltaGanjiang/XMatcher/issues
 
 소스 코드 또는 HTML 버전을 직접 사용하는 경우에만 로컬 API를 먼저 실행합니다.
 

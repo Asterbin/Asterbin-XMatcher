@@ -6,9 +6,9 @@
 
 **当前版本：V1.3.0**
 
-[![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
-[![说明手册](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
+[![GitHub stars](https://img.shields.io/github/stars/DeltaGanjiang/XMatcher?style=social)](https://github.com/DeltaGanjiang/XMatcher/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/DeltaGanjiang/XMatcher)](https://github.com/DeltaGanjiang/XMatcher/issues)
+[![说明手册](https://img.shields.io/badge/Guide-online-2563eb)](https://deltaganjiang.github.io/XMatcher)
 [![下载](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
 [![论文](https://img.shields.io/badge/arXiv-2607.17162-b31b1b.svg)](https://arxiv.org/abs/2607.17162)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
@@ -25,8 +25,8 @@ XMatcher 是用于实验粉末 X 射线衍射（XRD）物相识别的本地软�
 多数用户推荐直接下载封装好的 XMatcher App。App 版本会自动连接本地服务，用户不需要手动运行 `xmatcher_local_api.py`。
 
 - App、数据库和发布文件：https://doi.org/10.6084/m9.figshare.32812985
-- 在线手册：https://asterbin.github.io/Asterbin-XMatcher
-- 问题反馈：https://github.com/Asterbin/Asterbin-XMatcher/issues
+- 在线手册：https://deltaganjiang.github.io/XMatcher
+- 问题反馈：https://github.com/DeltaGanjiang/XMatcher/issues
 
 如果你直接使用源码或 HTML 版本，需要先启动本地 API：
 
@@ -52,7 +52,7 @@ python xmatcher_local_api.py --database MP500_xrd_database.pkl
 - 新增 2,007 个 RRUFF 晶体结构，扩展可检索的晶体结构数据库。
 - RRUFF 结构显示不带外部链接的 CrystID；Materials Project 结构仍保留 MPID 超链接。
 
-完整记录见 [CHANGELOG.md](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md)。
+完整记录见 [CHANGELOG.md](https://github.com/DeltaGanjiang/XMatcher/blob/main/CHANGELOG.md)。
 
 ## AutoMix 自动多相识别
 

@@ -20,7 +20,7 @@ from .xrd_reader import XRDReader
 __version__ = "1.3.0"
 __author__ = "Bin Cao"
 __email__ = "bcao686@connect.hkust-gz.edu.cn"
-__github__ = "https://github.com/Bin-Cao/XMatcher"
+__github__ = "https://github.com/DeltaGanjiang/XMatcher"
 
 __all__ = [
     "DatabaseBuilder",

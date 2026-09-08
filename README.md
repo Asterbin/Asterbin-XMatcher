@@ -6,9 +6,9 @@
 
 **Current release: V1.3.0**
 
-[![GitHub stars](https://img.shields.io/github/stars/Asterbin/Asterbin-XMatcher?style=social)](https://github.com/Asterbin/Asterbin-XMatcher/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Asterbin/Asterbin-XMatcher)](https://github.com/Asterbin/Asterbin-XMatcher/issues)
-[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://asterbin.github.io/Asterbin-XMatcher)
+[![GitHub stars](https://img.shields.io/github/stars/DeltaGanjiang/XMatcher?style=social)](https://github.com/DeltaGanjiang/XMatcher/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/DeltaGanjiang/XMatcher)](https://github.com/DeltaGanjiang/XMatcher/issues)
+[![Guide](https://img.shields.io/badge/Guide-online-2563eb)](https://deltaganjiang.github.io/XMatcher)
 [![Download](https://img.shields.io/badge/Download-App%20%26%20Data-0f766e)](https://doi.org/10.6084/m9.figshare.32812985)
 [![Paper](https://img.shields.io/badge/arXiv-2607.17162-b31b1b.svg)](https://arxiv.org/abs/2607.17162)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -30,8 +30,8 @@ App distribution connects to the local service automatically, so users do not
 need to start `xmatcher_local_api.py` manually.
 
 - App, database, and release files: https://doi.org/10.6084/m9.figshare.32812985
-- Online manual: https://asterbin.github.io/Asterbin-XMatcher
-- Issues and support: https://github.com/Asterbin/Asterbin-XMatcher/issues
+- Online manual: https://deltaganjiang.github.io/XMatcher
+- Issues and support: https://github.com/DeltaGanjiang/XMatcher/issues
 
 If you use the source/HTML version directly, start the local API first:
 
@@ -90,7 +90,7 @@ Related paper: Cao B., Zheng Z., Liu Y., Zhang L., Wong L. W. Y., Weng L.-T., Li
 - Expands the searchable crystal-structure database with 2,007 RRUFF structures.
 - Shows local RRUFF CrystIDs without external links; Materials Project IDs remain linked to their structure pages.
 
-See the [full release record](https://github.com/Asterbin/Asterbin-XMatcher/blob/main/CHANGELOG.md).
+See the [full release record](https://github.com/DeltaGanjiang/XMatcher/blob/main/CHANGELOG.md).
 
 ## AutoMix Multi-phase Identification
 

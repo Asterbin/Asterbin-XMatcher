@@ -6,7 +6,7 @@ on:
       database_url:
         description: "Optional direct download URL for MP500_xrd_database.pkl when it is not tracked in Git"
         required: false
-        default: "https://github.com/Asterbin/Asterbin-XMatcher/releases/download/pkl_V0.0.1/MP500_xrd_database.pkl"
+        default: "https://github.com/DeltaGanjiang/XMatcher/releases/download/pkl_V0.0.1/MP500_xrd_database.pkl"
 
 jobs:
   build:
