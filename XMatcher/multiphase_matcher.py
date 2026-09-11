@@ -6,12 +6,14 @@ The fitted values are relative diffraction contributions, not weight fractions.
 from __future__ import annotations
 
 from itertools import combinations
+from collections import Counter
 from typing import Dict, List, Optional, Sequence
 
 import numpy as np
 from scipy.optimize import nnls
 
 from .database import normalize_database_package
+from .formula import formula_ratio_key
 from .matcher import XRDMatcher
 
 
@@ -36,6 +38,8 @@ class MultiPhaseMatcher:
         required_element_sets: Optional[Sequence[Sequence[str]]] = None,
         minimum_required_contribution_percent: float = 3.0,
         two_theta_range: Optional[Sequence[float]] = None,
+        prefer_multiphase: bool = False,
+        required_formula_keys: Optional[Sequence[Sequence]] = None,
     ) -> Dict:
         """Return ranked phase combinations and peak-level attribution.
 
@@ -47,6 +51,8 @@ class MultiPhaseMatcher:
         candidate_pool = max(2, min(int(candidate_pool), 30))
         top_n = max(1, int(top_n))
         minimum_required_contribution_percent = max(0.0, float(minimum_required_contribution_percent))
+        required_formula_requirements = Counter(tuple(item) for item in required_formula_keys or [])
+        enforce_multiphase_formulas = sum(required_formula_requirements.values()) >= 2
         x = np.asarray(exp_positions, dtype=float)
         y = np.maximum(np.asarray(exp_intensities, dtype=float), 0.0)
         if x.ndim != 1 or y.ndim != 1 or x.size != y.size:
@@ -85,17 +91,33 @@ class MultiPhaseMatcher:
         required_sets = {tuple(sorted(str(element).strip().capitalize() for element in item if str(element).strip())) for item in required_element_sets or []}
         if len(required_ids) > max_phases:
             return {"candidate_count": len(candidates), "combinations_tested": 0, "results": [], "constraint_error": "More required MPIDs than the maximum number of phases."}
+        if sum(required_formula_requirements.values()) > max_phases:
+            return {"candidate_count": len(candidates), "combinations_tested": 0, "results": [], "constraint_error": "More required formula phases than the maximum number of phases."}
 
         columns = [self._response_column(candidate, len(x)) for candidate in candidates]
         results: List[Dict] = []
         tested = 0
         contribution_threshold_rejections = 0
-        for size in range(1, min(max_phases, len(candidates)) + 1):
+        # In preference mode, a good single-phase fit must not crowd out
+        # meaningful two- or three-phase explanations.  We retain the single
+        # phase as an explicit fallback below if no multi-phase fit survives.
+        first_size = 2 if prefer_multiphase and max_phases >= 2 else 1
+        for size in range(first_size, min(max_phases, len(candidates)) + 1):
             for indices in combinations(range(len(candidates)), size):
                 selected_candidates = [candidates[index] for index in indices]
                 selected_ids = {candidate["entry_id"] for candidate in selected_candidates}
                 selected_sets = {tuple(sorted(str(element).strip().capitalize() for element in candidate.get("elements", []) if str(element).strip())) for candidate in selected_candidates}
-                if not required_ids.issubset(selected_ids) or not required_sets.issubset(selected_sets):
+                selected_formula_keys = Counter()
+                for candidate in selected_candidates:
+                    try:
+                        selected_formula_keys[formula_ratio_key(candidate.get("formula", ""))] += 1
+                    except ValueError:
+                        continue
+                if (
+                    not required_ids.issubset(selected_ids)
+                    or not required_sets.issubset(selected_sets)
+                    or any(selected_formula_keys[key] < count for key, count in required_formula_requirements.items())
+                ):
                     continue
                 matrix = np.column_stack([columns[index] for index in indices])
                 if not np.any(matrix):
@@ -112,6 +134,21 @@ class MultiPhaseMatcher:
                 }
                 phases, contributions = self._phase_payload(selected_candidates, matrix, coefficients, predicted, force_keep)
                 if not phases:
+                    continue
+                # NNLS can set a selected component to zero. Such a row is
+                # effectively a one-phase fit and must not be presented as a
+                # multi-phase recommendation.
+                if prefer_multiphase and len(phases) < 2:
+                    continue
+                active_formula_keys = Counter()
+                for phase in phases:
+                    try:
+                        active_formula_keys[formula_ratio_key(phase.get("formula", ""))] += 1
+                    except ValueError:
+                        continue
+                # Formula lines are hard component requirements. In particular,
+                # repeated lines require distinct polymorph/structure entries.
+                if any(active_formula_keys[key] < count for key, count in required_formula_requirements.items()):
                     continue
                 # A user-specified MPID is a required phase, not merely a
                 # label carried by an NNLS-zero/minor component.  Reject the
@@ -141,7 +178,9 @@ class MultiPhaseMatcher:
         # A valid single-phase candidate must never disappear merely because a
         # combination fit was numerically rejected. This is both a useful
         # fallback and a clear baseline for interpreting multi-phase gains.
-        if not results and not required_ids and not required_sets:
+        used_single_phase_fallback = False
+        fallback_reason = None
+        if not results and not required_ids and not required_sets and not enforce_multiphase_formulas:
             for candidate, column in zip(candidates, columns):
                 matrix = column.reshape(-1, 1)
                 coefficients, _ = nnls(matrix, y)
@@ -157,6 +196,9 @@ class MultiPhaseMatcher:
                     "n_phases": 1, "phases": phases,
                     "peak_attribution": self._peak_attribution(x, y, predicted, contributions, phases),
                 })
+                used_single_phase_fallback = bool(prefer_multiphase)
+                if used_single_phase_fallback:
+                    fallback_reason = "fewer_than_two_candidates" if len(candidates) < 2 else "no_two_phase_fit"
 
         results.sort(key=lambda item: (item["score"], item["explained_intensity_percent"], -item["n_phases"]), reverse=True)
         # A tested combination can contain one or more NNLS-zero phases.  They
@@ -178,10 +220,15 @@ class MultiPhaseMatcher:
             "combinations_tested": tested,
             "results": unique_results[:top_n],
             "minimum_required_contribution_percent": minimum_required_contribution_percent if required_ids else None,
+            "prefer_multiphase": bool(prefer_multiphase),
+            "fallback_used": used_single_phase_fallback,
+            "fallback_reason": fallback_reason,
             "disclaimer": "Contributions are relative diffraction contributions, not quantitative weight fractions.",
         }
         if not response["results"] and contribution_threshold_rejections:
             response["constraint_error"] = "required_contribution_below_minimum"
+        elif not response["results"] and enforce_multiphase_formulas:
+            response["constraint_error"] = "required_formula_combination_not_found"
         return response
 
     def _known_entry_candidates(

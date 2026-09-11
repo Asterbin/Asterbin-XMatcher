@@ -1414,6 +1414,9 @@
           <label for="elements" data-i18n="elements">Elements</label>
           <input id="elements" type="text" data-i18n-placeholder="elementsPlaceholder" placeholder="e.g. Ti,O; blank = full database">
           <p class="field-help" data-i18n="elementsHelp">Leave blank for full database search. Use comma or space separators.</p>
+          <label for="formula" data-i18n="formulaFilter">Chemical formula (element ratio)</label>
+          <input id="formula" type="text" data-i18n-placeholder="formulaFilterPlaceholder" placeholder="e.g. TiO2">
+          <p class="field-help" data-i18n="formulaFilterHelp">When supplied, only database phases with the same reduced element ratio are searched (e.g. Fe2O3 also matches Fe4O6).</p>
           <div class="grid2">
             <div>
               <label for="filterMode" data-i18n="filterMode">Filter mode</label>
@@ -1724,8 +1727,14 @@
             <div><label for="maxPhases" data-i18n="maxPhases">Maximum phases</label><input id="maxPhases" type="number" min="1" max="3" value="3"></div>
             <div><label for="multiCandidatePool" data-i18n="multiCandidatePool">Candidate pool</label><input id="multiCandidatePool" type="number" min="2" max="30" value="8"><p class="field-help" data-i18n="multiCandidatePoolHelp">Number of leading single-phase candidates used to form AutoMix combinations. Keep it moderate: a larger pool makes combinations grow rapidly, slows the search, and can add noisy near-duplicates.</p></div>
             <div><label for="multiPeakCount" data-i18n="multiPeakCount">AutoMix fitting peaks</label><input id="multiPeakCount" type="number" min="4" max="80" value="12"><p class="field-help" data-i18n="multiPeakCountHelp">Number of detected peaks used to fit phase contributions. Use more peaks for a minor phase; 12 is recommended.</p></div>
+            <div><label><input id="preferMultiphase" type="checkbox" checked> <span data-i18n="preferMultiphase">Prefer multi-phase results</span></label><p class="field-help" data-i18n="preferMultiphaseHelp">Evaluate 2–3 phase combinations first. A single-phase result is shown only when no usable multi-phase combination is found.</p></div>
           </div>
           <div class="grid2 known-phase-controls">
+            <div>
+              <label for="multiKnownPhaseFormulas" data-i18n="multiKnownPhaseFormulas">Known phase: chemical formula ratio</label>
+              <textarea id="multiKnownPhaseFormulas" rows="3" data-i18n-placeholder="multiKnownPhaseFormulasPlaceholder" placeholder="One phase per line, e.g. TiO2&#10;SiO2"></textarea>
+              <p class="field-help" data-i18n="multiKnownPhaseFormulasHelp">Only entries with each entered formula's element ratio are used in the AutoMix candidate pool.</p>
+            </div>
             <div>
               <label for="multiKnownPhaseElements" data-i18n="multiKnownPhaseElements">Known phase: exact elements</label>
               <textarea id="multiKnownPhaseElements" rows="3" data-i18n-placeholder="multiKnownPhaseElementsPlaceholder" placeholder="One phase per line, e.g. Na, Cl&#10;Mn, O"></textarea>
@@ -2004,6 +2013,9 @@
         elements: "Elements",
         elementsPlaceholder: "e.g. Ti,O; blank = full database",
         elementsHelp: "Leave blank for full database search. Use comma or space separators.",
+        formulaFilter: "Chemical formula (element ratio)",
+        formulaFilterPlaceholder: "e.g. TiO2",
+        formulaFilterHelp: "When supplied, only database phases with the same reduced element ratio are searched (e.g. Fe2O3 also matches Fe4O6).",
         filterMode: "Filter mode",
         containsMode: "contains",
         exactMode: "exact",
@@ -2051,7 +2063,12 @@
         multiCandidatePoolHelp: "Number of leading single-phase candidates used to form AutoMix combinations. Keep it moderate: a larger pool makes combinations grow rapidly, slows the search, and can add noisy near-duplicates.",
         multiPeakCount: "AutoMix fitting peaks",
         multiPeakCountHelp: "Number of detected peaks used to fit phase contributions. Use more peaks for a minor phase; 12 is recommended.",
+        preferMultiphase: "Prefer multi-phase results",
+        preferMultiphaseHelp: "Evaluate 2–3 phase combinations first. A single-phase result is shown only when no usable multi-phase combination is found.",
         multiKnownPhaseElements: "Known phase: exact elements",
+        multiKnownPhaseFormulas: "Known phase: chemical formula ratio",
+        multiKnownPhaseFormulasPlaceholder: "One phase per line, e.g. TiO2\nSiO2",
+        multiKnownPhaseFormulasHelp: "Only entries with each entered formula's element ratio are used in the AutoMix candidate pool.",
         multiKnownPhaseElementsPlaceholder: "One phase per line, e.g. Na, Cl\nMn, O",
         multiKnownPhaseElementsHelp: "Each line is matched against the local database with an exact element set. Every accepted result must contain one matching phase; polymorphs remain ranked by diffraction evidence.",
         multiKnownPhaseMpids: "Known phase: MPID",
@@ -2064,6 +2081,7 @@
         multiPhaseRunning: "Searching phase combinations...",
         multiPhaseComplete: "AutoMix complete: {count} combinations ranked.",
         multiPhaseContributionConstraint: "No valid AutoMix combination: at least one specified MPID is below the required 3% relative diffraction contribution. Try increasing the detected peak count or verify the MPID and XRD pattern.",
+        multiPhaseFormulaConstraint: "No multi-phase combination satisfies every entered formula. Formula lines are hard requirements; each must be represented by a non-zero-contribution phase.",
         multiPhaseEmpty: "AutoMix found no usable phase combination. Try clearing or broadening the element scope, increasing detected peaks, or relaxing the peak tolerance.",
         multiPhaseDisplayTitle: "AutoMix full-peak comparison",
         multiPhaseDisplayNote: "Click a combination to compare the experimental profile with every shifted theoretical peak. Main-plot stick heights show theoretical relative intensity scaled by each phase's diffraction contribution; the bottom lane marks positions only.",
@@ -2084,6 +2102,8 @@
         multiPhaseUnexplained: "Unexplained",
         multiPhaseOverlap: "overlap",
         multiPhaseFallback: "AutoMix combination search fell back to the best single-phase recommendation.",
+        multiPhaseFallbackFewCandidates: "AutoMix returned a single phase because fewer than two usable candidates were available. Add at least two formula lines, broaden the element scope, or increase the candidate pool.",
+        multiPhaseFallbackNoFit: "AutoMix returned a single phase because every tested multi-phase combination assigned zero contribution to at least one component. Check the candidate formulas or increase the fitting peak count.",
         exportJson: "Export JSON",
         exportCsv: "Export CSV",
         matchingBusy: "Calculating...",
@@ -2261,6 +2281,9 @@
         elements: "元素过滤",
         elementsPlaceholder: "例如 Ti,O；留空 = 全库",
         elementsHelp: "留空表示全库检索，可用逗号或空格分隔。",
+        formulaFilter: "化学式（元素比例）",
+        formulaFilterPlaceholder: "例如 TiO2",
+        formulaFilterHelp: "填写后只检索元素比例相同的物相（例如 Fe2O3 也匹配 Fe4O6），不再搜索全库。",
         filterMode: "过滤模式",
         containsMode: "包含这些元素",
         exactMode: "元素集合完全一致",
@@ -2308,7 +2331,12 @@
         multiCandidatePoolHelp: "用于组成 AutoMix 相组合的前列单相候选数量。不要设置过大：组合数量会快速增长，计算变慢，也更容易出现噪声或近似重复结果。",
         multiPeakCount: "AutoMix 拟合峰数",
         multiPeakCountHelp: "用于拟合各相贡献的检测峰数量。少量相可适当增加；建议使用 12 个峰。",
+        preferMultiphase: "优先推荐多相结果",
+        preferMultiphaseHelp: "先评估 2–3 相组合；只有没有可用多相组合时，才显示单相回退结果。",
         multiKnownPhaseElements: "已知相：精确元素",
+        multiKnownPhaseFormulas: "已知相：化学式（元素比例）",
+        multiKnownPhaseFormulasPlaceholder: "每行一个相，例如 TiO2\nSiO2",
+        multiKnownPhaseFormulasHelp: "AutoMix 候选池只使用与每个输入化学式元素比例相同的数据库条目。",
         multiKnownPhaseElementsPlaceholder: "每行一个相，例如 Na, Cl\nMn, O",
         multiKnownPhaseElementsHelp: "每一行均以元素集合完全一致的方式匹配本地数据库。每个有效结果都必须包含一个匹配相；多晶型仍由衍射证据排序。",
         multiKnownPhaseMpids: "已知相：MPID",
@@ -2321,6 +2349,7 @@
         multiPhaseRunning: "正在搜索相组合...",
         multiPhaseComplete: "AutoMix 完成：已排序 {count} 个组合。",
         multiPhaseContributionConstraint: "没有满足条件的 AutoMix 组合：至少一个指定 MPID 的相对衍射贡献低于要求的 3%。请增加检测峰数，或核对 MPID 与 XRD 图谱。",
+        multiPhaseFormulaConstraint: "没有满足所有输入化学式的多相组合。每行化学式都是硬约束，必须由一个非零贡献相表示；相同化学式的重复行要求不同结构条目。",
         multiPhaseEmpty: "AutoMix 未找到可用的相组合。请尝试清空或放宽元素范围、增加检测峰数，或适当增大峰位容差。",
         multiPhaseDisplayTitle: "AutoMix 全峰对比",
         multiPhaseDisplayNote: "点击任一组合，可将实验曲线与各相平移后的全部理论峰对比。主图理论棒的高度表示按物相相对衍射贡献缩放后的理论相对强度；下方轨道仅标记峰位。",
@@ -2341,6 +2370,8 @@
         multiPhaseUnexplained: "未解释",
         multiPhaseOverlap: "重叠",
         multiPhaseFallback: "AutoMix 组合搜索已回退至最佳单相推荐结果。",
+        multiPhaseFallbackFewCandidates: "AutoMix 返回单相：可用候选不足两个。请至少输入两行化学式、放宽元素范围，或增大候选池。",
+        multiPhaseFallbackNoFit: "AutoMix 返回单相：所有测试的多相组合中，至少有一个相被拟合为零贡献。请核对候选化学式，或增加用于拟合的峰数。",
         exportJson: "导出 JSON",
         exportCsv: "导出 CSV",
         matchingBusy: "正在计算...",
@@ -2978,6 +3009,10 @@
       return text.split(/[,，\s]+/).map((x) => x.trim()).filter(Boolean);
     }
 
+    function getFormula() {
+      return $("formula").value.trim() || null;
+    }
+
     async function runMatch() {
       if (!state.raw) {
         log(t("uploadFirst"), "error");
@@ -2991,6 +3026,7 @@
           intensity: state.raw.intensity,
           params: getParams(),
           elements: getElements(),
+          formula: getFormula(),
           element_filter_mode: $("filterMode").value,
           top_n: Math.round(num("topN"))
         };
@@ -3212,7 +3248,12 @@
       const data = state.multiphase;
       if (!data) return;
       const count = data.results?.length || 0;
-      const message = count ? (data.fallback_used ? t("multiPhaseFallback") : t("multiPhaseComplete", {count})) : (data.constraint_error === "required_contribution_below_minimum" ? t("multiPhaseContributionConstraint") : t("multiPhaseEmpty"));
+      const fallbackMessage = data.fallback_reason === "fewer_than_two_candidates"
+        ? t("multiPhaseFallbackFewCandidates")
+        : data.fallback_reason === "no_two_phase_fit"
+          ? t("multiPhaseFallbackNoFit")
+          : t("multiPhaseFallback");
+      const message = count ? (data.fallback_used ? fallbackMessage : t("multiPhaseComplete", {count})) : (data.constraint_error === "required_contribution_below_minimum" ? t("multiPhaseContributionConstraint") : data.constraint_error === "required_formula_combination_not_found" ? t("multiPhaseFormulaConstraint") : t("multiPhaseEmpty"));
       const known = Number(data.known_phase_constraints?.resolved_entry_count || 0);
       const knownNote = known ? `<br>${escapeHtml(t("multiKnownPhaseResolved", {entries: known}))}` : "";
       $("multiPhaseLog").innerHTML = `<span class="${count ? "ok-text" : "warn-text"}">${escapeHtml(message)}</span>${knownNote}<br>${escapeHtml(t("multiPhaseDisclaimer"))}`;
@@ -3232,6 +3273,8 @@
           two_theta: state.raw.two_theta, intensity: state.raw.intensity,
           params: {...getParams(), multiphase_n_peaks: Math.round(num("multiPeakCount"))},
           elements: getElements(), element_filter_mode: $("filterMode").value,
+          known_phase_formulas: $("multiKnownPhaseFormulas").value,
+          prefer_multiphase: $("preferMultiphase").checked,
           max_phases: Math.round(num("maxPhases")), candidate_pool: Math.round(num("multiCandidatePool")), top_n: 10,
           known_phase_elements: $("multiKnownPhaseElements").value,
           known_phase_mpids: $("multiKnownPhaseMpids").value

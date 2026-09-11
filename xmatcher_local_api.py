@@ -22,6 +22,7 @@ import numpy as np
 
 from XMatcher.calibration import calibrate_two_theta
 from XMatcher.database import DatabaseBuilder, normalize_database_package
+from XMatcher.formula import formula_ratio_key
 from XMatcher.matcher import XRDMatcher
 from XMatcher.multiphase_matcher import MultiPhaseMatcher
 from XMatcher.peak_detector import PeakDetector
@@ -159,6 +160,45 @@ def _parse_known_mpids(value) -> List[str]:
     return result
 
 
+def _parse_known_formulas(value) -> List[str]:
+    """Read one chemical formula per line (or semicolon-separated)."""
+    if value is None or value == "":
+        return []
+    raw = value if isinstance(value, list) else str(value).replace("\r", "").replace(";", "\n").split("\n")
+    formulas = []
+    for item in raw:
+        formula = str(item).strip()
+        if formula:
+            # Validate at input time so a typo never silently becomes a full search.
+            formula_ratio_key(formula)
+            formulas.append(formula)
+    return formulas
+
+
+def _resolve_formula_entries(database: Dict, formulas: Sequence[str]) -> Tuple[List[int], Dict]:
+    """Resolve formulas by reduced element ratio, not display-string equality."""
+    keys = {formula: formula_ratio_key(formula) for formula in formulas}
+    entry_ids: List[int] = []
+    counts = {formula: 0 for formula in formulas}
+    for entry_id, entry in normalize_database_package(database)["xrd_database"].items():
+        try:
+            entry_key = formula_ratio_key(entry.get("formula", ""))
+        except ValueError:
+            continue
+        for formula, target_key in keys.items():
+            if entry_key == target_key:
+                entry_ids.append(int(entry_id))
+                counts[formula] += 1
+    missing = [formula for formula, count in counts.items() if count == 0]
+    if missing:
+        raise ValueError(f"No local database entries match the element ratio of: {', '.join(missing)}")
+    return list(dict.fromkeys(entry_ids)), {
+        "formulas": list(formulas),
+        "formula_ratio_match_counts": counts,
+        "resolved_entry_count": len(set(entry_ids)),
+    }
+
+
 def _canonical_mpid(value) -> str:
     """Normalize an MPID independently of the database's legacy ``.cif`` suffix."""
     return str(value).strip().lower().removesuffix(".cif")
@@ -264,8 +304,10 @@ def _match(payload: Dict) -> Dict:
         elements = None
     element_filter_mode = str(payload.get("element_filter_mode", "contains"))
     top_n = int(payload.get("top_n", 10))
+    formula = str(payload.get("formula") or "").strip()
+    formula_entry_ids, formula_constraint = _resolve_formula_entries(database, [formula]) if formula else (None, None)
 
-    candidate_ids = matcher.filter_by_elements(database, elements, mode=element_filter_mode)
+    candidate_ids = formula_entry_ids if formula_entry_ids is not None else matcher.filter_by_elements(database, elements, mode=element_filter_mode)
     results = matcher.match_pattern(
         exp_positions,
         exp_intensities,
@@ -274,6 +316,7 @@ def _match(payload: Dict) -> Dict:
         top_n=top_n,
         element_filter_mode=element_filter_mode,
         two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
+        candidate_ids=formula_entry_ids,
     )
 
     warning_fraction = float(params.get("shift_warning_fraction", 0.60))
@@ -321,6 +364,7 @@ def _match(payload: Dict) -> Dict:
             "max_penalty_fraction": max_penalty_fraction,
         },
         "elements": elements,
+        "formula_constraint": formula_constraint,
         "element_filter_mode": element_filter_mode,
         "calibration": {"fixed_zero_shift": zero_shift, "specimen_displacement": specimen_displacement},
     }
@@ -417,8 +461,14 @@ def _multiphase_match(payload: Dict) -> Dict:
         elements = [item.strip() for item in elements.split(",") if item.strip()]
     element_filter_mode = str(payload.get("element_filter_mode", "contains"))
     known_element_sets = _parse_known_element_sets(payload.get("known_phase_elements"))
+    known_formulas = _parse_known_formulas(payload.get("known_phase_formulas"))
     known_mpids = _parse_known_mpids(payload.get("known_phase_mpids"))
     known_entry_ids, known_phase_constraints = _resolve_known_phase_entries(database, known_element_sets, known_mpids)
+    formula_entry_ids, formula_constraints = _resolve_formula_entries(database, known_formulas) if known_formulas else ([], {"formulas": [], "formula_ratio_match_counts": {}, "resolved_entry_count": 0})
+    known_entry_ids = list(dict.fromkeys(known_entry_ids + formula_entry_ids))
+    known_phase_constraints["formulas"] = formula_constraints["formulas"]
+    known_phase_constraints["formula_ratio_match_counts"] = formula_constraints["formula_ratio_match_counts"]
+    known_phase_constraints["resolved_entry_count"] = len(known_entry_ids)
     unmatched_sets = [name for name, count in known_phase_constraints["exact_element_match_counts"].items() if count == 0]
     if unmatched_sets:
         raise ValueError(f"No local database entries match the exact known phase element set(s): {', '.join(unmatched_sets)}")
@@ -433,6 +483,8 @@ def _multiphase_match(payload: Dict) -> Dict:
         required_element_sets=known_element_sets,
         minimum_required_contribution_percent=3.0,
         two_theta_range=(float(calibrated_two_theta[0]), float(calibrated_two_theta[-1])),
+        prefer_multiphase=bool(payload.get("prefer_multiphase", True)),
+        required_formula_keys=[formula_ratio_key(formula) for formula in known_formulas],
     )
     single_results = []
     # MultiPhaseMatcher already evaluates its one-phase baseline. Only perform

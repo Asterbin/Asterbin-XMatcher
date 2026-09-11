@@ -126,10 +126,15 @@ class XRDMatcher:
         element_filter_mode: str = "contains",
         include_zero_scores: bool = False,
         two_theta_range: Optional[Tuple[float, float]] = None,
+        candidate_ids: Optional[Sequence[int]] = None,
     ) -> List[Dict]:
         database = normalize_database_package(database)
         xrd_db = database["xrd_database"]
-        candidate_ids = self.filter_by_elements(database, elements, mode=element_filter_mode)
+        candidate_ids = (
+            [int(entry_id) for entry_id in candidate_ids if int(entry_id) in xrd_db]
+            if candidate_ids is not None
+            else self.filter_by_elements(database, elements, mode=element_filter_mode)
+        )
         exp_positions_arr = np.asarray(exp_positions, dtype=float)
         exp_intensities_arr = np.asarray(exp_intensities, dtype=float)
 

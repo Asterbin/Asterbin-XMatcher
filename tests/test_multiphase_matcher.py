@@ -1,5 +1,6 @@
 from XMatcher.matcher import XRDMatcher
 from XMatcher.multiphase_matcher import MultiPhaseMatcher
+from XMatcher.formula import formula_ratio_key
 
 
 def test_single_phase_matching_retains_valid_pairs_when_other_peaks_are_residuals():
@@ -31,6 +32,60 @@ def test_identifies_two_phase_mixture_and_relative_contributions():
     assert contributions["A"] > contributions["B"]
     assert best["peak_attribution"][0]["assigned_formula"] == "A"
     assert best["peak_attribution"][2]["assigned_formula"] == "B"
+
+
+def test_prefer_multiphase_excludes_single_phase_rows_when_a_mixture_is_available():
+    database = {
+        "xrd_database": {
+            1: {"formula": "A", "elements": ["A"], "peaks": {"positions": [20, 30], "intensities": [100, 50]}},
+            2: {"formula": "B", "elements": ["B"], "peaks": {"positions": [40, 50], "intensities": [100, 40]}},
+        }
+    }
+    matcher = XRDMatcher(position_tolerance=0.15, min_matched_peaks=1, max_shift=0)
+    result = MultiPhaseMatcher(matcher).match_pattern(
+        [20, 30, 40, 50], [80, 40, 20, 8], database,
+        max_phases=2, candidate_pool=2, prefer_multiphase=True,
+    )
+
+    assert result["results"]
+    assert all(len(item["phases"]) >= 2 for item in result["results"])
+    assert not result["fallback_used"]
+
+
+def test_formula_lines_are_hard_requirements_and_can_require_two_polymorphs():
+    database = {
+        "xrd_database": {
+            1: {"formula": "TiO2", "elements": ["Ti", "O"], "peaks": {"positions": [20], "intensities": [100]}},
+            2: {"formula": "TiO2", "elements": ["Ti", "O"], "peaks": {"positions": [40], "intensities": [100]}},
+        }
+    }
+    matcher = XRDMatcher(position_tolerance=0.15, min_matched_peaks=1, max_shift=0)
+    result = MultiPhaseMatcher(matcher).match_pattern(
+        [20, 40], [80, 20], database, max_phases=2, candidate_pool=2,
+        prefer_multiphase=True,
+        required_formula_keys=[formula_ratio_key("TiO2"), formula_ratio_key("TiO2")],
+    )
+
+    assert result["results"]
+    assert len(result["results"][0]["phases"]) == 2
+    assert all(phase["formula"] == "TiO2" for phase in result["results"][0]["phases"])
+
+
+def test_unsatisfied_formula_requirements_never_fall_back_to_single_phase():
+    database = {
+        "xrd_database": {
+            1: {"formula": "TiO2", "elements": ["Ti", "O"], "peaks": {"positions": [20], "intensities": [100]}},
+        }
+    }
+    matcher = XRDMatcher(position_tolerance=0.15, min_matched_peaks=1, max_shift=0)
+    result = MultiPhaseMatcher(matcher).match_pattern(
+        [20], [100], database, max_phases=2, candidate_pool=2,
+        required_formula_keys=[formula_ratio_key("TiO2"), formula_ratio_key("TiO2")],
+    )
+
+    assert result["results"] == []
+    assert not result["fallback_used"]
+    assert result["constraint_error"] == "required_formula_combination_not_found"
 
 
 def test_element_scope_allows_component_phases_with_element_subsets():

@@ -4,7 +4,8 @@ import zipfile
 import numpy as np
 import pytest
 
-from xmatcher_local_api import _calibration_adjustment, _calculate_cif_xrd, _detect_peaks, _parse_known_element_sets, _parse_known_mpids, _pdf_peaks_xlsx, _resolve_known_phase_entries
+from xmatcher_local_api import _calibration_adjustment, _calculate_cif_xrd, _detect_peaks, _parse_known_element_sets, _parse_known_formulas, _parse_known_mpids, _pdf_peaks_xlsx, _resolve_formula_entries, _resolve_known_phase_entries
+from XMatcher.formula import formula_ratio_key
 
 
 NACL_CIF = """data_NaCl
@@ -125,6 +126,25 @@ def test_known_phase_constraints_resolve_exact_elements_and_mpid():
     assert mpids == ["mp-nacl"]
     assert entry_ids == [1, 2]
     assert status["exact_element_match_counts"] == {"Cl,Na": 1, "Cl,Na,O": 1}
+
+
+def test_formula_ratio_constraint_resolves_only_matching_stoichiometry():
+    database = {
+        "xrd_database": {
+            1: {"formula": "Fe2O3", "peaks": {"positions": [], "intensities": []}},
+            2: {"formula": "Fe4O6", "peaks": {"positions": [], "intensities": []}},
+            3: {"formula": "FeO", "peaks": {"positions": [], "intensities": []}},
+        }
+    }
+    ids, status = _resolve_formula_entries(database, ["O3Fe2"])
+
+    assert formula_ratio_key("Ca(OH)2") == (("Ca", 1), ("H", 2), ("O", 2))
+    assert ids == [1, 2]
+    assert status["formula_ratio_match_counts"] == {"O3Fe2": 2}
+
+
+def test_empty_formula_values_create_no_formula_constraint():
+    assert _parse_known_formulas(None) == []
 
 
 def test_known_phase_constraints_resolve_mpid_when_database_stores_cif_suffix():
